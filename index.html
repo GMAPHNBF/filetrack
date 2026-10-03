@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HNB Finance - File Tracking System</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { font-family: 'Poppins', sans-serif; }
+  body { background: #f0f4f8; margin: 0; }
+  .auth-bg { min-height: 100vh; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #0d6efd 100%); display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; overflow: hidden; }
+  .auth-bg::before { content: ''; position: absolute; width: 500px; height: 500px; background: rgba(255,255,255,0.05); border-radius: 50%; top: -200px; right: -100px; }
+  .auth-bg::after { content: ''; position: absolute; width: 400px; height: 400px; background: rgba(255,255,255,0.05); border-radius: 50%; bottom: -150px; left: -100px; }
+  .auth-card { border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: none; background: #fff; position: relative; z-index: 1; width: 100%; max-width: 480px; padding: 40px; }
+  .brand-logo { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #0d6efd, #1e3c72); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+  .auth-subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 28px; }
+  .sidebar { width: 260px; min-height: 100vh; background: linear-gradient(180deg, #1e3c72 0%, #0d6efd 100%); color: #fff; padding: 24px 16px; position: fixed; left: 0; top: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.08); z-index: 100; transition: all .3s; }
+  .sidebar-logo { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; padding: 0 8px; margin-bottom: 4px; }
+  .sidebar-sub { font-size: 11px; color: rgba(255,255,255,0.6); padding: 0 8px; letter-spacing: 1px; }
+  .sidebar hr { border-color: rgba(255,255,255,0.15); margin: 20px 0; }
+  .sidebar a { color: rgba(255,255,255,0.85); text-decoration: none; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; margin-bottom: 6px; transition: all .25s; cursor: pointer; font-size: 14px; font-weight: 500; position: relative; }
+  .sidebar a:hover { background: rgba(255,255,255,0.12); color: #fff; transform: translateX(4px); }
+  .sidebar a.active { background: #fff; color: #0d6efd; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+  .sidebar a i { font-size: 18px; }
+  .sidebar a .nav-badge { background: #ef4444; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; margin-left: auto; }
+  .user-box { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-top: 16px; border: 1px solid rgba(255,255,255,0.15); }
+  .user-box .name { font-weight: 600; font-size: 14px; }
+  .user-box .role { font-size: 11px; color: rgba(255,255,255,0.7); }
+  .logout-btn { width: 100%; margin-top: 12px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 10px; font-weight: 500; transition: all .2s; }
+  .logout-btn:hover { background: #fff; color: #0d6efd; }
+  .main-content { margin-left: 260px; min-height: 100vh; }
+  .topbar { background: #fff; padding: 18px 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
+  .topbar h5 { font-weight: 600; color: #1e293b; margin: 0; font-size: 18px; }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .notif-btn { position: relative; background: #f0f4f8; border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #1e293b; cursor: pointer; transition: all .2s; }
+  .notif-btn:hover { background: #dbeafe; color: #0d6efd; }
+  .notif-btn .notif-count { position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; border-radius: 10px; padding: 0 5px; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  .topbar .user-info { display: flex; align-items: center; gap: 10px; background: #f0f4f8; padding: 8px 16px; border-radius: 50px; font-size: 14px; font-weight: 500; color: #1e293b; }
+  .content-area { padding: 32px; }
+  .card { border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: all .3s; }
+  .stat-card { padding: 24px; position: relative; overflow: hidden; }
+  .stat-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+  .stat-card .icon-box { width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; margin-bottom: 16px; }
+  .stat-card .stat-label { color: #64748b; font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .stat-card .stat-value { font-size: 32px; font-weight: 700; color: #1e293b; margin: 0; }
+  .bg-grad-blue { background: linear-gradient(135deg,#0d6efd,#4d8bff); }
+  .bg-grad-green { background: linear-gradient(135deg,#10b981,#34d399); }
+  .bg-grad-orange { background: linear-gradient(135deg,#f59e0b,#fbbf24); }
+  .bg-grad-purple { background: linear-gradient(135deg,#8b5cf6,#a78bfa); }
+  .bg-grad-red { background: linear-gradient(135deg,#ef4444,#f87171); }
+  .bg-grad-cyan { background: linear-gradient(135deg,#06b6d4,#22d3ee); }
+  .bg-grad-gray { background: linear-gradient(135deg,#64748b,#94a3b8); }
+  .table { margin-bottom: 0; }
+  .table thead th { background: #f8fafc; color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; border: none; padding: 14px 16px; }
+  .table tbody td { padding: 14px 16px; vertical-align: middle; border-color: #f1f5f9; font-size: 14px; }
+  .table tbody tr { transition: .15s; }
+  .table tbody tr:hover { background: #f8fafc; }
+  .table tbody tr.unread-row { background: #fff7ed; }
+  .table tbody tr.unread-row:hover { background: #ffedd5; }
+  .btn { border-radius: 10px; font-weight: 500; padding: 9px 18px; font-size: 14px; transition: all .2s; }
+  .btn-primary { background: linear-gradient(135deg,#0d6efd,#4d8bff); border: none; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(13,110,253,0.35); }
+  .btn-success { background: linear-gradient(135deg,#10b981,#34d399); border: none; }
+  .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16,185,129,0.35); }
+  .btn-warning { background: linear-gradient(135deg,#f59e0b,#fbbf24); border: none; color: #fff; }
+  .btn-danger { background: linear-gradient(135deg,#ef4444,#f87171); border: none; }
+  .btn-dark { background: linear-gradient(135deg,#1e293b,#334155); border: none; }
+  .btn-info { background: linear-gradient(135deg,#06b6d4,#22d3ee); border: none; color:#fff; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+  .form-control, .form-select { border-radius: 10px; border: 1.5px solid #e2e8f0; padding: 11px 16px; font-size: 14px; transition: all .2s; }
+  .form-control:focus, .form-select:focus { border-color: #0d6efd; box-shadow: 0 0 0 4px rgba(13,110,253,0.1); }
+  .form-label { font-weight: 500; color: #334155; font-size: 13px; margin-bottom: 6px; }
+  .badge { padding: 6px 12px; border-radius: 8px; font-weight: 500; font-size: 12px; }
+  .hidden { display: none !important; }
+  .page-title { display: flex; align-items: center; gap: 12px; font-weight: 600; color: #1e293b; margin-bottom: 24px; font-size: 22px; }
+  .page-title .icon-circle { width: 46px; height: 46px; border-radius: 12px; background: linear-gradient(135deg,#0d6efd,#4d8bff); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .toast-notify { position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 16px 24px; border-radius: 12px; color: #fff; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: slideIn .3s ease; max-width: 380px; }
+  @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+  .empty-state i { font-size: 64px; opacity: 0.3; margin-bottom: 16px; }
+  .empty-state p { margin: 0; font-size: 15px; }
+  .timeline { position: relative; padding-left: 30px; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e2e8f0; }
+  .timeline-item { position: relative; padding-bottom: 20px; }
+  .timeline-item::before { content: ''; position: absolute; left: -30px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: #0d6efd; border: 3px solid #fff; box-shadow: 0 0 0 2px #0d6efd; }
+  .timeline-item .tl-time { font-size: 12px; color: #94a3b8; }
+  .timeline-item .tl-title { font-weight: 600; color: #1e293b; font-size: 14px; }
+  .timeline-item .tl-desc { font-size: 13px; color: #475569; }
+  .send-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .send-type-card { border: 2px solid #e2e8f0; border-radius: 14px; padding: 16px; cursor: pointer; transition: all .25s; text-align: center; background: #fff; }
+  .send-type-card:hover { border-color: #0d6efd; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(13,110,253,0.15); }
+  .send-type-card.selected { border-color: #0d6efd; background: linear-gradient(135deg, #eef4ff, #dbeafe); box-shadow: 0 8px 20px rgba(13,110,253,0.2); }
+  .send-type-card i { font-size: 32px; color: #0d6efd; margin-bottom: 8px; display: block; }
+  .send-type-card .type-title { font-weight: 600; color: #1e293b; font-size: 14px; margin-bottom: 2px; }
+  .send-type-card .type-desc { font-size: 11px; color: #64748b; }
+  .pay-badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; }
+  .pay-badge.interducer { background: #dbeafe; color: #1e40af; }
+  .pay-badge.supply { background: #d1fae5; color: #065f46; }
+  .pay-badge.rmv { background: #cffafe; color: #155e75; }
+  .send-indicator { padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+  .send-indicator.file { background: #dbeafe; color: #1e40af; }
+  .send-indicator.manualDO { background: #fef3c7; color: #92400e; }
+  .send-indicator.both { background: #e0e7ff; color: #3730a3; }
+  .send-indicator.other { background: #f1f5f9; color: #475569; }
+  .notif-dropdown { position: absolute; top: 70px; right: 20px; width: 380px; max-height: 500px; background: #fff; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); z-index: 200; overflow: hidden; animation: fadeDown .2s ease; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  .notif-dropdown .notif-header { padding: 16px 20px; background: linear-gradient(135deg,#0d6efd,#4d8bff); color: #fff; display: flex; justify-content: space-between; align-items: center; }
+  .notif-dropdown .notif-header h6 { margin: 0; font-weight: 600; font-size: 15px; }
+  .notif-dropdown .notif-body { max-height: 400px; overflow-y: auto; }
+  .notif-item { padding: 14px 20px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: .15s; display: flex; gap: 12px; align-items: flex-start; }
+  .notif-item:hover { background: #f8fafc; }
+  .notif-item.unread { background: #fff7ed; }
+  .notif-item.unread:hover { background: #ffedd5; }
+  .notif-item .notif-icon { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg,#0d6efd,#4d8bff); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .notif-item .notif-content { flex: 1; }
+  .notif-item .notif-title { font-weight: 600; font-size: 14px; color: #1e293b; margin-bottom: 2px; }
+  .notif-item .notif-desc { font-size: 12px; color: #64748b; line-height: 1.4; }
+  .notif-item .notif-time { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+  .notif-empty { padding: 40px 20px; text-align: center; color: #94a3b8; }
+  .notif-empty i { font-size: 48px; opacity: 0.3; display: block; margin-bottom: 12px; }
+  .alert-banner { background: linear-gradient(135deg, #fef3c7, #fde68a); border-left: 5px solid #f59e0b; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 12px rgba(245,158,11,0.15); animation: slideDown .4s ease; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  .alert-banner .alert-icon { font-size: 28px; color: #d97706; }
+  .alert-banner .alert-content { flex: 1; }
+  .alert-banner .alert-title { font-weight: 600; color: #92400e; font-size: 15px; }
+  .alert-banner .alert-desc { color: #78350f; font-size: 13px; }
+  .no-manager-warning { background: linear-gradient(135deg, #fee2e2, #fecaca); border-left: 5px solid #ef4444; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 14px; }
+  .no-manager-warning i { font-size: 26px; color: #dc2626; flex-shrink: 0; }
+  .no-manager-warning .warning-title { font-weight: 600; color: #7f1d1d; font-size: 14px; margin-bottom: 4px; }
+  .no-manager-warning .warning-desc { color: #991b1b; font-size: 12px; line-height: 1.5; }
+  .no-permission-box { background: linear-gradient(135deg, #fee2e2, #fecaca); border-left: 5px solid #ef4444; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 16px; }
+  .no-permission-box i { font-size: 42px; color: #dc2626; }
+  .no-permission-box .np-title { font-weight: 700; color: #7f1d1d; font-size: 16px; margin-bottom: 4px; }
+  .no-permission-box .np-desc { color: #991b1b; font-size: 13px; line-height: 1.5; }
+  .pay-status { padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+  .pay-status.pending { background: #fef3c7; color: #92400e; }
+  .pay-status.paid { background: #d1fae5; color: #065f46; }
+  .pay-status.rejected { background: #fee2e2; color: #991b1b; }
+  .pay-status.not-required { background: #f1f5f9; color: #475569; }
+  .pay-card { border: 2px solid #e2e8f0; border-radius: 14px; padding: 18px; transition: all .25s; background: #fff; height: 100%; }
+  .pay-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .pay-card.pending { border-left: 5px solid #f59e0b; }
+  .pay-card.paid { border-left: 5px solid #10b981; }
+  .pay-card.rejected { border-left: 5px solid #ef4444; }
+  .pay-card.not-required { border-left: 5px solid #94a3b8; }
+  .pay-card .pc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .pay-card .pc-type { font-weight: 700; font-size: 15px; color: #1e293b; }
+  .pay-card .pc-info { font-size: 12px; color: #64748b; line-height: 1.6; }
+  .pay-card .pc-info b { color: #334155; }
+  .pay-card .pc-actions { margin-top: 12px; display: flex; gap: 6px; }
+  .pay-card .pc-actions .btn { padding: 6px 12px; font-size: 12px; }
+  .pay-add-toggle { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #f8fafc; border-radius: 10px; margin-bottom: 10px; cursor: pointer; border: 2px solid #e2e8f0; transition: all .2s; }
+  .pay-add-toggle:hover { border-color: #0d6efd; }
+  .pay-add-toggle.active { background: #ecfdf5; border-color: #10b981; }
+  .pay-add-toggle input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: #10b981; }
+  .pay-add-toggle .pat-label { font-weight: 600; font-size: 14px; color: #1e293b; flex: 1; }
+  .pay-add-toggle .pat-label small { display: block; font-size: 11px; color: #64748b; font-weight: 400; }
+  .pay-inputs { background: #ecfdf5; border-radius: 12px; padding: 14px; margin-bottom: 12px; border: 1.5px solid #a7f3d0; display: none; }
+  .pay-inputs.show { display: block; }
+  .pm-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .pm-action-card { border: 2px solid #e2e8f0; border-radius: 14px; padding: 14px 10px; cursor: pointer; transition: all .25s; text-align: center; background: #fff; }
+  .pm-action-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+  .pm-action-card.selected { border-color: #0d6efd; background: linear-gradient(135deg, #eef4ff, #dbeafe); box-shadow: 0 8px 20px rgba(13,110,253,0.2); }
+  .pm-action-card i { font-size: 26px; margin-bottom: 6px; display: block; }
+  .pm-action-card .pm-title { font-weight: 600; color: #1e293b; font-size: 13px; margin-bottom: 2px; }
+  .pm-action-card .pm-desc { font-size: 10px; color: #64748b; }
+  .pm-action-card.paid i { color: #10b981; }
+  .pm-action-card.rejected i { color: #ef4444; }
+  .pm-action-card.pending i { color: #f59e0b; }
+  .pm-action-card.not-required i { color: #64748b; }
+  .report-pay-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; margin: 2px 2px 2px 0; }
+  .report-pay-chip.paid { background: #d1fae5; color: #065f46; }
+  .report-pay-chip.rejected { background: #fee2e2; color: #991b1b; }
+  .report-pay-chip.pending { background: #fef3c7; color: #92400e; }
+  .report-pay-chip.not-required { background: #f1f5f9; color: #475569; }
+  @media (max-width: 768px) {
+    .sidebar { width: 70px; padding: 20px 8px; }
+    .sidebar a span, .sidebar-logo span, .sidebar-sub, .user-box, .logout-btn span { display: none; }
+    .sidebar a { justify-content: center; padding: 12px; }
+    .main-content { margin-left: 70px; }
+    .content-area { padding: 16px; }
+    .send-type-grid { grid-template-columns: 1fr; }
+    .notif-dropdown { width: calc(100% - 40px); right: 20px; left: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="authScreen" class="auth-bg">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <div class="brand-logo"><i class="bi bi-shield-lock-fill"></i> HNB Finance</div>
+      <div class="auth-subtitle">File Tracking System</div>
+    </div>
+    <div id="loginForm">
+      <h5 class="mb-3 fw-semibold"><i class="bi bi-box-arrow-in-right text-primary"></i> Welcome Back</h5>
+      <p class="text-muted small mb-4">Sign in to continue</p>
+      <div class="mb-3"><label class="form-label">Email Address</label><input type="email" id="loginEmail" class="form-control" placeholder="you@hnb.lk"></div>
+      <div class="mb-4"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-control" placeholder="••••••••"></div>
+      <button class="btn btn-primary w-100 mb-3" onclick="doLogin()"><i class="bi bi-box-arrow-in-right"></i> Sign In</button>
+      <div class="text-center text-muted small">Don't have an account? <a href="#" onclick="showRegister(); return false;" class="text-primary fw-semibold text-decoration-none">Create one</a></div>
+    </div>
+    <div id="registerForm" class="hidden">
+      <h5 class="mb-3 fw-semibold"><i class="bi bi-person-plus-fill text-primary"></i> Create Account</h5>
+      <p class="text-muted small mb-4">Fill the details to register</p>
+      <div class="mb-2"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-control" placeholder="John Doe"></div>
+      <div class="mb-2"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-control" placeholder="you@hnb.lk"></div>
+      <div class="mb-2"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-control" placeholder="••••••••"></div>
+      <div class="mb-2"><label class="form-label">Designation</label>
+        <select id="regDesignation" class="form-select">
+          <option value="">-- Select --</option>
+          <option>Marketing Officer</option>
+          <option>Back Office</option>
+          <option>Back Office Incharge</option>
+          <option>Branch Manager</option>
+          <option>Head Office</option>
+        </select>
+      </div>
+      <div class="mb-3"><label class="form-label">Branch</label><input type="text" id="regBranch" class="form-control" placeholder="e.g. Colombo" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
+      <button class="btn btn-primary w-100 mb-3" onclick="doRegister()"><i class="bi bi-check-circle"></i> Register</button>
+      <div class="text-center text-muted small">Already have an account? <a href="#" onclick="showLogin(); return false;" class="text-primary fw-semibold text-decoration-none">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<div id="appScreen" class="hidden">
+  <div class="sidebar">
+    <div class="sidebar-logo"><i class="bi bi-shield-lock-fill"></i> <span>HNB Finance</span></div>
+    <div class="sidebar-sub">FILE TRACKING</div>
+    <hr>
+    <a onclick="showPage('dashboard')" id="nav-dashboard" class="active"><i class="bi bi-speedometer2"></i> <span>Dashboard</span> <span class="nav-badge hidden" id="dashBadge">0</span></a>
+    <a onclick="showPage('create')" id="nav-create"><i class="bi bi-file-earmark-plus"></i> <span>Create File</span></a>
+    <a onclick="showPage('search')" id="nav-search"><i class="bi bi-search"></i> <span>Search File</span></a>
+    <a onclick="showPage('payments')" id="nav-payments"><i class="bi bi-cash-coin"></i> <span>Pending Payments</span> <span class="nav-badge hidden" id="payBadge">0</span></a>
+    <a onclick="showPage('report')" id="nav-report"><i class="bi bi-file-earmark-excel"></i> <span>Reports</span></a>
+    <a onclick="showPage('logs')" id="nav-logs"><i class="bi bi-journal-text"></i> <span>Activity Logs</span></a>
+    <a onclick="showPage('users')" id="nav-users"><i class="bi bi-people"></i> <span>Users</span></a>
+    <div class="user-box">
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <i class="bi bi-person-circle fs-4"></i>
+        <div><div class="name" id="sideUserName">-</div><div class="role" id="sideUserDesig">-</div></div>
+      </div>
+      <div class="role"><i class="bi bi-geo-alt"></i> <span id="sideUserBranch">-</span></div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()"><i class="bi bi-box-arrow-right"></i> <span>Logout</span></button>
+  </div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <h5><i class="bi bi-folder2-open text-primary"></i> File Tracking System</h5>
+      <div class="topbar-right">
+        <button class="notif-btn" onclick="toggleNotif()"><i class="bi bi-bell-fill"></i><span class="notif-count hidden" id="notifCount">0</span></button>
+        <div class="user-info"><i class="bi bi-person-circle text-primary"></i> <span id="topUserName">-</span></div>
+      </div>
+    </div>
+
+    <div class="notif-dropdown hidden" id="notifDropdown">
+      <div class="notif-header">
+        <h6><i class="bi bi-bell-fill"></i> Notifications</h6>
+        <button class="btn btn-sm btn-light" onclick="markAllRead()" style="padding:4px 10px;font-size:12px;">Mark all read</button>
+      </div>
+      <div class="notif-body" id="notifBody"></div>
+    </div>
+
+    <div class="content-area">
+
+      <div id="page-dashboard">
+        <div class="page-title"><div class="icon-circle"><i class="bi bi-speedometer2"></i></div> Dashboard Overview</div>
+        <div id="pendingAlert"></div>
+        <div class="row g-3 mb-4">
+          <div class="col-md-3 col-sm-6"><div class="card stat-card"><div class="icon-box bg-grad-blue"><i class="bi bi-files"></i></div><div class="stat-label">TOTAL FILES</div><div class="stat-value" id="statTotal">0</div></div></div>
+          <div class="col-md-3 col-sm-6"><div class="card stat-card"><div class="icon-box bg-grad-red"><i class="bi bi-bell-fill"></i></div><div class="stat-label">PENDING (UNREAD)</div><div class="stat-value" id="statPending">0</div></div></div>
+          <div class="col-md-3 col-sm-6"><div class="card stat-card"><div class="icon-box bg-grad-orange"><i class="bi bi-hourglass-split"></i></div><div class="stat-label">IN PROGRESS</div><div class="stat-value" id="statProgress">0</div></div></div>
+          <div class="col-md-3 col-sm-6"><div class="card stat-card"><div class="icon-box bg-grad-purple"><i class="bi bi-check2-circle"></i></div><div class="stat-label">COMPLETED</div><div class="stat-value" id="statCompleted">0</div></div></div>
+        </div>
+
+        <div class="card p-3 mb-4 hidden" id="pendingCard">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-semibold m-0"><i class="bi bi-inbox-fill text-warning"></i> Files Waiting for You <span class="badge bg-danger ms-2" id="pendingCountBadge">0</span></h6>
+            <button class="btn btn-sm btn-outline-secondary" onclick="markAllRead(); loadDashboard();"><i class="bi bi-check2-all"></i> Mark All as Seen</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead><tr><th>AP NO</th><th>CUSTOMER</th><th>FROM</th><th>RECEIVED</th><th>ACTION</th></tr></thead>
+              <tbody id="pendingBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card p-3">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-semibold m-0"><i class="bi bi-clock-history text-primary"></i> Recent Files</h6>
+            <button class="btn btn-sm btn-primary" onclick="showPage('create')"><i class="bi bi-plus-lg"></i> New File</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead><tr><th>AP NO</th><th>NIC</th><th>CUSTOMER</th><th>AMOUNT</th><th>PAYMENTS</th><th>BRANCH</th><th>STATUS</th><th>ACTION</th></tr></thead>
+              <tbody id="recentFilesBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="page-create" class="hidden">
+        <div class="page-title"><div class="icon-circle"><i class="bi bi-file-earmark-plus"></i></div> Create New File</div>
+        <div class="card p-4" style="max-width: 1000px;">
+          <h6 class="fw-semibold mb-3"><i class="bi bi-info-circle text-primary"></i> File Information</h6>
+          <div class="row g-3 mb-4">
+            <div class="col-md-4"><label class="form-label">AP No <span class="text-danger">*</span></label><input type="text" id="cApNo" class="form-control" placeholder="e.g. AP001" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
+            <div class="col-md-4"><label class="form-label">NIC <span class="text-danger">*</span></label><input type="text" id="cNic" class="form-control" placeholder="e.g. 123456789V" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
+            <div class="col-md-4"><label class="form-label">Customer Name</label><input type="text" id="cCustomer" class="form-control" placeholder="Full name"></div>
+            <div class="col-md-4"><label class="form-label">Facility Amount (Rs.) <span class="text-danger">*</span></label><input type="number" step="0.01" id="cAmount" class="form-control" placeholder="0.00"></div>
+            <div class="col-md-4"><label class="form-label">Branch <span class="text-danger">*</span></label><input type="text" id="cBranch" class="form-control" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
+            <div class="col-md-4"><label class="form-label">Manual DO No (Optional)</label><input type="text" id="cManualDO" class="form-control" placeholder="e.g. DO-2024-001" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
+          </div>
+
+          <hr>
+          <h6 class="fw-semibold mb-1"><i class="bi bi-cash-coin text-success"></i> Add Payments (Optional)</h6>
+          <p class="text-muted small mb-3">Tick කරලා amount දාන payments <b>Paid</b> විදියට save වෙනවා. Tick නොකරපු ඒවා <b>Pending</b> විදියට තියෙනවා (පස්සේ update කරන්න පුළුවන්).</p>
+
+          <label class="pay-add-toggle" id="payToggle-Interducer">
+            <input type="checkbox" id="payCheck-Interducer" onchange="togglePayInput('Interducer')">
+            <div class="pat-label">
+              <span class="pay-badge interducer">Interducer</span>
+              <small>Add Interducer payment now (tick = Paid, no tick = Pending)</small>
+            </div>
+          </label>
+          <div class="pay-inputs" id="payInputs-Interducer">
+            <div class="row g-2">
+              <div class="col-md-6"><label class="form-label small">Amount (Rs.) <span class="text-danger">*</span></label><input type="number" step="0.01" id="payAmount-Interducer" class="form-control" placeholder="0.00"></div>
+              <div class="col-md-6"><label class="form-label small">Remarks</label><input type="text" id="payRemarks-Interducer" class="form-control" placeholder="e.g. Paid via cheque"></div>
+            </div>
+          </div>
+
+          <label class="pay-add-toggle" id="payToggle-Supply">
+            <input type="checkbox" id="payCheck-Supply" onchange="togglePayInput('Supply')">
+            <div class="pat-label">
+              <span class="pay-badge supply">Supply</span>
+              <small>Add Supply payment now</small>
+            </div>
+          </label>
+          <div class="pay-inputs" id="payInputs-Supply">
+            <div class="row g-2">
+              <div class="col-md-6"><label class="form-label small">Amount (Rs.) <span class="text-danger">*</span></label><input type="number" step="0.01" id="payAmount-Supply" class="form-control" placeholder="0.00"></div>
+              <div class="col-md-6"><label class="form-label small">Remarks</label><input type="text" id="payRemarks-Supply" class="form-control" placeholder="e.g. Paid via cheque"></div>
+            </div>
+          </div>
+
+          <label class="pay-add-toggle" id="payToggle-RMV">
+            <input type="checkbox" id="payCheck-RMV" onchange="togglePayInput('RMV')">
+            <div class="pat-label">
+              <span class="pay-badge rmv">RMV</span>
+              <small>Add RMV payment now</small>
+            </div>
+          </label>
+          <div class="pay-inputs" id="payInputs-RMV">
+            <div class="row g-2">
+              <div class="col-md-6"><label class="form-label small">Amount (Rs.) <span class="text-danger">*</span></label><input type="number" step="0.01" id="payAmount-RMV" class="form-control" placeholder="0.00"></div>
+              <div class="col-md-6"><label class="form-label small">Remarks</label><input type="text" id="payRemarks-RMV" class="form-control" placeholder="e.g. Paid via cheque"></div>
+            </div>
+          </div>
+
+          <div class="alert alert-info py-2 small mt-3"><i class="bi bi-info-circle"></i> After creating, you can send the file to the Branch Manager. Pending payments can be updated later.</div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" onclick="createFile()"><i class="bi bi-save"></i> Submit File</button>
+            <button class="btn btn-outline-secondary" onclick="clearCreateForm()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="page-search" class="hidden">
+        <div class="page-title"><div class="icon-circle"><i class="bi bi-search"></i></div> Search Files</div>
+        <div class="card p-3 mb-3">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-8"><input type="text" id="searchInput" class="form-control" placeholder="Search by AP No, NIC, Customer name, or DO No..." oninput="doSearch()"></div>
+            <div class="col-md-4 d-flex gap-2">
+              <button class="btn btn-primary flex-fill" onclick="doSearch()"><i class="bi bi-search"></i> Search</button>
+              <button class="btn btn-outline-secondary" onclick="clearSearch()"><i class="bi bi-x-lg"></i></button>
+            </div>
+          </div>
+        </div>
+        <div id="searchResults"></div>
+      </div>
+
+      <div id="page-payments" class="hidden">
+        <div class="page-title"><div class="icon-circle" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);"><i class="bi bi-cash-coin"></i></div> Pending Payments</div>
+        <div id="pendingPaymentsContent"></div>
+      </div>
+
+      <div id="page-report" class="hidden">
+        <div class="page-title"><div class="icon-circle" style="background:linear-gradient(135deg,#10b981,#34d399);"><i class="bi bi-file-earmark-excel"></i></div> Reports & Export</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="card p-4">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="icon-box bg-grad-green" style="width:50px;height:50px;font-size:22px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;"><i class="bi bi-file-earmark-excel"></i></div>
+                <div><h6 class="m-0 fw-semibold">Files Report</h6><small class="text-muted">All files with payments summary</small></div>
+              </div>
+              <button class="btn btn-success w-100" onclick="downloadExcel()"><i class="bi bi-download"></i> Download CSV</button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card p-4">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="icon-box bg-grad-cyan" style="width:50px;height:50px;font-size:22px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;"><i class="bi bi-cash-stack"></i></div>
+                <div><h6 class="m-0 fw-semibold">Payments Report</h6><small class="text-muted">All payments with status & time</small></div>
+              </div>
+              <button class="btn btn-info w-100" onclick="downloadPaymentsExcel()"><i class="bi bi-download"></i> Download CSV</button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card p-4">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="icon-box bg-grad-blue" style="width:50px;height:50px;font-size:22px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;"><i class="bi bi-journal-text"></i></div>
+                <div><h6 class="m-0 fw-semibold">Activity Logs</h6><small class="text-muted">Full history of file movements</small></div>
+              </div>
+              <button class="btn btn-primary w-100" onclick="downloadLogsExcel()"><i class="bi bi-download"></i> Download CSV</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-3 mt-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-semibold m-0"><i class="bi bi-table text-primary"></i> Payment Report Preview (Live)</h6>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr><th>AP NO</th><th>Customer</th><th>Interducer</th><th>Supply</th><th>RMV</th></tr>
+              </thead>
+              <tbody id="reportPaymentsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="page-logs" class="hidden">
+        <div class="page-title"><div class="icon-circle"><i class="bi bi-journal-text"></i></div> Activity Logs</div>
+        <div class="card p-3">
+          <div class="table-responsive">
+            <table class="table">
+              <thead><tr><th>DATE & TIME</th><th>AP NO</th><th>USER</th><th>DESIGNATION</th><th>ACTION</th><th>LOCATION</th><th>DETAILS</th></tr></thead>
+              <tbody id="logsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="page-users" class="hidden">
+        <div class="page-title"><div class="icon-circle"><i class="bi bi-people"></i></div> All Users</div>
+        <div class="card p-3">
+          <div class="table-responsive">
+            <table class="table">
+              <thead><tr><th>NAME</th><th>EMAIL</th><th>DESIGNATION</th><th>BRANCH</th></tr></thead>
+              <tbody id="usersBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="page-view" class="hidden">
+        <div id="viewContent"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="sendToBMModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;border:none;">
+      <div class="modal-header" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#fff;border-radius:20px 20px 0 0;border:none;">
+        <h5 class="modal-title"><i class="bi bi-send-fill"></i> Send to Branch Manager</h5>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="stFileId">
+        <div class="text-center mb-4">
+          <div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#10b981,#34d399);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:12px;">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <h5 class="mb-1 fw-semibold">File Created Successfully!</h5>
+          <p class="text-muted small mb-0">AP No: <b id="stApNo">-</b></p>
+        </div>
+        <div id="noManagerWarning"></div>
+        <div class="mb-3">
+          <label class="form-label">Select Branch Manager <span class="text-danger">*</span></label>
+          <select id="stBranchManager" class="form-select"><option value="">-- Select Branch Manager --</option></select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">What are you sending? <span class="text-danger">*</span></label>
+          <div class="send-type-grid" id="bmSendTypeGrid">
+            <div class="send-type-card" data-type="file" onclick="selectBMSendType('file')"><i class="bi bi-folder-fill"></i><div class="type-title">File Only</div><div class="type-desc">Physical file</div></div>
+            <div class="send-type-card" data-type="manualDO" onclick="selectBMSendType('manualDO')"><i class="bi bi-file-earmark-text-fill"></i><div class="type-title">Manual DO</div><div class="type-desc">DO document</div></div>
+            <div class="send-type-card" data-type="both" onclick="selectBMSendType('both')"><i class="bi bi-collection-fill"></i><div class="type-title">File + Manual DO</div><div class="type-desc">Both together</div></div>
+            <div class="send-type-card" data-type="other" onclick="selectBMSendType('other')"><i class="bi bi-three-dots"></i><div class="type-title">Other</div><div class="type-desc">Other document</div></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Remarks / Note</label>
+          <textarea id="stRemarks" class="form-control" rows="2" placeholder="e.g. For approval..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0 d-flex justify-content-between">
+        <button class="btn btn-outline-secondary" onclick="skipSend()">Skip for Now</button>
+        <button class="btn btn-warning" onclick="confirmSendToBM()" style="color:#fff;"><i class="bi bi-send"></i> Send to Branch Manager</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="handoverModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;border:none;">
+      <div class="modal-header" style="background:linear-gradient(135deg,#0d6efd,#4d8bff);color:#fff;border-radius:20px 20px 0 0;border:none;">
+        <h5 class="modal-title"><i class="bi bi-send-fill"></i> Handover File</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="hoFileId">
+        <div class="mb-3">
+          <label class="form-label">Hand Over To <span class="text-danger">*</span></label>
+          <select id="hoUser" class="form-select"><option value="">-- Select User --</option></select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">What are you sending? <span class="text-danger">*</span></label>
+          <div class="send-type-grid" id="hoSendTypeGrid">
+            <div class="send-type-card" data-type="file" onclick="selectHOSendType('file')"><i class="bi bi-folder-fill"></i><div class="type-title">File Only</div><div class="type-desc">Physical file</div></div>
+            <div class="send-type-card" data-type="manualDO" onclick="selectHOSendType('manualDO')"><i class="bi bi-file-earmark-text-fill"></i><div class="type-title">Manual DO</div><div class="type-desc">DO document</div></div>
+            <div class="send-type-card" data-type="both" onclick="selectHOSendType('both')"><i class="bi bi-collection-fill"></i><div class="type-title">File + Manual DO</div><div class="type-desc">Both together</div></div>
+            <div class="send-type-card" data-type="other" onclick="selectHOSendType('other')"><i class="bi bi-three-dots"></i><div class="type-title">Other</div><div class="type-desc">Other document</div></div>
+          </div>
+        </div>
+        <div class="mb-3 hidden" id="manualDOGroup">
+          <label class="form-label">Manual DO Number</label>
+          <input type="text" id="hoManualDO" class="form-control" placeholder="e.g. DO-2024-001" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Remarks / Note</label>
+          <textarea id="hoRemarks" class="form-control" rows="3" placeholder="e.g. For approval..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmHandover()"><i class="bi bi-check-circle"></i> Confirm Handover</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="paymentModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;border:none;">
+      <div class="modal-header" style="background:linear-gradient(135deg,#10b981,#34d399);color:#fff;border-radius:20px 20px 0 0;border:none;">
+        <h5 class="modal-title"><i class="bi bi-cash-coin"></i> Update Payment</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="pmFileId">
+        <input type="hidden" id="pmPayType">
+        <div class="text-center mb-3">
+          <div id="pmTypeBadge"></div>
+          <p class="mb-0 mt-2"><b>AP No: <span id="pmApNo">-</span></b></p>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Update Status To: <span class="text-danger">*</span></label>
+          <div class="pm-action-grid" id="pmActionGrid">
+            <div class="pm-action-card paid" data-action="paid" onclick="selectPMAction('paid')">
+              <i class="bi bi-check-circle-fill"></i>
+              <div class="pm-title">Paid</div>
+              <div class="pm-desc">Payment received</div>
+            </div>
+            <div class="pm-action-card rejected" data-action="rejected" onclick="selectPMAction('rejected')">
+              <i class="bi bi-x-circle-fill"></i>
+              <div class="pm-title">Rejected</div>
+              <div class="pm-desc">Payment rejected</div>
+            </div>
+            <div class="pm-action-card pending" data-action="pending" onclick="selectPMAction('pending')">
+              <i class="bi bi-clock-fill"></i>
+              <div class="pm-title">Pending</div>
+              <div class="pm-desc">Still waiting</div>
+            </div>
+            <div class="pm-action-card not-required" data-action="not-required" onclick="selectPMAction('not-required')">
+              <i class="bi bi-slash-circle-fill"></i>
+              <div class="pm-title">Not Required</div>
+              <div class="pm-desc">No payment needed</div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3" id="pmAmountGroup">
+          <label class="form-label">Amount (Rs.)</label>
+          <input type="number" step="0.01" id="pmAmount" class="form-control" placeholder="0.00">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Remarks / Note</label>
+          <textarea id="pmRemarks" class="form-control" rows="2" placeholder="e.g. Paid via cheque #12345 / Customer rejected..."></textarea>
+        </div>
+        <div class="alert alert-info mb-0 py-2 small"><i class="bi bi-info-circle"></i> Status will be recorded with your name and current time.</div>
+      </div>
+      <div class="modal-footer border-0">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-success" onclick="confirmPayment()"><i class="bi bi-check-circle"></i> Save Payment Status</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+/* ============================================================
+   HNB FINANCE FILE TRACKING - v16.0
+   Payments: Create = Paid if ticked, else Pending
+   ============================================================ */
+
+const DEBUG = true;
+function log(...args) { if (DEBUG) console.log('[HNB]', ...args); }
+
+const STORAGE_KEYS = {
+  users: 'hnb_users_v16',
+  files: 'hnb_files_v16',
+  logs: 'hnb_logs_v16',
+  payments: 'hnb_payments_v16',
+  notifications: 'hnb_notifications_v16',
+  current: 'hnb_current_v16'
+};
+
+const PAYMENT_TYPES = ['Interducer', 'Supply', 'RMV'];
+const PAYMENT_STATUS_LABELS = {
+  'pending': { label: 'Pending', icon: 'clock-fill', class: 'pending' },
+  'paid': { label: 'Paid', icon: 'check-circle-fill', class: 'paid' },
+  'rejected': { label: 'Rejected', icon: 'x-circle-fill', class: 'rejected' },
+  'not-required': { label: 'Not Required', icon: 'slash-circle-fill', class: 'not-required' }
+};
+
+let DB = { users: [], files: [], logs: [], payments: [], notifications: [] };
+let currentUser = null;
+let nextFileId = 1, nextLogId = 1, nextPayId = 1, nextUserId = 1, nextNotifId = 1;
+let selectedBMSendType = null, selectedHOSendType = null, selectedPMAction = null;
+let sendToBMModalInstance = null, handoverModalInstance = null, paymentModalInstance = null;
+
+function loadFromStorage() {
+  try {
+    DB.users = JSON.parse(localStorage.getItem(STORAGE_KEYS.users)) || [];
+    DB.files = JSON.parse(localStorage.getItem(STORAGE_KEYS.files)) || [];
+    DB.logs = JSON.parse(localStorage.getItem(STORAGE_KEYS.logs)) || [];
+    DB.payments = JSON.parse(localStorage.getItem(STORAGE_KEYS.payments)) || [];
+    DB.notifications = JSON.parse(localStorage.getItem(STORAGE_KEYS.notifications)) || [];
+    recalculateIds();
+  } catch (e) { console.error('[HNB] Load error:', e); }
+}
+function saveToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(DB.users));
+    localStorage.setItem(STORAGE_KEYS.files, JSON.stringify(DB.files));
+    localStorage.setItem(STORAGE_KEYS.logs, JSON.stringify(DB.logs));
+    localStorage.setItem(STORAGE_KEYS.payments, JSON.stringify(DB.payments));
+    localStorage.setItem(STORAGE_KEYS.notifications, JSON.stringify(DB.notifications));
+  } catch (e) { console.error('[HNB] Save error:', e); notify('Storage error!', 'danger'); }
+}
+function recalculateIds() {
+  nextFileId = DB.files.length ? Math.max(...DB.files.map(f => f.id)) + 1 : 1;
+  nextLogId = DB.logs.length ? Math.max(...DB.logs.map(l => l.id)) + 1 : 1;
+  nextPayId = DB.payments.length ? Math.max(...DB.payments.map(p => p.id)) + 1 : 1;
+  nextUserId = DB.users.length ? Math.max(...DB.users.map(u => u.id)) + 1 : 1;
+  nextNotifId = DB.notifications.length ? Math.max(...DB.notifications.map(n => n.id)) + 1 : 1;
+}
+function notify(message, type = 'success') {
+  const colors = { success: 'linear-gradient(135deg,#10b981,#34d399)', danger: 'linear-gradient(135deg,#ef4444,#f87171)', warning: 'linear-gradient(135deg,#f59e0b,#fbbf24)', info: 'linear-gradient(135deg,#0d6efd,#4d8bff)' };
+  const icons = { success:'check-circle-fill', danger:'exclamation-triangle-fill', warning:'exclamation-circle-fill', info:'info-circle-fill' };
+  const toast = document.createElement('div');
+  toast.className = 'toast-notify';
+  toast.style.background = colors[type];
+  toast.innerHTML = `<i class="bi bi-${icons[type]}"></i> ${message}`;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = '0.3s'; }, 2800);
+  setTimeout(() => toast.remove(), 3200);
+}
+function formatDateTime(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+}
+function timeAgo(iso) {
+  if (!iso) return '';
+  const sec = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (sec < 60) return sec + 's ago';
+  if (sec < 3600) return Math.floor(sec/60) + 'm ago';
+  if (sec < 86400) return Math.floor(sec/3600) + 'h ago';
+  return Math.floor(sec/86400) + 'd ago';
+}
+function payBadge(type) {
+  const map = { 'Interducer': 'interducer', 'Supply': 'supply', 'RMV': 'rmv' };
+  return `<span class="pay-badge ${map[type] || ''}">${type}</span>`;
+}
+function payStatusBadge(status) {
+  const info = PAYMENT_STATUS_LABELS[status] || PAYMENT_STATUS_LABELS['pending'];
+  return `<span class="pay-status ${info.class}"><i class="bi bi-${info.icon}"></i> ${info.label}</span>`;
+}
+function payReportChip(type, p) {
+  const info = PAYMENT_STATUS_LABELS[p.status] || PAYMENT_STATUS_LABELS['pending'];
+  const amt = p.status === 'paid' && p.amount ? ` Rs.${Number(p.amount).toLocaleString()}` : '';
+  return `<span class="report-pay-chip ${info.class}"><i class="bi bi-${info.icon}"></i> ${info.label}${amt}</span>`;
+}
+function sendTypeBadge(type) {
+  if (!type) return '';
+  const map = {
+    'file': { label: 'File Only', icon: 'folder-fill' },
+    'manualDO': { label: 'Manual DO', icon: 'file-earmark-text-fill' },
+    'both': { label: 'File + Manual DO', icon: 'collection-fill' },
+    'other': { label: 'Other', icon: 'three-dots' }
+  };
+  const info = map[type];
+  if (!info) return '';
+  return `<span class="send-indicator ${type}"><i class="bi bi-${info.icon}"></i> ${info.label}</span>`;
+}
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+// PERMISSIONS
+function isCreator(file) { return file.createdBy === currentUser.id; }
+function isCurrentHolder(fileId) {
+  const logs = DB.logs.filter(l => l.fileId === fileId).sort((a,b) => b.id - a.id);
+  const lastHandover = logs.find(l => l.handoverTo);
+  if (!lastHandover) return false;
+  return lastHandover.handoverTo === currentUser.id;
+}
+function hasBeenSentToBM(fileId) { return DB.logs.some(l => l.fileId === fileId && l.action.startsWith('Sent to Branch Manager')); }
+function hasBeenSentToHO(fileId) { return DB.logs.some(l => l.fileId === fileId && l.action === 'Sent to Head Office'); }
+function canUserAct(file) { return isCreator(file) || isCurrentHolder(file.id); }
+function canSendToBM(file) { return isCreator(file) && !hasBeenSentToBM(file.id) && currentUser.designation === 'Marketing Officer'; }
+function canEditDelete(file) { return isCreator(file) || currentUser.designation === 'Head Office'; }
+function canSendHO(file) { return currentUser.designation === 'Branch Manager' && isCurrentHolder(file.id) && !hasBeenSentToHO(file.id); }
+
+// PAYMENT HELPERS
+function getPaymentRecord(fileId, payType) {
+  return DB.payments.find(p => p.fileId === fileId && p.paymentType === payType);
+}
+function getFilePayments(fileId) {
+  return PAYMENT_TYPES.map(type => {
+    const existing = getPaymentRecord(fileId, type);
+    return {
+      type,
+      status: existing ? existing.status : 'pending',
+      amount: existing ? existing.amount : 0,
+      remarks: existing ? existing.remarks : '',
+      markedBy: existing ? existing.markedBy : null,
+      markedByName: existing ? existing.markedByName : null,
+      markedAt: existing ? existing.markedAt : null
+    };
+  });
+}
+function getMyPendingPaymentCount() {
+  if (!currentUser) return 0;
+  let count = 0;
+  DB.files.forEach(f => {
+    if (!canUserAct(f)) return;
+    const payments = getFilePayments(f.id);
+    payments.forEach(p => { if (p.status === 'pending') count++; });
+  });
+  return count;
+}
+function getMyPendingPayments() {
+  if (!currentUser) return [];
+  const result = [];
+  DB.files.forEach(f => {
+    if (!canUserAct(f)) return;
+    const payments = getFilePayments(f.id);
+    payments.forEach(p => {
+      if (p.status === 'pending') result.push({ file: f, payment: p });
+    });
+  });
+  return result;
+}
+
+// CREATE FORM
+function togglePayInput(type) {
+  const checkbox = document.getElementById('payCheck-' + type);
+  const toggle = document.getElementById('payToggle-' + type);
+  const inputs = document.getElementById('payInputs-' + type);
+  if (checkbox.checked) {
+    toggle.classList.add('active');
+    inputs.classList.add('show');
+  } else {
+    toggle.classList.remove('active');
+    inputs.classList.remove('show');
+    document.getElementById('payAmount-' + type).value = '';
+    document.getElementById('payRemarks-' + type).value = '';
+  }
+}
+
+// NOTIFICATIONS
+function createNotification(userId, type, title, message, fileId) {
+  const userExists = DB.users.find(u => u.id === userId);
+  if (!userExists) return;
+  DB.notifications.push({ id: nextNotifId++, userId, type, title, message, fileId, read: false, createdAt: new Date().toISOString() });
+  saveToStorage();
+}
+function getMyNotifications() {
+  if (!currentUser) return [];
+  return DB.notifications.filter(n => n.userId === currentUser.id).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+}
+function getUnreadCount() {
+  if (!currentUser) return 0;
+  return DB.notifications.filter(n => n.userId === currentUser.id && !n.read).length;
+}
+function updateNotifBadge() {
+  const count = getUnreadCount();
+  const badge = document.getElementById('notifCount');
+  const dashBadge = document.getElementById('dashBadge');
+  const payBadgeEl = document.getElementById('payBadge');
+  const payCount = getMyPendingPaymentCount();
+  if (badge) { if (count > 0) { badge.textContent = count; badge.classList.remove('hidden'); } else badge.classList.add('hidden'); }
+  if (dashBadge) { if (count > 0) { dashBadge.textContent = count; dashBadge.classList.remove('hidden'); } else dashBadge.classList.add('hidden'); }
+  if (payBadgeEl) { if (payCount > 0) { payBadgeEl.textContent = payCount; payBadgeEl.classList.remove('hidden'); } else payBadgeEl.classList.add('hidden'); }
+}
+function toggleNotif() {
+  const dd = document.getElementById('notifDropdown');
+  if (dd.classList.contains('hidden')) { renderNotifDropdown(); dd.classList.remove('hidden'); }
+  else dd.classList.add('hidden');
+}
+function renderNotifDropdown() {
+  const body = document.getElementById('notifBody');
+  const notifs = getMyNotifications().slice(0, 20);
+  if (notifs.length === 0) { body.innerHTML = `<div class="notif-empty"><i class="bi bi-bell-slash"></i><div>No notifications yet</div></div>`; return; }
+  body.innerHTML = notifs.map(n => `
+    <div class="notif-item ${n.read ? '' : 'unread'}" onclick="openNotifFile(${n.id}, ${n.fileId})">
+      <div class="notif-icon"><i class="bi bi-${n.type === 'file_received' ? 'inbox-fill' : 'bell-fill'}"></i></div>
+      <div class="notif-content">
+        <div class="notif-title">${escapeHtml(n.title)}</div>
+        <div class="notif-desc">${escapeHtml(n.message)}</div>
+        <div class="notif-time"><i class="bi bi-clock"></i> ${timeAgo(n.createdAt)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function openNotifFile(notifId, fileId) {
+  const n = DB.notifications.find(x => x.id === notifId);
+  if (n) { n.read = true; saveToStorage(); }
+  document.getElementById('notifDropdown').classList.add('hidden');
+  updateNotifBadge();
+  if (fileId) viewFile(fileId); else loadDashboard();
+}
+function markAllRead() {
+  if (!currentUser) return;
+  DB.notifications.forEach(n => { if (n.userId === currentUser.id) n.read = true; });
+  saveToStorage(); updateNotifBadge(); renderNotifDropdown(); loadDashboard();
+}
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('notifDropdown');
+  const btn = e.target.closest('.notif-btn');
+  if (dd && !dd.classList.contains('hidden') && !e.target.closest('.notif-dropdown') && !btn) dd.classList.add('hidden');
+});
+
+// PENDING FILES
+function getMyPendingFiles() {
+  if (!currentUser) return [];
+  const pendingNotifs = DB.notifications.filter(n => n.userId === currentUser.id && !n.read && n.type === 'file_received');
+  const pendingFileIds = [...new Set(pendingNotifs.map(n => n.fileId))];
+  return pendingFileIds.map(fileId => {
+    const file = DB.files.find(f => f.id === fileId);
+    const notif = pendingNotifs.find(n => n.fileId === fileId);
+    if (!file) return null;
+    const handoverLog = [...DB.logs].reverse().find(l => l.fileId === fileId && l.handoverTo === currentUser.id);
+    return {
+      file, notif,
+      fromUser: handoverLog ? handoverLog.userName : 'Unknown',
+      fromDesig: handoverLog ? handoverLog.designation : '',
+      sendType: handoverLog ? handoverLog.sendType : '',
+      sendTypeLabel: handoverLog ? handoverLog.sendTypeLabel : '',
+      receivedAt: notif.createdAt
+    };
+  }).filter(Boolean);
+}
+
+// AUTH
+function doLogin() {
+  loadFromStorage();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  if (!email || !pass) { notify('Please enter email and password', 'warning'); return; }
+  const user = DB.users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === pass);
+  if (user) {
+    currentUser = user;
+    sessionStorage.setItem(STORAGE_KEYS.current, user.id);
+    notify(`Welcome back, ${user.name}!`, 'success');
+    enterApp();
+  } else { notify('Invalid email or password!', 'danger'); }
+}
+function doRegister() {
+  loadFromStorage();
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const designation = document.getElementById('regDesignation').value;
+  const branch = document.getElementById('regBranch').value.trim().toUpperCase();
+  if (!name || !email || !password || !designation || !branch) { notify('Please fill all fields!', 'warning'); return; }
+  if (password.length < 4) { notify('Password must be at least 4 characters', 'warning'); return; }
+  if (DB.users.find(u => u.email.toLowerCase() === email.toLowerCase())) { notify('Email already exists!', 'danger'); return; }
+  const newId = DB.users.length ? Math.max(...DB.users.map(u => u.id)) + 1 : 1;
+  DB.users.push({ id: newId, name, email, password, designation, branch });
+  saveToStorage();
+  notify('Account created! Please sign in.', 'success');
+  showLogin();
+  document.getElementById('regName').value = '';
+  document.getElementById('regEmail').value = '';
+  document.getElementById('regPassword').value = '';
+  document.getElementById('regBranch').value = '';
+}
+function doLogout() {
+  if (!confirm('Logout?')) return;
+  currentUser = null;
+  sessionStorage.removeItem(STORAGE_KEYS.current);
+  document.getElementById('appScreen').classList.add('hidden');
+  document.getElementById('authScreen').classList.remove('hidden');
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+  showLogin();
+}
+function showRegister() { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
+function showLogin() { document.getElementById('registerForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); }
+
+// NAVIGATION
+function enterApp() {
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('sideUserName').textContent = currentUser.name;
+  document.getElementById('sideUserDesig').textContent = currentUser.designation;
+  document.getElementById('sideUserBranch').textContent = currentUser.branch;
+  document.getElementById('topUserName').textContent = currentUser.name;
+  document.getElementById('cBranch').value = currentUser.branch;
+  updateNotifBadge();
+  showPage('dashboard');
+}
+function showPage(page) {
+  ['dashboard','create','search','payments','report','logs','users','view'].forEach(p => {
+    document.getElementById('page-' + p).classList.add('hidden');
+    const nav = document.getElementById('nav-' + p);
+    if (nav) nav.classList.remove('active');
+  });
+  document.getElementById('page-' + page).classList.remove('hidden');
+  const nav = document.getElementById('nav-' + page);
+  if (nav) nav.classList.add('active');
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'logs') loadLogs();
+  if (page === 'users') loadUsers();
+  if (page === 'search') doSearch();
+  if (page === 'payments') loadPendingPayments();
+  if (page === 'report') loadPaymentReport();
+}
+
+// DASHBOARD
+function loadDashboard() {
+  document.getElementById('statTotal').textContent = DB.files.length;
+  document.getElementById('statPending').textContent = getUnreadCount();
+  document.getElementById('statProgress').textContent = DB.files.filter(f => f.status === 'In Progress').length;
+  document.getElementById('statCompleted').textContent = DB.files.filter(f => f.status === 'Completed').length;
+
+  const pending = getMyPendingFiles();
+  const alertBox = document.getElementById('pendingAlert');
+  const pendingCard = document.getElementById('pendingCard');
+
+  if (pending.length > 0) {
+    alertBox.innerHTML = `
+      <div class="alert-banner">
+        <i class="bi bi-bell-fill alert-icon"></i>
+        <div class="alert-content">
+          <div class="alert-title">You have ${pending.length} new file${pending.length > 1 ? 's' : ''} waiting!</div>
+          <div class="alert-desc">Please check the "Files Waiting for You" section below.</div>
+        </div>
+        <button class="btn btn-warning btn-sm" onclick="document.getElementById('pendingCard').scrollIntoView({behavior:'smooth'})">
+          <i class="bi bi-arrow-down"></i> View
+        </button>
+      </div>`;
+    pendingCard.classList.remove('hidden');
+    document.getElementById('pendingCountBadge').textContent = pending.length;
+    document.getElementById('pendingBody').innerHTML = pending.map(p => `
+      <tr class="unread-row">
+        <td><b>${escapeHtml(p.file.apNo)}</b><br><small class="text-muted">${escapeHtml(p.file.manualDO) || ''}</small></td>
+        <td>${escapeHtml(p.file.customer) || '-'}</td>
+        <td><b>${escapeHtml(p.fromUser)}</b><br><small class="text-muted">${escapeHtml(p.fromDesig)}</small></td>
+        <td><small>${formatDateTime(p.receivedAt)}<br><span class="text-muted">${timeAgo(p.receivedAt)}</span></small></td>
+        <td><button class="btn btn-sm btn-primary" onclick="viewFile(${p.file.id})"><i class="bi bi-eye"></i> Open</button></td>
+      </tr>`).join('');
+  } else {
+    alertBox.innerHTML = '';
+    pendingCard.classList.add('hidden');
+  }
+
+  const body = document.getElementById('recentFilesBody');
+  const recent = [...DB.files].sort((a,b) => b.id - a.id).slice(0, 50);
+  if (recent.length === 0) {
+    body.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="bi bi-inbox"></i><p>No files yet. Click "New File" to get started!</p></div></td></tr>`;
+    return;
+  }
+  body.innerHTML = recent.map(f => {
+    const filePayments = getFilePayments(f.id);
+    const payChips = filePayments.map(p => payReportChip(p.type, p)).join('');
+    return `<tr>
+      <td><b>${escapeHtml(f.apNo)}</b></td>
+      <td>${escapeHtml(f.nic)}</td>
+      <td>${escapeHtml(f.customer) || '<span class="text-muted">-</span>'}</td>
+      <td>Rs. ${Number(f.amount).toLocaleString('en-LK', {minimumFractionDigits:2})}</td>
+      <td>${payChips || '<span class="text-muted">-</span>'}</td>
+      <td>${escapeHtml(f.branch)}</td>
+      <td>${statusBadge(f.status)}</td>
+      <td><button class="btn btn-sm btn-primary" onclick="viewFile(${f.id})"><i class="bi bi-eye"></i></button></td>
+    </tr>`;
+  }).join('');
+}
+function statusBadge(status) {
+  const map = {
+    'Created': 'bg-secondary',
+    'In Progress': 'bg-warning text-dark',
+    'With Branch Manager': 'bg-info text-dark',
+    'Sent to Head Office': 'bg-primary',
+    'Approved': 'bg-success',
+    'Rejected': 'bg-danger',
+    'Completed': 'bg-success'
+  };
+  return `<span class="badge ${map[status] || 'bg-secondary'}">${status}</span>`;
+}
+
+// PENDING PAYMENTS PAGE
+function loadPendingPayments() {
+  const container = document.getElementById('pendingPaymentsContent');
+  const pending = getMyPendingPayments();
+
+  if (pending.length === 0) {
+    container.innerHTML = `<div class="card p-3"><div class="empty-state"><i class="bi bi-check2-circle"></i><p>🎉 No pending payments! All done.</p></div></div>`;
+    return;
+  }
+
+  const grouped = {};
+  pending.forEach(item => {
+    const key = item.file.id;
+    if (!grouped[key]) grouped[key] = { file: item.file, payments: [] };
+    grouped[key].payments.push(item.payment);
+  });
+
+  let html = `<div class="alert alert-warning mb-3"><i class="bi bi-info-circle"></i> You have <b>${pending.length}</b> pending payment(s) across <b>${Object.keys(grouped).length}</b> file(s).</div>`;
+
+  Object.values(grouped).forEach(group => {
+    html += `
+      <div class="card p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-semibold m-0">
+            <i class="bi bi-file-earmark-text text-primary"></i> 
+            ${escapeHtml(group.file.apNo)} — ${escapeHtml(group.file.customer) || 'No name'}
+          </h6>
+          <button class="btn btn-sm btn-outline-primary" onclick="viewFile(${group.file.id})">
+            <i class="bi bi-eye"></i> View File
+          </button>
+        </div>
+        <div class="row g-2">
+          ${group.payments.map(p => `
+            <div class="col-md-4">
+              <div class="pay-card pending">
+                <div class="pc-header">
+                  <span class="pc-type">${payBadge(p.type)}</span>
+                  ${payStatusBadge(p.status)}
+                </div>
+                <div class="pc-info mb-2">
+                  Branch: <b>${escapeHtml(group.file.branch)}</b><br>
+                  File Status: <b>${group.file.status}</b>
+                </div>
+                <button class="btn btn-warning btn-sm w-100" onclick="openPaymentModal(${group.file.id}, '${p.type}')">
+                  <i class="bi bi-cash-coin"></i> Update Payment
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// LIVE PAYMENT REPORT (Preview)
+function loadPaymentReport() {
+  const body = document.getElementById('reportPaymentsBody');
+  if (DB.files.length === 0) {
+    body.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No files yet</td></tr>';
+    return;
+  }
+  body.innerHTML = [...DB.files].sort((a,b) => b.id - a.id).map(f => {
+    const pays = getFilePayments(f.id);
+    const getPay = (type) => pays.find(p => p.type === type);
+    const renderCell = (p) => {
+      const info = PAYMENT_STATUS_LABELS[p.status] || PAYMENT_STATUS_LABELS['pending'];
+      const amt = p.status === 'paid' && p.amount ? `<br><small class="text-muted">Rs. ${Number(p.amount).toLocaleString()}</small>` : '';
+      return `<span class="report-pay-chip ${info.class}"><i class="bi bi-${info.icon}"></i> ${info.label}</span>${amt}`;
+    };
+    return `<tr>
+      <td><b>${escapeHtml(f.apNo)}</b></td>
+      <td>${escapeHtml(f.customer) || '-'}</td>
+      <td>${renderCell(getPay('Interducer'))}</td>
+      <td>${renderCell(getPay('Supply'))}</td>
+      <td>${renderCell(getPay('RMV'))}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// CREATE FILE — Payments: Tick = Paid, No tick = Pending
+// ============================================================
+function createFile() {
+  const apNo = document.getElementById('cApNo').value.trim().toUpperCase();
+  const nic = document.getElementById('cNic').value.trim().toUpperCase();
+  const customer = document.getElementById('cCustomer').value.trim();
+  const amount = document.getElementById('cAmount').value;
+  const branch = document.getElementById('cBranch').value.trim().toUpperCase();
+  const manualDO = document.getElementById('cManualDO').value.trim().toUpperCase();
+
+  if (!apNo || !nic || !amount || !branch) { notify('Please fill AP No, NIC, Amount and Branch', 'warning'); return; }
+  if (DB.files.find(f => f.apNo.toLowerCase() === apNo.toLowerCase())) { notify(`AP No "${apNo}" already exists!`, 'danger'); return; }
+
+  const paymentsData = {};
+  let hasError = false;
+
+  PAYMENT_TYPES.forEach(type => {
+    const checkbox = document.getElementById('payCheck-' + type);
+    if (checkbox && checkbox.checked) {
+      const payAmount = parseFloat(document.getElementById('payAmount-' + type).value);
+      const payRemarks = document.getElementById('payRemarks-' + type).value.trim();
+      if (!payAmount || payAmount <= 0) {
+        notify(`Please enter valid amount for ${type}`, 'warning');
+        hasError = true;
+        return;
+      }
+      paymentsData[type] = { amount: payAmount, remarks: payRemarks };
+    }
+  });
+
+  if (hasError) return;
+
+  const fileId = nextFileId++;
+  const now = new Date().toISOString();
+
+  DB.files.push({
+    id: fileId, apNo, nic, customer,
+    amount: parseFloat(amount),
+    branch, manualDO,
+    createdBy: currentUser.id,
+    status: 'Created',
+    headOfficeSent: false,
+    createdAt: now
+  });
+
+  DB.logs.push({
+    id: nextLogId++, fileId,
+    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
+    action: 'Created File', location: currentUser.branch,
+    remarks: manualDO ? `Manual DO: ${manualDO}` : '', createdAt: now
+  });
+
+  // ============================================================
+  // PAYMENTS: Tick = Paid (with amount), No tick = Pending
+  // ============================================================
+  PAYMENT_TYPES.forEach(type => {
+    if (paymentsData[type]) {
+      // ✅ User ticked — mark as PAID
+      DB.payments.push({
+        id: nextPayId++, fileId, paymentType: type,
+        status: 'paid',
+        amount: paymentsData[type].amount,
+        remarks: paymentsData[type].remarks,
+        markedBy: currentUser.id, markedByName: currentUser.name, markedAt: now
+      });
+      DB.logs.push({
+        id: nextLogId++, fileId,
+        userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
+        action: `${type} Payment Added — Paid`,
+        location: currentUser.branch,
+        remarks: `Amount: Rs. ${paymentsData[type].amount.toLocaleString()}${paymentsData[type].remarks ? ' — ' + paymentsData[type].remarks : ''}`,
+        createdAt: now
+      });
+    } else {
+      // ❌ User did NOT tick — leave as PENDING (to be completed later)
+      DB.payments.push({
+        id: nextPayId++, fileId, paymentType: type,
+        status: 'pending',
+        amount: 0,
+        remarks: '',
+        markedBy: null, markedByName: null, markedAt: null
+      });
+    }
+  });
+
+  saveToStorage();
+  clearCreateForm();
+  notify(`File created! (AP: ${apNo})`, 'success');
+  setTimeout(() => openSendToBM(fileId, apNo), 300);
+}
+function clearCreateForm() {
+  ['cApNo','cNic','cCustomer','cAmount','cManualDO'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('cBranch').value = currentUser.branch;
+  PAYMENT_TYPES.forEach(type => {
+    const cb = document.getElementById('payCheck-' + type);
+    if (cb) { cb.checked = false; }
+    const toggle = document.getElementById('payToggle-' + type);
+    if (toggle) toggle.classList.remove('active');
+    const inputs = document.getElementById('payInputs-' + type);
+    if (inputs) inputs.classList.remove('show');
+    const amt = document.getElementById('payAmount-' + type);
+    if (amt) amt.value = '';
+    const rem = document.getElementById('payRemarks-' + type);
+    if (rem) rem.value = '';
+  });
+}
+
+// SEND TO BM
+function openSendToBM(fileId, apNo) {
+  const file = DB.files.find(f => f.id === fileId);
+  if (!file) { notify('File save error!', 'danger'); return; }
+  if (hasBeenSentToBM(fileId)) { notify('This file has already been sent to a Branch Manager!', 'warning'); return; }
+  if (!isCreator(file)) { notify('Only the file creator can send to Branch Manager!', 'danger'); return; }
+
+  document.getElementById('stFileId').value = fileId;
+  document.getElementById('stApNo').textContent = apNo;
+  document.getElementById('stRemarks').value = '';
+  selectedBMSendType = null;
+  document.querySelectorAll('#bmSendTypeGrid .send-type-card').forEach(c => c.classList.remove('selected'));
+
+  const sel = document.getElementById('stBranchManager');
+  const warningBox = document.getElementById('noManagerWarning');
+  sel.innerHTML = '';
+  DB.users = JSON.parse(localStorage.getItem(STORAGE_KEYS.users)) || [];
+
+  const sameBranchBMs = DB.users.filter(u =>
+    u.designation === 'Branch Manager' && u.id !== currentUser.id &&
+    u.branch.toUpperCase() === currentUser.branch.toUpperCase()
+  );
+
+  if (sameBranchBMs.length === 0) {
+    sel.innerHTML = '<option value="">-- No Branch Manager available --</option>';
+    sel.disabled = true;
+    warningBox.innerHTML = `
+      <div class="no-manager-warning">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div>
+          <div class="warning-title">No Branch Manager found in your branch!</div>
+          <div class="warning-desc">
+            Only the Branch Manager of <b>${escapeHtml(currentUser.branch)}</b> branch can receive this file.<br>
+            Please ask them to register first.<br>
+            <b>Note:</b> Click "Skip for Now" to save the file.
+          </div>
+        </div>
+      </div>`;
+  } else {
+    sel.disabled = false;
+    warningBox.innerHTML = '';
+    sel.innerHTML = `<optgroup label="${currentUser.branch} Branch">`;
+    sameBranchBMs.forEach(u => {
+      sel.innerHTML += `<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.branch)}</option>`;
+    });
+    sel.innerHTML += '</optgroup>';
+  }
+
+  if (!sendToBMModalInstance) sendToBMModalInstance = new bootstrap.Modal(document.getElementById('sendToBMModal'));
+  sendToBMModalInstance.show();
+}
+function selectBMSendType(type) {
+  selectedBMSendType = type;
+  document.querySelectorAll('#bmSendTypeGrid .send-type-card').forEach(c => c.classList.remove('selected'));
+  const card = document.querySelector(`#bmSendTypeGrid .send-type-card[data-type="${type}"]`);
+  if (card) card.classList.add('selected');
+}
+function confirmSendToBM() {
+  const fileId = parseInt(document.getElementById('stFileId').value);
+  const sel = document.getElementById('stBranchManager');
+  const toUserId = parseInt(sel.value);
+  const remarks = document.getElementById('stRemarks').value.trim();
+
+  if (hasBeenSentToBM(fileId)) { notify('This file has already been sent!', 'danger'); sendToBMModalInstance.hide(); return; }
+  if (!toUserId || isNaN(toUserId)) { notify('Please select a Branch Manager', 'warning'); return; }
+  if (!selectedBMSendType) { notify('Please select what you are sending', 'warning'); return; }
+
+  loadFromStorage();
+  const toUser = DB.users.find(u => u.id === toUserId);
+  const file = DB.files.find(f => f.id === fileId);
+  if (!toUser) { notify('Branch Manager not found', 'danger'); return; }
+  if (!file) { notify('File not found', 'danger'); return; }
+  if (toUser.designation !== 'Branch Manager') { notify('Only a Branch Manager can receive this file!', 'danger'); return; }
+  if (toUser.branch.toUpperCase() !== currentUser.branch.toUpperCase()) { notify('Only your branch manager can receive this file!', 'danger'); return; }
+
+  const now = new Date().toISOString();
+  const sendTypeLabels = { 'file': 'File Only', 'manualDO': 'Manual DO', 'both': 'File + Manual DO', 'other': 'Other' };
+
+  DB.logs.push({
+    id: nextLogId++, fileId,
+    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
+    action: `Sent to Branch Manager (${toUser.name})`,
+    location: toUser.branch,
+    handoverTo: toUser.id, handoverToName: toUser.name, handoverToDesig: toUser.designation,
+    sendType: selectedBMSendType, sendTypeLabel: sendTypeLabels[selectedBMSendType],
+    remarks: remarks || '', createdAt: now
+  });
+
+  const sendTypeText = selectedBMSendType === 'manualDO' ? 'Manual DO only' : selectedBMSendType === 'file' ? 'File only' : selectedBMSendType === 'both' ? 'File + Manual DO' : 'Document';
+  createNotification(
+    toUser.id, 'file_received',
+    `New file received: ${file.apNo} (${sendTypeText})`,
+    `From ${currentUser.name} (${currentUser.designation}) — Sending: ${sendTypeText}${remarks ? ' — Note: ' + remarks : ''}`,
+    fileId
+  );
+
+  if (file.status === 'Created') file.status = 'In Progress';
+
+  saveToStorage();
+  sendToBMModalInstance.hide();
+  notify(`Sent to ${toUser.name}!`, 'success');
+  updateNotifBadge();
+  viewFile(fileId);
+}
+function skipSend() {
+  const fileId = parseInt(document.getElementById('stFileId').value);
+  sendToBMModalInstance.hide();
+  if (fileId) viewFile(fileId);
+}
+
+// ACCEPT
+function acceptFile(fileId) {
+  const file = DB.files.find(f => f.id === fileId);
+  if (!file) return;
+  if (!isCurrentHolder(fileId)) { notify('You are not the current holder of this file!', 'danger'); return; }
+  const now = new Date().toISOString();
+  DB.notifications.forEach(n => {
+    if (n.userId === currentUser.id && n.fileId === fileId && !n.read) n.read = true;
+  });
+  DB.logs.push({
+    id: nextLogId++, fileId,
+    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
+    action: 'Accepted File (In Hand)',
+    location: currentUser.branch,
+    remarks: 'File received and taken into hand',
+    createdAt: now
+  });
+  if (file.status === 'Created' || file.status === 'In Progress') file.status = 'With Branch Manager';
+  saveToStorage();
+  notify('File accepted!', 'success');
+  updateNotifBadge();
+  viewFile(fileId);
+}
+
+// SEND TO HO
+function sendToHeadOffice(fileId) {
+  const file = DB.files.find(f => f.id === fileId);
+  if (!file) return;
+  if (currentUser.designation !== 'Branch Manager') { notify('Only Branch Managers can send files to Head Office!', 'danger'); return; }
+  if (!isCurrentHolder(fileId)) { notify('You are not the current holder!', 'danger'); return; }
+  if (hasBeenSentToHO(fileId)) { notify('Already sent to Head Office!', 'danger'); return; }
+
+  loadFromStorage();
+  const hoUser = DB.users.find(u => u.designation === 'Head Office');
+  const now = new Date().toISOString();
+  file.headOfficeSent = true;
+  file.status = 'Sent to Head Office';
+
+  DB.logs.push({
+    id: nextLogId++, fileId,
+    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
+    action: 'Sent to Head Office',
+    location: 'Head Office',
+    handoverTo: hoUser ? hoUser.id : null,
+    handoverToName: hoUser ? hoUser.name : 'Head Office',
+    handoverToDesig: 'Head Office',
+    remarks: 'File dispatched to Head Office',
+    createdAt: now
+  });
+
+  if (hoUser) {
+    createNotification(
+      hoUser.id, 'file_received',
+      `New file received: ${file.apNo} (from Branch)`,
+      `From ${currentUser.name} (${currentUser.designation}) — File from ${currentUser.branch} branch`,
+      fileId
+    );
+  }
+  saveToStorage();
+  notify('File sent to Head Office!', 'success');
+  updateNotifBadge();
+  viewFile(fileId);
+}
+
+// HANDOVER
+function openHandover(id) {
+  loadFromStorage();
+  const file = DB.files.find(f => f.id === id);
+  if (!file) { notify('File not found', 'danger'); return; }
+  if (!canUserAct(file)) { notify('No permission to handover!', 'danger'); return; }
+  if (hasBeenSentToHO(id)) { notify('Already sent to Head Office!', 'danger'); return; }
+
+  document.getElementById('hoFileId').value = id;
+  document.getElementById('hoRemarks').value = '';
+  document.getElementById('hoManualDO').value = '';
+  document.getElementById('manualDOGroup').classList.add('hidden');
+  selectedHOSendType = null;
+  document.querySelectorAll('#hoSendTypeGrid .send-type-card').forEach(c => c.classList.remove('selected'));
+
+  const sel = document.getElementById('hoUser');
+  sel.innerHTML = '<option value="">-- Select User --</option>';
+  const otherUsers = DB.users.filter(u => u.id !== currentUser.id);
+  if (otherUsers.length === 0) {
+    sel.innerHTML = '<option value="">-- No other users available --</option>';
+    sel.disabled = true;
+  } else {
+    sel.disabled = false;
+    otherUsers.forEach(u => {
+      sel.innerHTML += `<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.designation)} (${escapeHtml(u.branch)})</option>`;
+    });
+  }
+  if (!handoverModalInstance) handoverModalInstance = new bootstrap.Modal(document.getElementById('handoverModal'));
+  handoverModalInstance.show();
+}
+function selectHOSendType(type) {
+  selectedHOSendType = type;
+  document.querySelectorAll('#hoSendTypeGrid .send-type-card').forEach(c => c.classList.remove('selected'));
+  const card = document.querySelector(`#hoSendTypeGrid .send-type-card[data-type="${type}"]`);
+  if (card) card.classList.add('selected');
+  if (type === 'manualDO' || type === 'both') document.getElementById('manualDOGroup').classList.remove('hidden');
+  else document.getElementById('manualDOGroup').classList.add('hidden');
+}
+function confirmHandover() {
+  const fileId = parseInt(document.getElementById('hoFileId').value);
+  const toUserId = parseInt(document.getElementById('hoUser').value);
+  const manualDO = document.getElementById('hoManualDO').value.trim().toUpperCase();
+  const remarks = document.getElementById('hoRemarks').value.trim();
+
+  const checkFile = DB.files.find(f => f.id === fileId);
+  if (!checkFile) { notify('File not found', 'danger'); return; }
+  if (!canUserAct(checkFile)) { notify('No permission!', 'danger'); return; }
+  if (hasBeenSentToHO(fileId)) { notify('Already sent to Head Office!', 'danger'); return; }
+  if (!toUserId || isNaN(toUserId)) { notify('Please select a user', 'warning'); return; }
+  if (!selectedHOSendType) { notify('Please select what you are sending', 'warning'); return; }
+
+  loadFromStorage();
+  const toUser = DB.users.find(u => u.id === toUserId);
+  const file = DB.files.find(f => f.id === fileId);
+  if (!toUser) { notify('User not found', 'danger'); return; }
+  if (!file) { notify('File not found', 'danger'); return; }
+
+  const now = new Date().toISOString();
+  const sendTypeLabels = { 'file': 'File Only', 'manualDO': 'Manual DO', 'both': 'File + Manual DO', 'other': 'Other' };
+  if (manualDO && (selectedHOSendType === 'manualDO' || selectedHOSendType === 'both')) file.manualDO = manualDO;
+
+  DB.logs.push({
+    id: nextLogId++, fileId,
+    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
+    action: `Handed Over to ${toUser.name}`,
+    location: toUser.branch,
+    handoverTo: toUser.id, handoverToName: toUser.name, handoverToDesig: toUser.designation,
+    sendType: selectedHOSendType, sendTypeLabel: sendTypeLabels[selectedHOSendType],
+    remarks: remarks || (manualDO ? `Manual DO: ${manualDO}` : ''),
+    createdAt: now
+  });
+
+  const sendTypeText = selectedHOSendType === 'manualDO' ? 'Manual DO only' : selectedHOSendType === 'file' ? 'File only' : selectedHOSendType === 'both' ? 'File + Manual DO' : 'Document';
+  createNotification(
+    toUser.id, 'file_received',
+    `New file received: ${file.apNo} (${sendTypeText})`,
+    `From ${currentUser.name} (${currentUser.designation}) — Sending: ${sendTypeText}${remarks ? ' — Note: ' + remarks : ''}`,
+    fileId
+  );
+  saveToStorage();
+  handoverModalInstance.hide();
+  notify(`File handed over to ${toUser.name}!`, 'success');
+  updateNotifBadge();
+  viewFile(fileId);
+}
+
+// PAYMENT MODAL
+function openPaymentModal(fileId, payType) {
+  const file = DB.files.find(f => f.id === fileId);
+  if (!file) { notify('File not found', 'danger'); return; }
+  if (!canUserAct(file)) { notify('You do not have permission!', 'danger'); return; }
+
+  const existing = getPaymentRecord(fileId, payType);
+  document.getElementById('pmFileId').value = fileId;
+  document.getElementById('pmPayType').value = payType;
+  document.getElementById('pmApNo').textContent = file.apNo;
+  document.getElementById('pmTypeBadge').innerHTML = payBadge(payType);
+  document.getElementById('pmRemarks').value = existing ? existing.remarks : '';
+  document.getElementById('pmAmount').value = existing && existing.amount ? existing.amount : '';
+
+  selectedPMAction = existing && existing.status ? existing.status : null;
+  document.querySelectorAll('#pmActionGrid .pm-action-card').forEach(c => c.classList.remove('selected'));
+  if (selectedPMAction) {
+    const card = document.querySelector(`#pmActionGrid .pm-action-card[data-action="${selectedPMAction}"]`);
+    if (card) card.classList.add('selected');
+  }
+  updateAmountVisibility();
+
+  if (!paymentModalInstance) paymentModalInstance = new bootstrap.Modal(document.getElementById('paymentModal'));
+  paymentModalInstance.show();
+}
+function selectPMAction(action) {
+  selectedPMAction = action;
+  document.querySelectorAll('#pmActionGrid .pm-action-card').forEach(c => c.classList.remove('selected'));
+  const card = document.querySelector(`#pmActionGrid .pm-action-card[data-action="${action}"]`);
+  if (card) card.classList.add('selected');
+  updateAmountVisibility();
+}
+function updateAmountVisibility() {
+  const amountGroup = document.getElementById('pmAmountGroup');
+  if (selectedPMAction === 'paid') {
+    amountGroup.classList.remove('hidden');
+  } else {
+    amountGroup.classList.add('hidden');
+  }
+}
+function confirmPayment() {
+  const fileId = parseInt(document.getElementById('pmFileId').value);
+  const payType = document.getElementById('pmPayType').value;
+  const remarks = document.getElementById('pmRemarks').value.trim();
+  const amount = parseFloat(document.getElementById('pmAmount').value) || 0;
+
+  if (!selectedPMAction) { notify('Please select a status', 'warning'); return; }
+  if (selectedPMAction === 'paid' && (!amount || amount <= 0)) {
+    notify('Please enter valid amount for Paid status', 'warning');
+    return;
+  }
+
+  const file = DB.files.find(f => f.id === fileId);
+  if (!file) { notify('File not found', 'danger'); return; }
+  if (!canUserAct(file)) { notify('No permission!', 'danger'); return; }
+
+  const existing = getPaymentRecord(fileId, payType);
+  const now = new Date().toISOString();
+  const statusLabel = PAYMENT_STATUS_LABELS[selectedPMAction].label;
+
+  if (existing) {
+    existing.status = selectedPMAction;
+    existing.amount = selectedPMAction === 'paid' ? amount : 0;
+    existing.remarks = remarks;
+    existing.markedBy = currentUser.id;
+    existing.markedByName = currentUser.name;
+    existing.markedAt = now;
+  } else {
+    DB.payments.push({
+      id: nextPayId++, fileId, paymentType: payType,
+      status: selectedPMAction,
+      amount: selectedPMAction === 'paid' ? amount : 0,
+      remarks, markedBy: currentUser.id, markedByName: currentUser.name, markedAt: now
+    });
+  }
+
+  DB.logs.push({
+    id: nextLogId++, fileId,
+    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
+    action: `${payType} Payment — ${statusLabel}`,
+    location: currentUser.branch,
+    remarks: selectedPMAction === 'paid' && amount > 0 
+      ? `Amount: Rs. ${amount.toLocaleString()}${remarks ? ' — ' + remarks : ''}`
+      : remarks || `Marked as ${statusLabel}`,
+    createdAt: now
+  });
+
+  saveToStorage();
+  paymentModalInstance.hide();
+  notify(`${payType} payment marked as ${statusLabel}!`, 'success');
+  updateNotifBadge();
+
+  if (!document.getElementById('page-payments').classList.contains('hidden')) loadPendingPayments();
+  else if (!document.getElementById('page-report').classList.contains('hidden')) { loadPaymentReport(); }
+  else viewFile(fileId);
+}
+
+// SEARCH
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const box = document.getElementById('searchResults');
+  let results = DB.files;
+  if (q) {
+    results = DB.files.filter(f =>
+      f.apNo.toLowerCase().includes(q) || f.nic.toLowerCase().includes(q) ||
+      (f.customer || '').toLowerCase().includes(q) || (f.manualDO || '').toLowerCase().includes(q)
+    );
+  }
+  if (results.length === 0) {
+    box.innerHTML = `<div class="card p-3"><div class="empty-state"><i class="bi bi-search"></i><p>${q ? 'No files matching your search' : 'Start typing to search files...'}</p></div></div>`;
+    return;
+  }
+  box.innerHTML = `
+    <div class="card p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-semibold m-0"><i class="bi bi-list-check text-primary"></i> ${results.length} result(s)</h6>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead><tr><th>AP NO</th><th>DO NO</th><th>NIC</th><th>CUSTOMER</th><th>BRANCH</th><th>PAYMENTS</th><th>STATUS</th><th>HOLDER</th><th>ACTION</th></tr></thead>
+          <tbody>
+            ${results.map(f => {
+              const lastLog = [...DB.logs].filter(l => l.fileId === f.id).sort((a,b) => b.id - a.id)[0];
+              const filePayments = getFilePayments(f.id);
+              const payChips = filePayments.map(p => payReportChip(p.type, p)).join('');
+              return `<tr>
+                <td><b>${escapeHtml(f.apNo)}</b></td>
+                <td>${escapeHtml(f.manualDO) || '<span class="text-muted">-</span>'}</td>
+                <td>${escapeHtml(f.nic)}</td>
+                <td>${escapeHtml(f.customer) || '<span class="text-muted">-</span>'}</td>
+                <td>${escapeHtml(f.branch)}</td>
+                <td>${payChips || '-'}</td>
+                <td>${statusBadge(f.status)}</td>
+                <td>${lastLog ? `<div><b>${escapeHtml(lastLog.userName)}</b><br><small class="text-muted">${escapeHtml(lastLog.designation)}</small></div>` : '<span class="text-muted">-</span>'}</td>
+                <td><button class="btn btn-sm btn-primary" onclick="viewFile(${f.id})"><i class="bi bi-eye"></i> Open</button></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+function clearSearch() { document.getElementById('searchInput').value = ''; doSearch(); }
+
+// VIEW FILE
+function viewFile(id) {
+  const file = DB.files.find(f => f.id === id);
+  if (!file) { notify('File not found', 'danger'); return; }
+
+  const logs = DB.logs.filter(l => l.fileId === id).sort((a,b) => b.id - a.id);
+  const filePayments = getFilePayments(file.id);
+
+  const userIsCreator = isCreator(file);
+  const userCanAct = canUserAct(file);
+  const userCanEditDelete = canEditDelete(file);
+  const userCanSendBM = canSendToBM(file);
+  const userCanHandover = userCanAct && !hasBeenSentToHO(file.id);
+  const userCanSendHO = canSendHO(file);
+  const fileSentToBM = hasBeenSentToBM(file.id);
+  const fileSentToHO = hasBeenSentToHO(file.id);
+
+  const lastHandoverLog = logs.find(l => l.handoverTo);
+  const currentHolder = lastHandoverLog ? {
+    userName: lastHandoverLog.handoverToName,
+    designation: lastHandoverLog.handoverToDesig,
+    location: lastHandoverLog.location,
+    createdAt: lastHandoverLog.createdAt,
+    userId: lastHandoverLog.handoverTo
+  } : null;
+
+  const hasPendingNotif = DB.notifications.some(n => n.userId === currentUser.id && n.fileId === id && !n.read && n.type === 'file_received');
+  const noPermission = !userCanAct && !userIsCreator;
+
+  const totals = { Interducer: 0, Supply: 0, RMV: 0 };
+  filePayments.forEach(p => { if (p.status === 'paid') totals[p.type] += p.amount; });
+  const grandTotal = totals.Interducer + totals.Supply + totals.RMV;
+
+  document.getElementById('viewContent').innerHTML = `
+    <div class="page-title d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-3">
+        <div class="icon-circle"><i class="bi bi-file-earmark-text"></i></div>
+        File #${file.id} — ${escapeHtml(file.apNo)}
+      </div>
+      <div class="d-flex gap-2">
+        ${userCanEditDelete ? `<button class="btn btn-warning btn-sm" onclick="editFile(${id})"><i class="bi bi-pencil"></i> Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteFile(${id})"><i class="bi bi-trash"></i> Delete</button>` : ''}
+        <button class="btn btn-outline-secondary btn-sm" onclick="showPage('dashboard')"><i class="bi bi-arrow-left"></i> Back</button>
+      </div>
+    </div>
+
+    ${hasPendingNotif ? `
+      <div class="card p-3 mb-3" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left:5px solid #0d6efd;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-inbox-fill" style="font-size:28px;color:#1e40af;"></i>
+            <div>
+              <div style="font-weight:600;color:#1e3a8a;">This file was sent to you!</div>
+              <div style="font-size:13px;color:#1e40af;">Please accept it to start working.</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="acceptFile(${id})">
+            <i class="bi bi-check-circle-fill"></i> Accept File
+          </button>
+        </div>
+      </div>
+    ` : ''}
+
+    ${userCanSendBM ? `
+      <div class="card p-3 mb-3" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:5px solid #f59e0b;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-info-circle-fill" style="font-size:28px;color:#d97706;"></i>
+            <div>
+              <div style="font-weight:600;color:#92400e;">This file has not been sent to the Branch Manager yet.</div>
+              <div style="font-size:13px;color:#78350f;">You can send Manual DO / File / Both.</div>
+            </div>
+          </div>
+          <button class="btn btn-warning" style="color:#fff;" onclick="openSendToBM(${id}, '${escapeHtml(file.apNo)}')">
+            <i class="bi bi-send"></i> Send to Branch Manager
+          </button>
+        </div>
+      </div>
+    ` : ''}
+
+    ${fileSentToBM && !fileSentToHO ? `
+      <div class="card p-3 mb-3" style="background:#f1f5f9;border-left:5px solid #64748b;">
+        <div class="d-flex align-items-center gap-3">
+          <i class="bi bi-info-circle-fill" style="font-size:24px;color:#64748b;"></i>
+          <div>
+            <div style="font-weight:600;color:#334155;">File already sent to Branch Manager</div>
+            <div style="font-size:12px;color:#64748b;">Cannot send again to Branch Manager</div>
+          </div>
+        </div>
+      </div>
+    ` : ''}
+
+    ${fileSentToHO ? `
+      <div class="card p-3 mb-3" style="background:#dcfce7;border-left:5px solid #16a34a;">
+        <div class="d-flex align-items-center gap-3">
+          <i class="bi bi-check-circle-fill" style="font-size:24px;color:#16a34a;"></i>
+          <div>
+            <div style="font-weight:600;color:#166534;">File sent to Head Office</div>
+            <div style="font-size:12px;color:#166534;">This file has been dispatched to Head Office</div>
+          </div>
+        </div>
+      </div>
+    ` : ''}
+
+    ${noPermission ? `
+      <div class="card p-4 mb-3">
+        <div class="no-permission-box">
+          <i class="bi bi-lock-fill"></i>
+          <div>
+            <div class="np-title">You don't have permission to act on this file</div>
+            <div class="np-desc">
+              This file belongs to <b>${escapeHtml(currentHolder ? currentHolder.userName : 'another user')}</b>.
+              You can only <b>view</b> this file.
+            </div>
+          </div>
+        </div>
+      </div>
+    ` : ''}
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card p-4">
+          <h6 class="fw-semibold mb-3"><i class="bi bi-info-circle text-primary"></i> File Details</h6>
+          <table class="table table-sm mb-0">
+            <tr><th width="45%" class="text-muted">AP No</th><td><b>${escapeHtml(file.apNo)}</b></td></tr>
+            <tr><th class="text-muted">Manual DO No</th><td>${escapeHtml(file.manualDO) || '<span class="text-muted">Not assigned</span>'}</td></tr>
+            <tr><th class="text-muted">NIC</th><td>${escapeHtml(file.nic)}</td></tr>
+            <tr><th class="text-muted">Customer</th><td>${escapeHtml(file.customer) || '-'}</td></tr>
+            <tr><th class="text-muted">Amount</th><td><b class="text-success">Rs. ${Number(file.amount).toLocaleString('en-LK', {minimumFractionDigits:2})}</b></td></tr>
+            <tr><th class="text-muted">Branch</th><td>${escapeHtml(file.branch)}</td></tr>
+            <tr><th class="text-muted">Status</th><td>${statusBadge(file.status)}</td></tr>
+            <tr><th class="text-muted">Sent to HO</th><td>${file.headOfficeSent ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>'}</td></tr>
+            <tr><th class="text-muted">Created</th><td><small>${formatDateTime(file.createdAt)}</small></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card p-4 mb-3" style="background:linear-gradient(135deg,#0d6efd,#4d8bff);color:#fff;">
+          <h6 class="fw-semibold mb-2"><i class="bi bi-person-badge"></i> Current Holder</h6>
+          ${currentHolder ? `
+            <div class="d-flex align-items-center gap-3">
+              <i class="bi bi-person-circle" style="font-size:42px;opacity:0.9;"></i>
+              <div>
+                <div style="font-size:17px;font-weight:600;">${escapeHtml(currentHolder.userName)}${currentHolder.userId === currentUser.id ? ' (You)' : ''}</div>
+                <div style="font-size:13px;opacity:0.9;">${escapeHtml(currentHolder.designation)} • ${escapeHtml(currentHolder.location)}</div>
+                <div style="font-size:11px;opacity:0.8;margin-top:3px;"><i class="bi bi-clock"></i> ${formatDateTime(currentHolder.createdAt)}</div>
+              </div>
+            </div>
+          ` : `<div class="text-white-50">Not yet handed over</div>`}
+        </div>
+
+        ${userCanAct && !noPermission ? `
+        <div class="card p-4">
+          <h6 class="fw-semibold mb-3"><i class="bi bi-lightning-charge text-warning"></i> File Actions</h6>
+
+          ${userCanHandover ? `
+            <button class="btn btn-primary w-100 mb-2" onclick="openHandover(${id})">
+              <i class="bi bi-arrow-left-right"></i> Handover to Someone
+            </button>
+          ` : ''}
+
+          ${userCanSendHO ? `
+            <button class="btn btn-success w-100 mb-2" onclick="sendToHeadOffice(${id})">
+              <i class="bi bi-building-fill"></i> Send to Head Office
+            </button>
+          ` : ''}
+
+          <label class="form-label small mt-2">Update File Status</label>
+          <div class="input-group mb-2">
+            <select id="statusSelect" class="form-select">
+              ${['Created','In Progress','With Branch Manager','Sent to Head Office','Approved','Rejected','Completed'].map(s =>
+                `<option ${file.status===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+            <button class="btn btn-primary" onclick="updateStatus(${id})">Update</button>
+          </div>
+        </div>
+        ` : ''}
+      </div>
+    </div>
+
+    <div class="card p-4 mt-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-semibold m-0"><i class="bi bi-cash-coin text-success"></i> Payments</h6>
+        <div>
+          <span class="badge bg-primary">Total Paid: Rs. ${grandTotal.toLocaleString('en-LK', {minimumFractionDigits:2})}</span>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        ${filePayments.map(p => `
+          <div class="col-md-4">
+            <div class="pay-card ${p.status}">
+              <div class="pc-header">
+                <span class="pc-type">${payBadge(p.type)}</span>
+                ${payStatusBadge(p.status)}
+              </div>
+              <div class="pc-info">
+                ${p.status === 'paid' ? `
+                  Amount: <b class="text-success">Rs. ${Number(p.amount).toLocaleString('en-LK', {minimumFractionDigits:2})}</b><br>
+                  Marked by: <b>${escapeHtml(p.markedByName || '-')}</b><br>
+                  When: <b>${formatDateTime(p.markedAt)}</b>
+                  ${p.remarks ? `<br>Note: <i>${escapeHtml(p.remarks)}</i>` : ''}
+                ` : p.status === 'rejected' ? `
+                  <b class="text-danger">Payment Rejected</b><br>
+                  Marked by: <b>${escapeHtml(p.markedByName || '-')}</b><br>
+                  When: <b>${formatDateTime(p.markedAt)}</b>
+                  ${p.remarks ? `<br>Reason: <i>${escapeHtml(p.remarks)}</i>` : ''}
+                ` : p.status === 'not-required' ? `
+                  <span class="text-muted">Not required</span>
+                  ${p.markedByName ? `<br>By: <b>${escapeHtml(p.markedByName)}</b>` : ''}
+                ` : `
+                  <span class="text-muted">Waiting for payment</span>
+                  ${p.markedByName ? `<br>By: <b>${escapeHtml(p.markedByName)}</b><br>When: <b>${formatDateTime(p.markedAt)}</b>` : ''}
+                `}
+              </div>
+              ${userCanAct ? `
+                <div class="pc-actions">
+                  <button class="btn ${p.status === 'pending' ? 'btn-warning' : 'btn-outline-secondary'} w-100" onclick="openPaymentModal(${id}, '${p.type}')">
+                    <i class="bi bi-pencil"></i> ${p.status === 'pending' ? 'Update Payment' : 'Change Status'}
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="row g-3 mt-3">
+      <div class="col-md-12">
+        <div class="card p-4">
+          <h6 class="fw-semibold mb-3"><i class="bi bi-diagram-3 text-primary"></i> File Timeline</h6>
+          ${logs.length === 0 ? '<div class="text-center text-muted py-4">No history yet</div>' : `
+          <div class="timeline">
+            ${logs.map(l => `
+              <div class="timeline-item">
+                <div class="tl-time"><i class="bi bi-clock"></i> ${formatDateTime(l.createdAt)} <span class="ms-2 badge bg-light text-dark">${timeAgo(l.createdAt)}</span></div>
+                <div class="tl-title">${escapeHtml(l.action)}</div>
+                <div class="tl-desc"><i class="bi bi-person"></i> <b>${escapeHtml(l.userName)}</b> (${escapeHtml(l.designation)}) • <i class="bi bi-geo-alt"></i> ${escapeHtml(l.location)}</div>
+                ${l.sendTypeLabel ? `<div class="mt-1">${sendTypeBadge(l.sendType)}</div>` : ''}
+                ${l.remarks ? `<div class="tl-desc mt-1 p-2" style="background:#f8fafc;border-radius:8px;border-left:3px solid #0d6efd;"><i class="bi bi-chat-left-text"></i> <i>${escapeHtml(l.remarks)}</i></div>` : ''}
+              </div>
+            `).join('')}
+          </div>`}
+        </div>
+      </div>
+    </div>`;
+
+  showPage('view');
+}
+
+function updateStatus(id) {
+  const file = DB.files.find(f => f.id === id);
+  if (!file) return;
+  if (!canUserAct(file)) { notify('You do not have permission!', 'danger'); return; }
+  const status = document.getElementById('statusSelect').value;
+  const now = new Date().toISOString();
+  file.status = status;
+  DB.logs.push({ id: nextLogId++, fileId: id, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Status changed to ' + status, location: currentUser.branch, remarks: '', createdAt: now });
+  saveToStorage();
+  notify('Status updated to ' + status, 'info');
+  viewFile(id);
+}
+
+// EDIT/DELETE
+function editFile(id) {
+  const file = DB.files.find(f => f.id === id);
+  if (!file) return;
+  if (!canEditDelete(file)) { notify('You do not have permission!', 'danger'); return; }
+  const newAp = prompt('AP No:', file.apNo); if (newAp === null) return;
+  const newNic = prompt('NIC:', file.nic); if (newNic === null) return;
+  const newCust = prompt('Customer Name:', file.customer); if (newCust === null) return;
+  const newAmt = prompt('Facility Amount:', file.amount); if (newAmt === null) return;
+  const newBranch = prompt('Branch:', file.branch); if (newBranch === null) return;
+  const newDO = prompt('Manual DO No:', file.manualDO || ''); if (newDO === null) return;
+  if (DB.files.find(f => f.id !== id && f.apNo.toLowerCase() === newAp.trim().toLowerCase())) { notify('AP No already exists!', 'danger'); return; }
+  file.apNo = newAp.trim().toUpperCase();
+  file.nic = newNic.trim().toUpperCase();
+  file.customer = newCust.trim();
+  file.amount = parseFloat(newAmt);
+  file.branch = newBranch.trim().toUpperCase();
+  file.manualDO = newDO.trim().toUpperCase();
+  DB.logs.push({ id: nextLogId++, fileId: id, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Edited File Details', location: currentUser.branch, remarks: newDO ? `Manual DO: ${newDO}` : '', createdAt: new Date().toISOString() });
+  saveToStorage();
+  notify('File updated!', 'success');
+  viewFile(id);
+}
+function deleteFile(id) {
+  const file = DB.files.find(f => f.id === id);
+  if (!file) return;
+  if (!canEditDelete(file)) { notify('You do not have permission!', 'danger'); return; }
+  if (!confirm('Delete this file permanently?')) return;
+  DB.files = DB.files.filter(f => f.id !== id);
+  DB.logs = DB.logs.filter(l => l.fileId !== id);
+  DB.payments = DB.payments.filter(p => p.fileId !== id);
+  DB.notifications = DB.notifications.filter(n => n.fileId !== id);
+  saveToStorage();
+  notify('File deleted', 'success');
+  updateNotifBadge();
+  showPage('dashboard');
+}
+
+// LOGS
+function loadLogs() {
+  const body = document.getElementById('logsBody');
+  const logs = [...DB.logs].sort((a,b) => b.id - a.id);
+  if (logs.length === 0) { body.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="bi bi-journal-x"></i><p>No activity logs yet</p></div></td></tr>`; return; }
+  body.innerHTML = logs.map(l => {
+    const f = DB.files.find(x => x.id === l.fileId);
+    return `<tr>
+      <td><small><b>${formatDateTime(l.createdAt)}</b><br><span class="text-muted">${timeAgo(l.createdAt)}</span></small></td>
+      <td><b>${f ? escapeHtml(f.apNo) : '-'}</b></td>
+      <td>${escapeHtml(l.userName)}</td>
+      <td><small>${escapeHtml(l.designation)}</small></td>
+      <td>${escapeHtml(l.action)}${l.sendTypeLabel ? `<br>${sendTypeBadge(l.sendType)}` : ''}</td>
+      <td><span class="badge bg-secondary">${escapeHtml(l.location)}</span></td>
+      <td><small>${escapeHtml(l.remarks) || '<span class="text-muted">-</span>'}</small></td>
+    </tr>`;
+  }).join('');
+}
+
+// USERS
+function loadUsers() {
+  const body = document.getElementById('usersBody');
+  if (DB.users.length === 0) { body.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No users</td></tr>'; return; }
+  body.innerHTML = DB.users.map(u => `
+    <tr>
+      <td><i class="bi bi-person-circle text-primary"></i> <b>${escapeHtml(u.name)}</b>${u.id===currentUser.id?' <span class="badge bg-info">You</span>':''}</td>
+      <td>${escapeHtml(u.email)}</td>
+      <td><span class="badge bg-primary">${escapeHtml(u.designation)}</span></td>
+      <td>${escapeHtml(u.branch)}</td>
+    </tr>`).join('');
+}
+
+// CSV EXPORT
+function downloadExcel() {
+  if (DB.files.length === 0) { notify('No files to export', 'warning'); return; }
+  let csv = 'AP No,Manual DO,NIC,Customer,Facility Amount,Branch,Status,Sent to HO,';
+  csv += 'Interducer Status,Interducer Amount,Interducer By,Interducer When,';
+  csv += 'Supply Status,Supply Amount,Supply By,Supply When,';
+  csv += 'RMV Status,RMV Amount,RMV By,RMV When,';
+  csv += 'Current Holder,Created At\n';
+  DB.files.forEach(f => {
+    const lastLog = [...DB.logs].filter(l => l.fileId === f.id).sort((a,b) => b.id - a.id)[0];
+    const pays = getFilePayments(f.id);
+    const pI = pays.find(p => p.type === 'Interducer');
+    const pS = pays.find(p => p.type === 'Supply');
+    const pR = pays.find(p => p.type === 'RMV');
+    csv += [
+      `"${f.apNo}"`, `"${f.manualDO || ''}"`, `"${f.nic}"`, `"${f.customer}"`,
+      f.amount, `"${f.branch}"`, `"${f.status}"`, f.headOfficeSent ? 'YES' : 'NO',
+      `"${pI.status}"`, pI.amount || 0, `"${pI.markedByName || ''}"`, `"${pI.markedAt ? formatDateTime(pI.markedAt) : ''}"`,
+      `"${pS.status}"`, pS.amount || 0, `"${pS.markedByName || ''}"`, `"${pS.markedAt ? formatDateTime(pS.markedAt) : ''}"`,
+      `"${pR.status}"`, pR.amount || 0, `"${pR.markedByName || ''}"`, `"${pR.markedAt ? formatDateTime(pR.markedAt) : ''}"`,
+      `"${lastLog ? lastLog.userName : ''}"`,
+      formatDateTime(f.createdAt)
+    ].join(',') + '\n';
+  });
+  downloadCSV(csv, 'hnb_files_report.csv');
+  notify('Files report downloaded!', 'success');
+}
+function downloadLogsExcel() {
+  if (DB.logs.length === 0) { notify('No logs to export', 'warning'); return; }
+  let csv = 'Log ID,AP No,User,Designation,Action,Send Type,Location,Remarks,Date & Time\n';
+  DB.logs.forEach(l => {
+    const f = DB.files.find(x => x.id === l.fileId);
+    csv += [l.id, `"${f ? f.apNo : '-'}"`, `"${l.userName}"`, `"${l.designation}"`, `"${l.action}"`, `"${l.sendTypeLabel || ''}"`, `"${l.location}"`, `"${l.remarks || ''}"`, formatDateTime(l.createdAt)].join(',') + '\n';
+  });
+  downloadCSV(csv, 'hnb_logs_report.csv');
+  notify('Logs report downloaded!', 'success');
+}
+function downloadPaymentsExcel() {
+  if (DB.payments.length === 0) { notify('No payments to export', 'warning'); return; }
+  let csv = 'Payment ID,AP No,Customer,Payment Type,Status,Amount (Rs.),Marked By,Date & Time,Remarks\n';
+  DB.payments.forEach(p => {
+    const f = DB.files.find(x => x.id === p.fileId);
+    csv += [
+      p.id, `"${f ? f.apNo : '-'}"`, `"${f ? f.customer : ''}"`,
+      `"${p.paymentType}"`,
+      `"${p.status || 'pending'}"`,
+      p.amount || 0,
+      `"${p.markedByName || ''}"`,
+      p.markedAt ? formatDateTime(p.markedAt) : '',
+      `"${p.remarks || ''}"`
+    ].join(',') + '\n';
+  });
+  downloadCSV(csv, 'hnb_payments_report.csv');
+  notify('Payments report downloaded!', 'success');
+}
+function downloadCSV(csv, filename) {
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+}
+
+// INIT
+window.addEventListener('load', () => {
+  loadFromStorage();
+  const saved = sessionStorage.getItem(STORAGE_KEYS.current);
+  if (saved) {
+    const u = DB.users.find(x => x.id == saved);
+    if (u) { currentUser = u; enterApp(); return; }
+    else sessionStorage.removeItem(STORAGE_KEYS.current);
+  }
+  document.getElementById('authScreen').classList.remove('hidden');
+});
+
+window.hnbDebug = {
+  show: () => { loadFromStorage(); console.table(DB.users); console.table(DB.files); console.table(DB.payments); },
+  reset: () => { if(confirm('Clear ALL data?')) { localStorage.clear(); sessionStorage.clear(); location.reload(); } },
+  DB: DB,
+  currentUser: () => currentUser
+};
+console.log('%c[HNB] Debug: hnbDebug.show() / hnbDebug.reset()', 'color:#0d6efd;font-weight:bold;');
+</script>
+</body>
+</html>
