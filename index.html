@@ -176,6 +176,9 @@
   .report-pay-chip.rejected { background: #fee2e2; color: #991b1b; }
   .report-pay-chip.pending { background: #fef3c7; color: #92400e; }
   .report-pay-chip.not-required { background: #f1f5f9; color: #475569; }
+  .loading-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.75); z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #fff; gap: 16px; }
+  .loading-overlay .spinner-border { width: 60px; height: 60px; }
+  .loading-overlay p { font-size: 15px; font-weight: 500; margin: 0; }
   @media (max-width: 768px) {
     .sidebar { width: 70px; padding: 20px 8px; }
     .sidebar a span, .sidebar-logo span, .sidebar-sub, .user-box, .logout-btn span { display: none; }
@@ -189,7 +192,13 @@
 </head>
 <body>
 
-<div id="authScreen" class="auth-bg">
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="spinner-border text-light" role="status"></div>
+  <p>Connecting to Firebase...</p>
+</div>
+
+<div id="authScreen" class="auth-bg hidden">
   <div class="auth-card">
     <div class="text-center mb-4">
       <div class="brand-logo"><i class="bi bi-shield-lock-fill"></i> HNB Finance</div>
@@ -608,22 +617,55 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Firebase SDK + Global Expose -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { 
+    getFirestore, collection, doc, getDocs, setDoc, deleteDoc, 
+    query, where, onSnapshot, writeBatch 
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBy1psm7zQcV8YNwkTYXi3w0Mh1sDW77cA",
+    authDomain: "track-46cf6.firebaseapp.com",
+    projectId: "track-46cf6",
+    storageBucket: "track-46cf6.firebasestorage.app",
+    messagingSenderId: "330069529231",
+    appId: "1:330069529231:web:e39eb356fa7eb75baa56fa",
+    measurementId: "G-SXGFWZTN86"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
+
+  // Expose to global window so non-module script can use
+  window.FirebaseDB = db;
+  window.FirebaseFns = { collection, doc, getDocs, setDoc, deleteDoc, query, where, onSnapshot, writeBatch };
+  window.firebaseReady = true;
+  window.dispatchEvent(new Event('firebase-ready'));
+  console.log('[HNB] Firebase initialized ✅');
+</script>
+
+<!-- Main App Logic -->
 <script>
 /* ============================================================
-   HNB FINANCE FILE TRACKING - v16.0
-   Payments: Create = Paid if ticked, else Pending
+   HNB FINANCE FILE TRACKING - v17.0 (Firebase Firestore)
    ============================================================ */
 
 const DEBUG = true;
 function log(...args) { if (DEBUG) console.log('[HNB]', ...args); }
 
-const STORAGE_KEYS = {
-  users: 'hnb_users_v16',
-  files: 'hnb_files_v16',
-  logs: 'hnb_logs_v16',
-  payments: 'hnb_payments_v16',
-  notifications: 'hnb_notifications_v16',
-  current: 'hnb_current_v16'
+const STORAGE_KEYS = { current: 'hnb_current_v17' };
+const COLLECTIONS = {
+  users: 'users',
+  files: 'files',
+  logs: 'logs',
+  payments: 'payments',
+  notifications: 'notifications',
+  meta: 'meta'
 };
 
 const PAYMENT_TYPES = ['Interducer', 'Supply', 'RMV'];
@@ -639,26 +681,169 @@ let currentUser = null;
 let nextFileId = 1, nextLogId = 1, nextPayId = 1, nextUserId = 1, nextNotifId = 1;
 let selectedBMSendType = null, selectedHOSendType = null, selectedPMAction = null;
 let sendToBMModalInstance = null, handoverModalInstance = null, paymentModalInstance = null;
+let realtimeUnsubs = [];
+let firebaseIsReady = false;
 
-function loadFromStorage() {
+// ============================================================
+// FIREBASE HELPERS
+// ============================================================
+function waitForFirebase() {
+  return new Promise(resolve => {
+    if (window.firebaseReady) return resolve();
+    window.addEventListener('firebase-ready', () => resolve(), { once: true });
+  });
+}
+
+async function loadFromStorage() {
+  await waitForFirebase();
+  const { collection, getDocs } = window.FirebaseFns;
+  const db = window.FirebaseDB;
   try {
-    DB.users = JSON.parse(localStorage.getItem(STORAGE_KEYS.users)) || [];
-    DB.files = JSON.parse(localStorage.getItem(STORAGE_KEYS.files)) || [];
-    DB.logs = JSON.parse(localStorage.getItem(STORAGE_KEYS.logs)) || [];
-    DB.payments = JSON.parse(localStorage.getItem(STORAGE_KEYS.payments)) || [];
-    DB.notifications = JSON.parse(localStorage.getItem(STORAGE_KEYS.notifications)) || [];
+    const [uS, fS, lS, pS, nS, mS] = await Promise.all([
+      getDocs(collection(db, COLLECTIONS.users)),
+      getDocs(collection(db, COLLECTIONS.files)),
+      getDocs(collection(db, COLLECTIONS.logs)),
+      getDocs(collection(db, COLLECTIONS.payments)),
+      getDocs(collection(db, COLLECTIONS.notifications)),
+      getDocs(collection(db, COLLECTIONS.meta))
+    ]);
+    DB.users = uS.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    DB.files = fS.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    DB.logs = lS.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    DB.payments = pS.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    DB.notifications = nS.docs.map(d => ({ ...d.data(), _docId: d.id }));
+
+    mS.docs.forEach(d => {
+      const m = d.data();
+      if (m.key === 'nextFileId') nextFileId = m.value;
+      if (m.key === 'nextLogId') nextLogId = m.value;
+      if (m.key === 'nextPayId') nextPayId = m.value;
+      if (m.key === 'nextUserId') nextUserId = m.value;
+      if (m.key === 'nextNotifId') nextNotifId = m.value;
+    });
     recalculateIds();
-  } catch (e) { console.error('[HNB] Load error:', e); }
+    console.log('[HNB] Loaded:', { users: DB.users.length, files: DB.files.length, logs: DB.logs.length, payments: DB.payments.length, notifs: DB.notifications.length });
+  } catch (e) {
+    console.error('[HNB] Load error:', e);
+    notify('Firebase load error! Check console.', 'danger');
+  }
 }
-function saveToStorage() {
+
+async function fbSet(coll, docId, data) {
+  await waitForFirebase();
+  const { doc, setDoc } = window.FirebaseFns;
+  await setDoc(doc(window.FirebaseDB, coll, String(docId)), data, { merge: true });
+}
+
+async function fbDelete(coll, docId) {
+  await waitForFirebase();
+  const { doc, deleteDoc } = window.FirebaseFns;
+  await deleteDoc(doc(window.FirebaseDB, coll, String(docId)));
+}
+
+async function fbBatch(writes) {
+  await waitForFirebase();
+  const { writeBatch, doc } = window.FirebaseFns;
+  const batch = writeBatch(window.FirebaseDB);
+  writes.forEach(w => {
+    const ref = doc(window.FirebaseDB, w.collection, String(w.docId));
+    if (w.delete) batch.delete(ref);
+    else batch.set(ref, w.data, { merge: true });
+  });
+  await batch.commit();
+}
+
+async function saveCounters() {
+  await waitForFirebase();
+  await fbBatch([
+    { collection: COLLECTIONS.meta, docId: 'nextFileId', data: { key: 'nextFileId', value: nextFileId } },
+    { collection: COLLECTIONS.meta, docId: 'nextLogId', data: { key: 'nextLogId', value: nextLogId } },
+    { collection: COLLECTIONS.meta, docId: 'nextPayId', data: { key: 'nextPayId', value: nextPayId } },
+    { collection: COLLECTIONS.meta, docId: 'nextUserId', data: { key: 'nextUserId', value: nextUserId } },
+    { collection: COLLECTIONS.meta, docId: 'nextNotifId', data: { key: 'nextNotifId', value: nextNotifId } }
+  ]);
+}
+
+// Bulk save (simple + safe) — writes everything changed
+async function saveToStorage() {
   try {
-    localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(DB.users));
-    localStorage.setItem(STORAGE_KEYS.files, JSON.stringify(DB.files));
-    localStorage.setItem(STORAGE_KEYS.logs, JSON.stringify(DB.logs));
-    localStorage.setItem(STORAGE_KEYS.payments, JSON.stringify(DB.payments));
-    localStorage.setItem(STORAGE_KEYS.notifications, JSON.stringify(DB.notifications));
-  } catch (e) { console.error('[HNB] Save error:', e); notify('Storage error!', 'danger'); }
+    await waitForFirebase();
+    const writes = [];
+    DB.users.forEach(u => { const { _docId, ...d } = u; writes.push({ collection: COLLECTIONS.users, docId: _docId || u.id, data: d }); });
+    DB.files.forEach(f => { const { _docId, ...d } = f; writes.push({ collection: COLLECTIONS.files, docId: _docId || f.id, data: d }); });
+    DB.logs.forEach(l => { const { _docId, ...d } = l; writes.push({ collection: COLLECTIONS.logs, docId: _docId || l.id, data: d }); });
+    DB.payments.forEach(p => { const { _docId, ...d } = p; writes.push({ collection: COLLECTIONS.payments, docId: _docId || p.id, data: d }); });
+    DB.notifications.forEach(n => { const { _docId, ...d } = n; writes.push({ collection: COLLECTIONS.notifications, docId: _docId || n.id, data: d }); });
+
+    const CHUNK = 400;
+    for (let i = 0; i < writes.length; i += CHUNK) {
+      await fbBatch(writes.slice(i, i + CHUNK));
+    }
+    await saveCounters();
+  } catch (e) {
+    console.error('[HNB] Save error:', e);
+    notify('Firebase save error!', 'danger');
+  }
 }
+
+// Real-time sync
+async function startRealtimeSync() {
+  await waitForFirebase();
+  const { collection, onSnapshot } = window.FirebaseFns;
+  const db = window.FirebaseDB;
+
+  realtimeUnsubs.push(onSnapshot(collection(db, COLLECTIONS.users), snap => {
+    DB.users = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    if (currentUser) {
+      if (!document.getElementById('page-users').classList.contains('hidden')) loadUsers();
+      updateNotifBadge();
+    }
+  }));
+
+  realtimeUnsubs.push(onSnapshot(collection(db, COLLECTIONS.files), snap => {
+    DB.files = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    if (currentUser) {
+      if (!document.getElementById('page-dashboard').classList.contains('hidden')) loadDashboard();
+      if (!document.getElementById('page-search').classList.contains('hidden')) doSearch();
+      if (!document.getElementById('page-report').classList.contains('hidden')) loadPaymentReport();
+      if (!document.getElementById('page-payments').classList.contains('hidden')) loadPendingPayments();
+    }
+  }));
+
+  realtimeUnsubs.push(onSnapshot(collection(db, COLLECTIONS.logs), snap => {
+    DB.logs = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    if (currentUser && !document.getElementById('page-logs').classList.contains('hidden')) loadLogs();
+  }));
+
+  realtimeUnsubs.push(onSnapshot(collection(db, COLLECTIONS.payments), snap => {
+    DB.payments = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    if (currentUser) {
+      updateNotifBadge();
+      if (!document.getElementById('page-payments').classList.contains('hidden')) loadPendingPayments();
+      if (!document.getElementById('page-report').classList.contains('hidden')) loadPaymentReport();
+    }
+  }));
+
+  realtimeUnsubs.push(onSnapshot(collection(db, COLLECTIONS.notifications), snap => {
+    DB.notifications = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
+    if (currentUser) {
+      updateNotifBadge();
+      if (!document.getElementById('notifDropdown').classList.contains('hidden')) renderNotifDropdown();
+      if (!document.getElementById('page-dashboard').classList.contains('hidden')) loadDashboard();
+    }
+  }));
+
+  console.log('[HNB] Real-time sync started ✅');
+}
+
+function stopRealtimeSync() {
+  realtimeUnsubs.forEach(u => u());
+  realtimeUnsubs = [];
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
 function recalculateIds() {
   nextFileId = DB.files.length ? Math.max(...DB.files.map(f => f.id)) + 1 : 1;
   nextLogId = DB.logs.length ? Math.max(...DB.logs.map(l => l.id)) + 1 : 1;
@@ -666,6 +851,7 @@ function recalculateIds() {
   nextUserId = DB.users.length ? Math.max(...DB.users.map(u => u.id)) + 1 : 1;
   nextNotifId = DB.notifications.length ? Math.max(...DB.notifications.map(n => n.id)) + 1 : 1;
 }
+
 function notify(message, type = 'success') {
   const colors = { success: 'linear-gradient(135deg,#10b981,#34d399)', danger: 'linear-gradient(135deg,#ef4444,#f87171)', warning: 'linear-gradient(135deg,#f59e0b,#fbbf24)', info: 'linear-gradient(135deg,#0d6efd,#4d8bff)' };
   const icons = { success:'check-circle-fill', danger:'exclamation-triangle-fill', warning:'exclamation-circle-fill', info:'info-circle-fill' };
@@ -677,11 +863,13 @@ function notify(message, type = 'success') {
   setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = '0.3s'; }, 2800);
   setTimeout(() => toast.remove(), 3200);
 }
+
 function formatDateTime(iso) {
   if (!iso) return '-';
   const d = new Date(iso);
   return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
 }
+
 function timeAgo(iso) {
   if (!iso) return '';
   const sec = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -690,19 +878,23 @@ function timeAgo(iso) {
   if (sec < 86400) return Math.floor(sec/3600) + 'h ago';
   return Math.floor(sec/86400) + 'd ago';
 }
+
 function payBadge(type) {
   const map = { 'Interducer': 'interducer', 'Supply': 'supply', 'RMV': 'rmv' };
   return `<span class="pay-badge ${map[type] || ''}">${type}</span>`;
 }
+
 function payStatusBadge(status) {
   const info = PAYMENT_STATUS_LABELS[status] || PAYMENT_STATUS_LABELS['pending'];
   return `<span class="pay-status ${info.class}"><i class="bi bi-${info.icon}"></i> ${info.label}</span>`;
 }
+
 function payReportChip(type, p) {
   const info = PAYMENT_STATUS_LABELS[p.status] || PAYMENT_STATUS_LABELS['pending'];
   const amt = p.status === 'paid' && p.amount ? ` Rs.${Number(p.amount).toLocaleString()}` : '';
   return `<span class="report-pay-chip ${info.class}"><i class="bi bi-${info.icon}"></i> ${info.label}${amt}</span>`;
 }
+
 function sendTypeBadge(type) {
   if (!type) return '';
   const map = {
@@ -715,12 +907,15 @@ function sendTypeBadge(type) {
   if (!info) return '';
   return `<span class="send-indicator ${type}"><i class="bi bi-${info.icon}"></i> ${info.label}</span>`;
 }
+
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
 }
 
+// ============================================================
 // PERMISSIONS
+// ============================================================
 function isCreator(file) { return file.createdBy === currentUser.id; }
 function isCurrentHolder(fileId) {
   const logs = DB.logs.filter(l => l.fileId === fileId).sort((a,b) => b.id - a.id);
@@ -735,7 +930,9 @@ function canSendToBM(file) { return isCreator(file) && !hasBeenSentToBM(file.id)
 function canEditDelete(file) { return isCreator(file) || currentUser.designation === 'Head Office'; }
 function canSendHO(file) { return currentUser.designation === 'Branch Manager' && isCurrentHolder(file.id) && !hasBeenSentToHO(file.id); }
 
+// ============================================================
 // PAYMENT HELPERS
+// ============================================================
 function getPaymentRecord(fileId, payType) {
   return DB.payments.find(p => p.fileId === fileId && p.paymentType === payType);
 }
@@ -776,7 +973,9 @@ function getMyPendingPayments() {
   return result;
 }
 
+// ============================================================
 // CREATE FORM
+// ============================================================
 function togglePayInput(type) {
   const checkbox = document.getElementById('payCheck-' + type);
   const toggle = document.getElementById('payToggle-' + type);
@@ -792,12 +991,16 @@ function togglePayInput(type) {
   }
 }
 
+// ============================================================
 // NOTIFICATIONS
-function createNotification(userId, type, title, message, fileId) {
+// ============================================================
+async function createNotification(userId, type, title, message, fileId) {
   const userExists = DB.users.find(u => u.id === userId);
   if (!userExists) return;
-  DB.notifications.push({ id: nextNotifId++, userId, type, title, message, fileId, read: false, createdAt: new Date().toISOString() });
-  saveToStorage();
+  const notif = { id: nextNotifId++, userId, type, title, message, fileId, read: false, createdAt: new Date().toISOString() };
+  DB.notifications.push(notif);
+  await fbSet(COLLECTIONS.notifications, notif.id, notif);
+  await saveCounters();
 }
 function getMyNotifications() {
   if (!currentUser) return [];
@@ -837,25 +1040,34 @@ function renderNotifDropdown() {
     </div>
   `).join('');
 }
-function openNotifFile(notifId, fileId) {
+async function openNotifFile(notifId, fileId) {
   const n = DB.notifications.find(x => x.id === notifId);
-  if (n) { n.read = true; saveToStorage(); }
+  if (n) { n.read = true; await fbSet(COLLECTIONS.notifications, n.id, n); }
   document.getElementById('notifDropdown').classList.add('hidden');
   updateNotifBadge();
   if (fileId) viewFile(fileId); else loadDashboard();
 }
-function markAllRead() {
+async function markAllRead() {
   if (!currentUser) return;
-  DB.notifications.forEach(n => { if (n.userId === currentUser.id) n.read = true; });
-  saveToStorage(); updateNotifBadge(); renderNotifDropdown(); loadDashboard();
+  const toUpdate = DB.notifications.filter(n => n.userId === currentUser.id && !n.read);
+  toUpdate.forEach(n => n.read = true);
+  if (toUpdate.length) {
+    const writes = toUpdate.map(n => ({ collection: COLLECTIONS.notifications, docId: n._docId || n.id, data: { read: true } }));
+    await fbBatch(writes);
+  }
+  updateNotifBadge(); renderNotifDropdown();
+  if (!document.getElementById('page-dashboard').classList.contains('hidden')) loadDashboard();
 }
+
 document.addEventListener('click', (e) => {
   const dd = document.getElementById('notifDropdown');
   const btn = e.target.closest('.notif-btn');
   if (dd && !dd.classList.contains('hidden') && !e.target.closest('.notif-dropdown') && !btn) dd.classList.add('hidden');
 });
 
+// ============================================================
 // PENDING FILES
+// ============================================================
 function getMyPendingFiles() {
   if (!currentUser) return [];
   const pendingNotifs = DB.notifications.filter(n => n.userId === currentUser.id && !n.read && n.type === 'file_received');
@@ -876,9 +1088,11 @@ function getMyPendingFiles() {
   }).filter(Boolean);
 }
 
+// ============================================================
 // AUTH
-function doLogin() {
-  loadFromStorage();
+// ============================================================
+async function doLogin() {
+  await loadFromStorage();
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPassword').value;
   if (!email || !pass) { notify('Please enter email and password', 'warning'); return; }
@@ -890,8 +1104,9 @@ function doLogin() {
     enterApp();
   } else { notify('Invalid email or password!', 'danger'); }
 }
-function doRegister() {
-  loadFromStorage();
+
+async function doRegister() {
+  await loadFromStorage();
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const password = document.getElementById('regPassword').value;
@@ -901,8 +1116,10 @@ function doRegister() {
   if (password.length < 4) { notify('Password must be at least 4 characters', 'warning'); return; }
   if (DB.users.find(u => u.email.toLowerCase() === email.toLowerCase())) { notify('Email already exists!', 'danger'); return; }
   const newId = DB.users.length ? Math.max(...DB.users.map(u => u.id)) + 1 : 1;
-  DB.users.push({ id: newId, name, email, password, designation, branch });
-  saveToStorage();
+  const newUser = { id: newId, name, email, password, designation, branch };
+  DB.users.push(newUser);
+  await fbSet(COLLECTIONS.users, newId, newUser);
+  await saveCounters();
   notify('Account created! Please sign in.', 'success');
   showLogin();
   document.getElementById('regName').value = '';
@@ -910,8 +1127,10 @@ function doRegister() {
   document.getElementById('regPassword').value = '';
   document.getElementById('regBranch').value = '';
 }
+
 function doLogout() {
   if (!confirm('Logout?')) return;
+  stopRealtimeSync();
   currentUser = null;
   sessionStorage.removeItem(STORAGE_KEYS.current);
   document.getElementById('appScreen').classList.add('hidden');
@@ -920,10 +1139,13 @@ function doLogout() {
   document.getElementById('loginPassword').value = '';
   showLogin();
 }
+
 function showRegister() { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
 function showLogin() { document.getElementById('registerForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); }
 
+// ============================================================
 // NAVIGATION
+// ============================================================
 function enterApp() {
   document.getElementById('authScreen').classList.add('hidden');
   document.getElementById('appScreen').classList.remove('hidden');
@@ -935,9 +1157,11 @@ function enterApp() {
   updateNotifBadge();
   showPage('dashboard');
 }
+
 function showPage(page) {
   ['dashboard','create','search','payments','report','logs','users','view'].forEach(p => {
-    document.getElementById('page-' + p).classList.add('hidden');
+    const el = document.getElementById('page-' + p);
+    if (el) el.classList.add('hidden');
     const nav = document.getElementById('nav-' + p);
     if (nav) nav.classList.remove('active');
   });
@@ -952,7 +1176,9 @@ function showPage(page) {
   if (page === 'report') loadPaymentReport();
 }
 
+// ============================================================
 // DASHBOARD
+// ============================================================
 function loadDashboard() {
   document.getElementById('statTotal').textContent = DB.files.length;
   document.getElementById('statPending').textContent = getUnreadCount();
@@ -1011,6 +1237,7 @@ function loadDashboard() {
     </tr>`;
   }).join('');
 }
+
 function statusBadge(status) {
   const map = {
     'Created': 'bg-secondary',
@@ -1024,7 +1251,9 @@ function statusBadge(status) {
   return `<span class="badge ${map[status] || 'bg-secondary'}">${status}</span>`;
 }
 
+// ============================================================
 // PENDING PAYMENTS PAGE
+// ============================================================
 function loadPendingPayments() {
   const container = document.getElementById('pendingPaymentsContent');
   const pending = getMyPendingPayments();
@@ -1080,7 +1309,9 @@ function loadPendingPayments() {
   container.innerHTML = html;
 }
 
-// LIVE PAYMENT REPORT (Preview)
+// ============================================================
+// LIVE PAYMENT REPORT
+// ============================================================
 function loadPaymentReport() {
   const body = document.getElementById('reportPaymentsBody');
   if (DB.files.length === 0) {
@@ -1106,9 +1337,9 @@ function loadPaymentReport() {
 }
 
 // ============================================================
-// CREATE FILE — Payments: Tick = Paid, No tick = Pending
+// CREATE FILE
 // ============================================================
-function createFile() {
+async function createFile() {
   const apNo = document.getElementById('cApNo').value.trim().toUpperCase();
   const nic = document.getElementById('cNic').value.trim().toUpperCase();
   const customer = document.getElementById('cCustomer').value.trim();
@@ -1141,7 +1372,7 @@ function createFile() {
   const fileId = nextFileId++;
   const now = new Date().toISOString();
 
-  DB.files.push({
+  const newFile = {
     id: fileId, apNo, nic, customer,
     amount: parseFloat(amount),
     branch, manualDO,
@@ -1149,53 +1380,63 @@ function createFile() {
     status: 'Created',
     headOfficeSent: false,
     createdAt: now
-  });
+  };
+  DB.files.push(newFile);
 
-  DB.logs.push({
+  const newLog = {
     id: nextLogId++, fileId,
     userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
     action: 'Created File', location: currentUser.branch,
     remarks: manualDO ? `Manual DO: ${manualDO}` : '', createdAt: now
-  });
+  };
+  DB.logs.push(newLog);
 
-  // ============================================================
-  // PAYMENTS: Tick = Paid (with amount), No tick = Pending
-  // ============================================================
+  const newPayments = [];
+  const newPaymentLogs = [];
   PAYMENT_TYPES.forEach(type => {
     if (paymentsData[type]) {
-      // ✅ User ticked — mark as PAID
-      DB.payments.push({
+      const p = {
         id: nextPayId++, fileId, paymentType: type,
         status: 'paid',
         amount: paymentsData[type].amount,
         remarks: paymentsData[type].remarks,
         markedBy: currentUser.id, markedByName: currentUser.name, markedAt: now
-      });
-      DB.logs.push({
+      };
+      DB.payments.push(p);
+      newPayments.push(p);
+      const lg = {
         id: nextLogId++, fileId,
         userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
         action: `${type} Payment Added — Paid`,
         location: currentUser.branch,
         remarks: `Amount: Rs. ${paymentsData[type].amount.toLocaleString()}${paymentsData[type].remarks ? ' — ' + paymentsData[type].remarks : ''}`,
         createdAt: now
-      });
+      };
+      DB.logs.push(lg);
+      newPaymentLogs.push(lg);
     } else {
-      // ❌ User did NOT tick — leave as PENDING (to be completed later)
-      DB.payments.push({
+      const p = {
         id: nextPayId++, fileId, paymentType: type,
-        status: 'pending',
-        amount: 0,
-        remarks: '',
+        status: 'pending', amount: 0, remarks: '',
         markedBy: null, markedByName: null, markedAt: null
-      });
+      };
+      DB.payments.push(p);
+      newPayments.push(p);
     }
   });
 
-  saveToStorage();
+  // Save to Firestore
+  await fbSet(COLLECTIONS.files, fileId, newFile);
+  await fbSet(COLLECTIONS.logs, newLog.id, newLog);
+  for (const p of newPayments) await fbSet(COLLECTIONS.payments, p.id, p);
+  for (const lg of newPaymentLogs) await fbSet(COLLECTIONS.logs, lg.id, lg);
+  await saveCounters();
+
   clearCreateForm();
   notify(`File created! (AP: ${apNo})`, 'success');
   setTimeout(() => openSendToBM(fileId, apNo), 300);
 }
+
 function clearCreateForm() {
   ['cApNo','cNic','cCustomer','cAmount','cManualDO'].forEach(id => {
     const el = document.getElementById(id);
@@ -1216,7 +1457,9 @@ function clearCreateForm() {
   });
 }
 
+// ============================================================
 // SEND TO BM
+// ============================================================
 function openSendToBM(fileId, apNo) {
   const file = DB.files.find(f => f.id === fileId);
   if (!file) { notify('File save error!', 'danger'); return; }
@@ -1232,7 +1475,6 @@ function openSendToBM(fileId, apNo) {
   const sel = document.getElementById('stBranchManager');
   const warningBox = document.getElementById('noManagerWarning');
   sel.innerHTML = '';
-  DB.users = JSON.parse(localStorage.getItem(STORAGE_KEYS.users)) || [];
 
   const sameBranchBMs = DB.users.filter(u =>
     u.designation === 'Branch Manager' && u.id !== currentUser.id &&
@@ -1273,7 +1515,7 @@ function selectBMSendType(type) {
   const card = document.querySelector(`#bmSendTypeGrid .send-type-card[data-type="${type}"]`);
   if (card) card.classList.add('selected');
 }
-function confirmSendToBM() {
+async function confirmSendToBM() {
   const fileId = parseInt(document.getElementById('stFileId').value);
   const sel = document.getElementById('stBranchManager');
   const toUserId = parseInt(sel.value);
@@ -1283,7 +1525,6 @@ function confirmSendToBM() {
   if (!toUserId || isNaN(toUserId)) { notify('Please select a Branch Manager', 'warning'); return; }
   if (!selectedBMSendType) { notify('Please select what you are sending', 'warning'); return; }
 
-  loadFromStorage();
   const toUser = DB.users.find(u => u.id === toUserId);
   const file = DB.files.find(f => f.id === fileId);
   if (!toUser) { notify('Branch Manager not found', 'danger'); return; }
@@ -1294,7 +1535,7 @@ function confirmSendToBM() {
   const now = new Date().toISOString();
   const sendTypeLabels = { 'file': 'File Only', 'manualDO': 'Manual DO', 'both': 'File + Manual DO', 'other': 'Other' };
 
-  DB.logs.push({
+  const logEntry = {
     id: nextLogId++, fileId,
     userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
     action: `Sent to Branch Manager (${toUser.name})`,
@@ -1302,10 +1543,11 @@ function confirmSendToBM() {
     handoverTo: toUser.id, handoverToName: toUser.name, handoverToDesig: toUser.designation,
     sendType: selectedBMSendType, sendTypeLabel: sendTypeLabels[selectedBMSendType],
     remarks: remarks || '', createdAt: now
-  });
+  };
+  DB.logs.push(logEntry);
 
   const sendTypeText = selectedBMSendType === 'manualDO' ? 'Manual DO only' : selectedBMSendType === 'file' ? 'File only' : selectedBMSendType === 'both' ? 'File + Manual DO' : 'Document';
-  createNotification(
+  await createNotification(
     toUser.id, 'file_received',
     `New file received: ${file.apNo} (${sendTypeText})`,
     `From ${currentUser.name} (${currentUser.designation}) — Sending: ${sendTypeText}${remarks ? ' — Note: ' + remarks : ''}`,
@@ -1314,7 +1556,10 @@ function confirmSendToBM() {
 
   if (file.status === 'Created') file.status = 'In Progress';
 
-  saveToStorage();
+  await fbSet(COLLECTIONS.logs, logEntry.id, logEntry);
+  await fbSet(COLLECTIONS.files, fileId, file);
+  await saveCounters();
+
   sendToBMModalInstance.hide();
   notify(`Sent to ${toUser.name}!`, 'success');
   updateNotifBadge();
@@ -1326,45 +1571,55 @@ function skipSend() {
   if (fileId) viewFile(fileId);
 }
 
+// ============================================================
 // ACCEPT
-function acceptFile(fileId) {
+// ============================================================
+async function acceptFile(fileId) {
   const file = DB.files.find(f => f.id === fileId);
   if (!file) return;
   if (!isCurrentHolder(fileId)) { notify('You are not the current holder of this file!', 'danger'); return; }
   const now = new Date().toISOString();
-  DB.notifications.forEach(n => {
-    if (n.userId === currentUser.id && n.fileId === fileId && !n.read) n.read = true;
-  });
-  DB.logs.push({
+  const notifsToRead = DB.notifications.filter(n => n.userId === currentUser.id && n.fileId === fileId && !n.read);
+  notifsToRead.forEach(n => n.read = true);
+  const newLog = {
     id: nextLogId++, fileId,
     userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
     action: 'Accepted File (In Hand)',
     location: currentUser.branch,
     remarks: 'File received and taken into hand',
     createdAt: now
-  });
+  };
+  DB.logs.push(newLog);
   if (file.status === 'Created' || file.status === 'In Progress') file.status = 'With Branch Manager';
-  saveToStorage();
+
+  await fbSet(COLLECTIONS.logs, newLog.id, newLog);
+  await fbSet(COLLECTIONS.files, fileId, file);
+  if (notifsToRead.length) {
+    await fbBatch(notifsToRead.map(n => ({ collection: COLLECTIONS.notifications, docId: n._docId || n.id, data: { read: true } })));
+  }
+  await saveCounters();
+
   notify('File accepted!', 'success');
   updateNotifBadge();
   viewFile(fileId);
 }
 
+// ============================================================
 // SEND TO HO
-function sendToHeadOffice(fileId) {
+// ============================================================
+async function sendToHeadOffice(fileId) {
   const file = DB.files.find(f => f.id === fileId);
   if (!file) return;
   if (currentUser.designation !== 'Branch Manager') { notify('Only Branch Managers can send files to Head Office!', 'danger'); return; }
   if (!isCurrentHolder(fileId)) { notify('You are not the current holder!', 'danger'); return; }
   if (hasBeenSentToHO(fileId)) { notify('Already sent to Head Office!', 'danger'); return; }
 
-  loadFromStorage();
   const hoUser = DB.users.find(u => u.designation === 'Head Office');
   const now = new Date().toISOString();
   file.headOfficeSent = true;
   file.status = 'Sent to Head Office';
 
-  DB.logs.push({
+  const newLog = {
     id: nextLogId++, fileId,
     userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
     action: 'Sent to Head Office',
@@ -1374,25 +1629,30 @@ function sendToHeadOffice(fileId) {
     handoverToDesig: 'Head Office',
     remarks: 'File dispatched to Head Office',
     createdAt: now
-  });
+  };
+  DB.logs.push(newLog);
 
   if (hoUser) {
-    createNotification(
+    await createNotification(
       hoUser.id, 'file_received',
       `New file received: ${file.apNo} (from Branch)`,
       `From ${currentUser.name} (${currentUser.designation}) — File from ${currentUser.branch} branch`,
       fileId
     );
   }
-  saveToStorage();
+  await fbSet(COLLECTIONS.logs, newLog.id, newLog);
+  await fbSet(COLLECTIONS.files, fileId, file);
+  await saveCounters();
+
   notify('File sent to Head Office!', 'success');
   updateNotifBadge();
   viewFile(fileId);
 }
 
+// ============================================================
 // HANDOVER
+// ============================================================
 function openHandover(id) {
-  loadFromStorage();
   const file = DB.files.find(f => f.id === id);
   if (!file) { notify('File not found', 'danger'); return; }
   if (!canUserAct(file)) { notify('No permission to handover!', 'danger'); return; }
@@ -1428,7 +1688,7 @@ function selectHOSendType(type) {
   if (type === 'manualDO' || type === 'both') document.getElementById('manualDOGroup').classList.remove('hidden');
   else document.getElementById('manualDOGroup').classList.add('hidden');
 }
-function confirmHandover() {
+async function confirmHandover() {
   const fileId = parseInt(document.getElementById('hoFileId').value);
   const toUserId = parseInt(document.getElementById('hoUser').value);
   const manualDO = document.getElementById('hoManualDO').value.trim().toUpperCase();
@@ -1441,7 +1701,6 @@ function confirmHandover() {
   if (!toUserId || isNaN(toUserId)) { notify('Please select a user', 'warning'); return; }
   if (!selectedHOSendType) { notify('Please select what you are sending', 'warning'); return; }
 
-  loadFromStorage();
   const toUser = DB.users.find(u => u.id === toUserId);
   const file = DB.files.find(f => f.id === fileId);
   if (!toUser) { notify('User not found', 'danger'); return; }
@@ -1451,7 +1710,7 @@ function confirmHandover() {
   const sendTypeLabels = { 'file': 'File Only', 'manualDO': 'Manual DO', 'both': 'File + Manual DO', 'other': 'Other' };
   if (manualDO && (selectedHOSendType === 'manualDO' || selectedHOSendType === 'both')) file.manualDO = manualDO;
 
-  DB.logs.push({
+  const newLog = {
     id: nextLogId++, fileId,
     userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
     action: `Handed Over to ${toUser.name}`,
@@ -1460,23 +1719,30 @@ function confirmHandover() {
     sendType: selectedHOSendType, sendTypeLabel: sendTypeLabels[selectedHOSendType],
     remarks: remarks || (manualDO ? `Manual DO: ${manualDO}` : ''),
     createdAt: now
-  });
+  };
+  DB.logs.push(newLog);
 
   const sendTypeText = selectedHOSendType === 'manualDO' ? 'Manual DO only' : selectedHOSendType === 'file' ? 'File only' : selectedHOSendType === 'both' ? 'File + Manual DO' : 'Document';
-  createNotification(
+  await createNotification(
     toUser.id, 'file_received',
     `New file received: ${file.apNo} (${sendTypeText})`,
     `From ${currentUser.name} (${currentUser.designation}) — Sending: ${sendTypeText}${remarks ? ' — Note: ' + remarks : ''}`,
     fileId
   );
-  saveToStorage();
+
+  await fbSet(COLLECTIONS.logs, newLog.id, newLog);
+  await fbSet(COLLECTIONS.files, fileId, file);
+  await saveCounters();
+
   handoverModalInstance.hide();
   notify(`File handed over to ${toUser.name}!`, 'success');
   updateNotifBadge();
   viewFile(fileId);
 }
 
+// ============================================================
 // PAYMENT MODAL
+// ============================================================
 function openPaymentModal(fileId, payType) {
   const file = DB.files.find(f => f.id === fileId);
   if (!file) { notify('File not found', 'danger'); return; }
@@ -1510,13 +1776,10 @@ function selectPMAction(action) {
 }
 function updateAmountVisibility() {
   const amountGroup = document.getElementById('pmAmountGroup');
-  if (selectedPMAction === 'paid') {
-    amountGroup.classList.remove('hidden');
-  } else {
-    amountGroup.classList.add('hidden');
-  }
+  if (selectedPMAction === 'paid') amountGroup.classList.remove('hidden');
+  else amountGroup.classList.add('hidden');
 }
-function confirmPayment() {
+async function confirmPayment() {
   const fileId = parseInt(document.getElementById('pmFileId').value);
   const payType = document.getElementById('pmPayType').value;
   const remarks = document.getElementById('pmRemarks').value.trim();
@@ -1535,6 +1798,7 @@ function confirmPayment() {
   const existing = getPaymentRecord(fileId, payType);
   const now = new Date().toISOString();
   const statusLabel = PAYMENT_STATUS_LABELS[selectedPMAction].label;
+  let payDoc;
 
   if (existing) {
     existing.status = selectedPMAction;
@@ -1543,16 +1807,18 @@ function confirmPayment() {
     existing.markedBy = currentUser.id;
     existing.markedByName = currentUser.name;
     existing.markedAt = now;
+    payDoc = existing;
   } else {
-    DB.payments.push({
+    payDoc = {
       id: nextPayId++, fileId, paymentType: payType,
       status: selectedPMAction,
       amount: selectedPMAction === 'paid' ? amount : 0,
       remarks, markedBy: currentUser.id, markedByName: currentUser.name, markedAt: now
-    });
+    };
+    DB.payments.push(payDoc);
   }
 
-  DB.logs.push({
+  const newLog = {
     id: nextLogId++, fileId,
     userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
     action: `${payType} Payment — ${statusLabel}`,
@@ -1561,19 +1827,25 @@ function confirmPayment() {
       ? `Amount: Rs. ${amount.toLocaleString()}${remarks ? ' — ' + remarks : ''}`
       : remarks || `Marked as ${statusLabel}`,
     createdAt: now
-  });
+  };
+  DB.logs.push(newLog);
 
-  saveToStorage();
+  await fbSet(COLLECTIONS.payments, payDoc._docId || payDoc.id, payDoc);
+  await fbSet(COLLECTIONS.logs, newLog.id, newLog);
+  await saveCounters();
+
   paymentModalInstance.hide();
   notify(`${payType} payment marked as ${statusLabel}!`, 'success');
   updateNotifBadge();
 
   if (!document.getElementById('page-payments').classList.contains('hidden')) loadPendingPayments();
-  else if (!document.getElementById('page-report').classList.contains('hidden')) { loadPaymentReport(); }
+  else if (!document.getElementById('page-report').classList.contains('hidden')) loadPaymentReport();
   else viewFile(fileId);
 }
 
+// ============================================================
 // SEARCH
+// ============================================================
 function doSearch() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   const box = document.getElementById('searchResults');
@@ -1620,7 +1892,9 @@ function doSearch() {
 }
 function clearSearch() { document.getElementById('searchInput').value = ''; doSearch(); }
 
+// ============================================================
 // VIEW FILE
+// ============================================================
 function viewFile(id) {
   const file = DB.files.find(f => f.id === id);
   if (!file) { notify('File not found', 'danger'); return; }
@@ -1872,21 +2146,26 @@ function viewFile(id) {
   showPage('view');
 }
 
-function updateStatus(id) {
+async function updateStatus(id) {
   const file = DB.files.find(f => f.id === id);
   if (!file) return;
   if (!canUserAct(file)) { notify('You do not have permission!', 'danger'); return; }
   const status = document.getElementById('statusSelect').value;
   const now = new Date().toISOString();
   file.status = status;
-  DB.logs.push({ id: nextLogId++, fileId: id, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Status changed to ' + status, location: currentUser.branch, remarks: '', createdAt: now });
-  saveToStorage();
+  const newLog = { id: nextLogId++, fileId: id, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Status changed to ' + status, location: currentUser.branch, remarks: '', createdAt: now };
+  DB.logs.push(newLog);
+  await fbSet(COLLECTIONS.files, file._docId || id, file);
+  await fbSet(COLLECTIONS.logs, newLog.id, newLog);
+  await saveCounters();
   notify('Status updated to ' + status, 'info');
   viewFile(id);
 }
 
+// ============================================================
 // EDIT/DELETE
-function editFile(id) {
+// ============================================================
+async function editFile(id) {
   const file = DB.files.find(f => f.id === id);
   if (!file) return;
   if (!canEditDelete(file)) { notify('You do not have permission!', 'danger'); return; }
@@ -1903,27 +2182,43 @@ function editFile(id) {
   file.amount = parseFloat(newAmt);
   file.branch = newBranch.trim().toUpperCase();
   file.manualDO = newDO.trim().toUpperCase();
-  DB.logs.push({ id: nextLogId++, fileId: id, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Edited File Details', location: currentUser.branch, remarks: newDO ? `Manual DO: ${newDO}` : '', createdAt: new Date().toISOString() });
-  saveToStorage();
+  const newLog = { id: nextLogId++, fileId: id, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Edited File Details', location: currentUser.branch, remarks: newDO ? `Manual DO: ${newDO}` : '', createdAt: new Date().toISOString() };
+  DB.logs.push(newLog);
+  await fbSet(COLLECTIONS.files, file._docId || id, file);
+  await fbSet(COLLECTIONS.logs, newLog.id, newLog);
+  await saveCounters();
   notify('File updated!', 'success');
   viewFile(id);
 }
-function deleteFile(id) {
+
+async function deleteFile(id) {
   const file = DB.files.find(f => f.id === id);
   if (!file) return;
   if (!canEditDelete(file)) { notify('You do not have permission!', 'danger'); return; }
   if (!confirm('Delete this file permanently?')) return;
+
+  const relatedLogs = DB.logs.filter(l => l.fileId === id);
+  const relatedPays = DB.payments.filter(p => p.fileId === id);
+  const relatedNotifs = DB.notifications.filter(n => n.fileId === id);
+
   DB.files = DB.files.filter(f => f.id !== id);
   DB.logs = DB.logs.filter(l => l.fileId !== id);
   DB.payments = DB.payments.filter(p => p.fileId !== id);
   DB.notifications = DB.notifications.filter(n => n.fileId !== id);
-  saveToStorage();
+
+  await fbDelete(COLLECTIONS.files, file._docId || id);
+  for (const l of relatedLogs) await fbDelete(COLLECTIONS.logs, l._docId || l.id);
+  for (const p of relatedPays) await fbDelete(COLLECTIONS.payments, p._docId || p.id);
+  for (const n of relatedNotifs) await fbDelete(COLLECTIONS.notifications, n._docId || n.id);
+
   notify('File deleted', 'success');
   updateNotifBadge();
   showPage('dashboard');
 }
 
+// ============================================================
 // LOGS
+// ============================================================
 function loadLogs() {
   const body = document.getElementById('logsBody');
   const logs = [...DB.logs].sort((a,b) => b.id - a.id);
@@ -1942,7 +2237,9 @@ function loadLogs() {
   }).join('');
 }
 
+// ============================================================
 // USERS
+// ============================================================
 function loadUsers() {
   const body = document.getElementById('usersBody');
   if (DB.users.length === 0) { body.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No users</td></tr>'; return; }
@@ -1955,7 +2252,9 @@ function loadUsers() {
     </tr>`).join('');
 }
 
+// ============================================================
 // CSV EXPORT
+// ============================================================
 function downloadExcel() {
   if (DB.files.length === 0) { notify('No files to export', 'warning'); return; }
   let csv = 'AP No,Manual DO,NIC,Customer,Facility Amount,Branch,Status,Sent to HO,';
@@ -2018,25 +2317,46 @@ function downloadCSV(csv, filename) {
   link.click();
 }
 
+// ============================================================
 // INIT
-window.addEventListener('load', () => {
-  loadFromStorage();
-  const saved = sessionStorage.getItem(STORAGE_KEYS.current);
-  if (saved) {
-    const u = DB.users.find(x => x.id == saved);
-    if (u) { currentUser = u; enterApp(); return; }
-    else sessionStorage.removeItem(STORAGE_KEYS.current);
+// ============================================================
+window.addEventListener('load', async () => {
+  try {
+    await loadFromStorage();
+    await startRealtimeSync();
+    firebaseIsReady = true;
+
+    // Hide loading overlay
+    document.getElementById('loadingOverlay').classList.add('hidden');
+
+    const saved = sessionStorage.getItem(STORAGE_KEYS.current);
+    if (saved) {
+      const u = DB.users.find(x => x.id == saved);
+      if (u) { currentUser = u; enterApp(); return; }
+      else sessionStorage.removeItem(STORAGE_KEYS.current);
+    }
+    document.getElementById('authScreen').classList.remove('hidden');
+  } catch (e) {
+    console.error('[HNB] Init error:', e);
+    document.getElementById('loadingOverlay').innerHTML = `
+      <div style="text-align:center;color:#fff;">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size:60px;color:#fbbf24;"></i>
+        <h4 style="margin-top:16px;">Firebase Connection Failed</h4>
+        <p style="font-size:14px;opacity:0.8;">Check console for details. Make sure Firestore is enabled.</p>
+        <button class="btn btn-light mt-3" onclick="location.reload()">Retry</button>
+      </div>`;
   }
-  document.getElementById('authScreen').classList.remove('hidden');
 });
 
+// Debug helpers
 window.hnbDebug = {
-  show: () => { loadFromStorage(); console.table(DB.users); console.table(DB.files); console.table(DB.payments); },
-  reset: () => { if(confirm('Clear ALL data?')) { localStorage.clear(); sessionStorage.clear(); location.reload(); } },
-  DB: DB,
-  currentUser: () => currentUser
+  show: async () => { await loadFromStorage(); console.table(DB.users); console.table(DB.files); console.table(DB.payments); },
+  reset: () => { if(confirm('Clear SESSION only (Firebase data stays)?')) { sessionStorage.clear(); location.reload(); } },
+  DB: () => DB,
+  currentUser: () => currentUser,
+  reload: () => loadFromStorage()
 };
-console.log('%c[HNB] Debug: hnbDebug.show() / hnbDebug.reset()', 'color:#0d6efd;font-weight:bold;');
+console.log('%c[HNB Firebase v17] Debug: hnbDebug.show() / hnbDebug.reload()', 'color:#0d6efd;font-weight:bold;');
 </script>
 </body>
 </html>
