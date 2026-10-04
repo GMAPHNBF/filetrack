@@ -16,7 +16,7 @@
   .auth-card { border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); border: none; background: #fff; position: relative; z-index: 1; width: 100%; max-width: 480px; padding: 40px; }
   .brand-logo { font-size: 28px; font-weight: 700; background: linear-gradient(135deg, #0d6efd, #1e3c72); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
   .auth-subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 28px; }
-  .sidebar { width: 260px; min-height: 100vh; background: linear-gradient(180deg, #1e3c72 0%, #0d6efd 100%); color: #fff; padding: 24px 16px; position: fixed; left: 0; top: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.08); z-index: 100; transition: all .3s; }
+  .sidebar { width: 260px; min-height: 100vh; background: linear-gradient(180deg, #1e3c72 0%, #0d6efd 100%); color: #fff; padding: 24px 16px; position: fixed; left: 0; top: 0; box-shadow: 4px 0 20px rgba(0,0,0,0.08); z-index: 100; transition: all .3s; overflow-y: auto; max-height: 100vh; }
   .sidebar-logo { font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; padding: 0 8px; margin-bottom: 4px; }
   .sidebar-sub { font-size: 11px; color: rgba(255,255,255,0.6); padding: 0 8px; letter-spacing: 1px; }
   .sidebar hr { border-color: rgba(255,255,255,0.15); margin: 20px 0; }
@@ -25,6 +25,8 @@
   .sidebar a.active { background: #fff; color: #0d6efd; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
   .sidebar a i { font-size: 18px; }
   .sidebar a .nav-badge { background: #ef4444; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; margin-left: auto; }
+  .sidebar a.home-link { background: linear-gradient(135deg, #10b981, #34d399); color: #fff !important; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+  .sidebar a.home-link:hover { background: linear-gradient(135deg, #059669, #10b981); transform: translateX(4px) scale(1.02); box-shadow: 0 6px 18px rgba(16,185,129,0.5); }
   .user-box { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-top: 16px; border: 1px solid rgba(255,255,255,0.15); }
   .user-box .name { font-weight: 600; font-size: 14px; }
   .user-box .role { font-size: 11px; color: rgba(255,255,255,0.7); }
@@ -34,6 +36,8 @@
   .topbar { background: #fff; padding: 18px 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
   .topbar h5 { font-weight: 600; color: #1e293b; margin: 0; font-size: 18px; }
   .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .home-btn-top { background: linear-gradient(135deg, #10b981, #34d399); color: #fff; border: none; padding: 10px 18px; border-radius: 50px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all .25s; text-decoration: none; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+  .home-btn-top:hover { background: linear-gradient(135deg, #059669, #10b981); color: #fff; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16,185,129,0.5); }
   .notif-btn { position: relative; background: #f0f4f8; border: none; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #1e293b; cursor: pointer; transition: all .2s; }
   .notif-btn:hover { background: #dbeafe; color: #0d6efd; }
   .notif-btn .notif-count { position: absolute; top: -4px; right: -4px; background: #ef4444; color: #fff; font-size: 11px; font-weight: 700; min-width: 20px; height: 20px; border-radius: 10px; padding: 0 5px; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; animation: pulse 1.5s infinite; }
@@ -179,6 +183,9 @@
   .loading-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.75); z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #fff; gap: 16px; }
   .loading-overlay .spinner-border { width: 60px; height: 60px; }
   .loading-overlay p { font-size: 15px; font-weight: 500; margin: 0; }
+  .auth-tabs { display: flex; gap: 8px; margin-bottom: 20px; background: #f1f5f9; padding: 4px; border-radius: 10px; }
+  .auth-tabs button { flex: 1; padding: 10px; border: none; background: transparent; border-radius: 8px; font-weight: 600; font-size: 13px; color: #64748b; cursor: pointer; transition: all .2s; }
+  .auth-tabs button.active { background: #fff; color: #0d6efd; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
   @media (max-width: 768px) {
     .sidebar { width: 70px; padding: 20px 8px; }
     .sidebar a span, .sidebar-logo span, .sidebar-sub, .user-box, .logout-btn span { display: none; }
@@ -187,6 +194,8 @@
     .content-area { padding: 16px; }
     .send-type-grid { grid-template-columns: 1fr; }
     .notif-dropdown { width: calc(100% - 40px); right: 20px; left: 20px; }
+    .home-btn-top span { display: none; }
+    .home-btn-top { padding: 10px 12px; }
   }
 </style>
 </head>
@@ -209,7 +218,8 @@
       <p class="text-muted small mb-4">Sign in to continue</p>
       <div class="mb-3"><label class="form-label">Email Address</label><input type="email" id="loginEmail" class="form-control" placeholder="you@hnb.lk"></div>
       <div class="mb-4"><label class="form-label">Password</label><input type="password" id="loginPassword" class="form-control" placeholder="••••••••"></div>
-      <button class="btn btn-primary w-100 mb-3" onclick="doLogin()"><i class="bi bi-box-arrow-in-right"></i> Sign In</button>
+      <button class="btn btn-primary w-100 mb-3" id="loginBtn" onclick="doLogin()"><i class="bi bi-box-arrow-in-right"></i> Sign In</button>
+      <div class="text-center text-muted small mb-3"><a href="#" onclick="doForgotPassword(); return false;" class="text-primary fw-semibold text-decoration-none">Forgot password?</a></div>
       <div class="text-center text-muted small">Don't have an account? <a href="#" onclick="showRegister(); return false;" class="text-primary fw-semibold text-decoration-none">Create one</a></div>
     </div>
     <div id="registerForm" class="hidden">
@@ -217,7 +227,7 @@
       <p class="text-muted small mb-4">Fill the details to register</p>
       <div class="mb-2"><label class="form-label">Full Name</label><input type="text" id="regName" class="form-control" placeholder="John Doe"></div>
       <div class="mb-2"><label class="form-label">Email</label><input type="email" id="regEmail" class="form-control" placeholder="you@hnb.lk"></div>
-      <div class="mb-2"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-control" placeholder="••••••••"></div>
+      <div class="mb-2"><label class="form-label">Password</label><input type="password" id="regPassword" class="form-control" placeholder="At least 6 characters"></div>
       <div class="mb-2"><label class="form-label">Designation</label>
         <select id="regDesignation" class="form-select">
           <option value="">-- Select --</option>
@@ -229,7 +239,7 @@
         </select>
       </div>
       <div class="mb-3"><label class="form-label">Branch</label><input type="text" id="regBranch" class="form-control" placeholder="e.g. Colombo" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
-      <button class="btn btn-primary w-100 mb-3" onclick="doRegister()"><i class="bi bi-check-circle"></i> Register</button>
+      <button class="btn btn-primary w-100 mb-3" id="registerBtn" onclick="doRegister()"><i class="bi bi-check-circle"></i> Register</button>
       <div class="text-center text-muted small">Already have an account? <a href="#" onclick="showLogin(); return false;" class="text-primary fw-semibold text-decoration-none">Sign in</a></div>
     </div>
   </div>
@@ -247,6 +257,11 @@
     <a onclick="showPage('report')" id="nav-report"><i class="bi bi-file-earmark-excel"></i> <span>Reports</span></a>
     <a onclick="showPage('logs')" id="nav-logs"><i class="bi bi-journal-text"></i> <span>Activity Logs</span></a>
     <a onclick="showPage('users')" id="nav-users"><i class="bi bi-people"></i> <span>Users</span></a>
+    <hr>
+    <a href="https://gmaphnbf.github.io/HNBFGMAP/" class="home-link" target="_blank" rel="noopener">
+      <i class="bi bi-house-door-fill"></i> <span>Home</span>
+      <i class="bi bi-box-arrow-up-right ms-auto" style="font-size:12px;opacity:0.7;"></i>
+    </a>
     <div class="user-box">
       <div class="d-flex align-items-center gap-2 mb-1">
         <i class="bi bi-person-circle fs-4"></i>
@@ -261,6 +276,9 @@
     <div class="topbar">
       <h5><i class="bi bi-folder2-open text-primary"></i> File Tracking System</h5>
       <div class="topbar-right">
+        <a href="https://gmaphnbf.github.io/HNBFGMAP/" class="home-btn-top" target="_blank" rel="noopener" title="Go to Home">
+          <i class="bi bi-house-door-fill"></i> <span>Home</span>
+        </a>
         <button class="notif-btn" onclick="toggleNotif()"><i class="bi bi-bell-fill"></i><span class="notif-count hidden" id="notifCount">0</span></button>
         <div class="user-info"><i class="bi bi-person-circle text-primary"></i> <span id="topUserName">-</span></div>
       </div>
@@ -275,7 +293,6 @@
     </div>
 
     <div class="content-area">
-
       <div id="page-dashboard">
         <div class="page-title"><div class="icon-circle"><i class="bi bi-speedometer2"></i></div> Dashboard Overview</div>
         <div id="pendingAlert"></div>
@@ -285,7 +302,6 @@
           <div class="col-md-3 col-sm-6"><div class="card stat-card"><div class="icon-box bg-grad-orange"><i class="bi bi-hourglass-split"></i></div><div class="stat-label">IN PROGRESS</div><div class="stat-value" id="statProgress">0</div></div></div>
           <div class="col-md-3 col-sm-6"><div class="card stat-card"><div class="icon-box bg-grad-purple"><i class="bi bi-check2-circle"></i></div><div class="stat-label">COMPLETED</div><div class="stat-value" id="statCompleted">0</div></div></div>
         </div>
-
         <div class="card p-3 mb-4 hidden" id="pendingCard">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="fw-semibold m-0"><i class="bi bi-inbox-fill text-warning"></i> Files Waiting for You <span class="badge bg-danger ms-2" id="pendingCountBadge">0</span></h6>
@@ -298,7 +314,6 @@
             </table>
           </div>
         </div>
-
         <div class="card p-3">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="fw-semibold m-0"><i class="bi bi-clock-history text-primary"></i> Recent Files</h6>
@@ -325,17 +340,12 @@
             <div class="col-md-4"><label class="form-label">Branch <span class="text-danger">*</span></label><input type="text" id="cBranch" class="form-control" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
             <div class="col-md-4"><label class="form-label">Manual DO No (Optional)</label><input type="text" id="cManualDO" class="form-control" placeholder="e.g. DO-2024-001" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
           </div>
-
           <hr>
           <h6 class="fw-semibold mb-1"><i class="bi bi-cash-coin text-success"></i> Add Payments (Optional)</h6>
-          <p class="text-muted small mb-3">Tick කරලා amount දාන payments <b>Paid</b> විදියට save වෙනවා. Tick නොකරපු ඒවා <b>Pending</b> විදියට තියෙනවා (පස්සේ update කරන්න පුළුවන්).</p>
-
+          <p class="text-muted small mb-3">Tick කරලා amount දාන payments <b>Paid</b> විදියට save වෙනවා. Tick නොකරපු ඒවා <b>Pending</b> විදියට තියෙනවා.</p>
           <label class="pay-add-toggle" id="payToggle-Interducer">
             <input type="checkbox" id="payCheck-Interducer" onchange="togglePayInput('Interducer')">
-            <div class="pat-label">
-              <span class="pay-badge interducer">Interducer</span>
-              <small>Add Interducer payment now (tick = Paid, no tick = Pending)</small>
-            </div>
+            <div class="pat-label"><span class="pay-badge interducer">Interducer</span><small>Add Interducer payment now</small></div>
           </label>
           <div class="pay-inputs" id="payInputs-Interducer">
             <div class="row g-2">
@@ -343,13 +353,9 @@
               <div class="col-md-6"><label class="form-label small">Remarks</label><input type="text" id="payRemarks-Interducer" class="form-control" placeholder="e.g. Paid via cheque"></div>
             </div>
           </div>
-
           <label class="pay-add-toggle" id="payToggle-Supply">
             <input type="checkbox" id="payCheck-Supply" onchange="togglePayInput('Supply')">
-            <div class="pat-label">
-              <span class="pay-badge supply">Supply</span>
-              <small>Add Supply payment now</small>
-            </div>
+            <div class="pat-label"><span class="pay-badge supply">Supply</span><small>Add Supply payment now</small></div>
           </label>
           <div class="pay-inputs" id="payInputs-Supply">
             <div class="row g-2">
@@ -357,13 +363,9 @@
               <div class="col-md-6"><label class="form-label small">Remarks</label><input type="text" id="payRemarks-Supply" class="form-control" placeholder="e.g. Paid via cheque"></div>
             </div>
           </div>
-
           <label class="pay-add-toggle" id="payToggle-RMV">
             <input type="checkbox" id="payCheck-RMV" onchange="togglePayInput('RMV')">
-            <div class="pat-label">
-              <span class="pay-badge rmv">RMV</span>
-              <small>Add RMV payment now</small>
-            </div>
+            <div class="pat-label"><span class="pay-badge rmv">RMV</span><small>Add RMV payment now</small></div>
           </label>
           <div class="pay-inputs" id="payInputs-RMV">
             <div class="row g-2">
@@ -371,10 +373,9 @@
               <div class="col-md-6"><label class="form-label small">Remarks</label><input type="text" id="payRemarks-RMV" class="form-control" placeholder="e.g. Paid via cheque"></div>
             </div>
           </div>
-
           <div class="alert alert-info py-2 small mt-3"><i class="bi bi-info-circle"></i> After creating, you can send the file to the Branch Manager. Pending payments can be updated later.</div>
           <div class="d-flex gap-2">
-            <button class="btn btn-primary" onclick="createFile()"><i class="bi bi-save"></i> Submit File</button>
+            <button class="btn btn-primary" id="createFileBtn" onclick="createFile()"><i class="bi bi-save"></i> Submit File</button>
             <button class="btn btn-outline-secondary" onclick="clearCreateForm()">Clear</button>
           </div>
         </div>
@@ -430,16 +431,13 @@
             </div>
           </div>
         </div>
-
         <div class="card p-3 mt-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h6 class="fw-semibold m-0"><i class="bi bi-table text-primary"></i> Payment Report Preview (Live)</h6>
           </div>
           <div class="table-responsive">
             <table class="table table-sm">
-              <thead>
-                <tr><th>AP NO</th><th>Customer</th><th>Interducer</th><th>Supply</th><th>RMV</th></tr>
-              </thead>
+              <thead><tr><th>AP NO</th><th>Customer</th><th>Interducer</th><th>Supply</th><th>RMV</th></tr></thead>
               <tbody id="reportPaymentsBody"></tbody>
             </table>
           </div>
@@ -470,14 +468,12 @@
         </div>
       </div>
 
-      <div id="page-view" class="hidden">
-        <div id="viewContent"></div>
-      </div>
-
+      <div id="page-view" class="hidden"><div id="viewContent"></div></div>
     </div>
   </div>
 </div>
 
+<!-- Modals -->
 <div class="modal fade" id="sendToBMModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:20px;border:none;">
@@ -576,26 +572,10 @@
         <div class="mb-3">
           <label class="form-label">Update Status To: <span class="text-danger">*</span></label>
           <div class="pm-action-grid" id="pmActionGrid">
-            <div class="pm-action-card paid" data-action="paid" onclick="selectPMAction('paid')">
-              <i class="bi bi-check-circle-fill"></i>
-              <div class="pm-title">Paid</div>
-              <div class="pm-desc">Payment received</div>
-            </div>
-            <div class="pm-action-card rejected" data-action="rejected" onclick="selectPMAction('rejected')">
-              <i class="bi bi-x-circle-fill"></i>
-              <div class="pm-title">Rejected</div>
-              <div class="pm-desc">Payment rejected</div>
-            </div>
-            <div class="pm-action-card pending" data-action="pending" onclick="selectPMAction('pending')">
-              <i class="bi bi-clock-fill"></i>
-              <div class="pm-title">Pending</div>
-              <div class="pm-desc">Still waiting</div>
-            </div>
-            <div class="pm-action-card not-required" data-action="not-required" onclick="selectPMAction('not-required')">
-              <i class="bi bi-slash-circle-fill"></i>
-              <div class="pm-title">Not Required</div>
-              <div class="pm-desc">No payment needed</div>
-            </div>
+            <div class="pm-action-card paid" data-action="paid" onclick="selectPMAction('paid')"><i class="bi bi-check-circle-fill"></i><div class="pm-title">Paid</div><div class="pm-desc">Payment received</div></div>
+            <div class="pm-action-card rejected" data-action="rejected" onclick="selectPMAction('rejected')"><i class="bi bi-x-circle-fill"></i><div class="pm-title">Rejected</div><div class="pm-desc">Payment rejected</div></div>
+            <div class="pm-action-card pending" data-action="pending" onclick="selectPMAction('pending')"><i class="bi bi-clock-fill"></i><div class="pm-title">Pending</div><div class="pm-desc">Still waiting</div></div>
+            <div class="pm-action-card not-required" data-action="not-required" onclick="selectPMAction('not-required')"><i class="bi bi-slash-circle-fill"></i><div class="pm-title">Not Required</div><div class="pm-desc">No payment needed</div></div>
           </div>
         </div>
         <div class="mb-3" id="pmAmountGroup">
@@ -604,7 +584,7 @@
         </div>
         <div class="mb-3">
           <label class="form-label">Remarks / Note</label>
-          <textarea id="pmRemarks" class="form-control" rows="2" placeholder="e.g. Paid via cheque #12345 / Customer rejected..."></textarea>
+          <textarea id="pmRemarks" class="form-control" rows="2" placeholder="e.g. Paid via cheque #12345..."></textarea>
         </div>
         <div class="alert alert-info mb-0 py-2 small"><i class="bi bi-info-circle"></i> Status will be recorded with your name and current time.</div>
       </div>
@@ -618,14 +598,18 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Firebase SDK + Global Expose -->
+<!-- Firebase SDK (with Auth) -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
   import { 
     getFirestore, collection, doc, getDocs, setDoc, deleteDoc, 
-    query, where, onSnapshot, writeBatch 
+    onSnapshot, writeBatch, getDoc 
   } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+  import {
+    getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    signOut, onAuthStateChanged, sendPasswordResetEmail
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBy1psm7zQcV8YNwkTYXi3w0Mh1sDW77cA",
@@ -640,32 +624,31 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const db = getFirestore(app);
+  const auth = getAuth(app);
 
-  // Expose to global window so non-module script can use
   window.FirebaseDB = db;
-  window.FirebaseFns = { collection, doc, getDocs, setDoc, deleteDoc, query, where, onSnapshot, writeBatch };
+  window.FirebaseAuth = auth;
+  window.FirebaseFns = { 
+    collection, doc, getDocs, setDoc, deleteDoc, onSnapshot, writeBatch, getDoc,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail
+  };
   window.firebaseReady = true;
   window.dispatchEvent(new Event('firebase-ready'));
-  console.log('[HNB] Firebase initialized ✅');
+  console.log('[HNB] Firebase + Auth initialized ✅');
 </script>
 
 <!-- Main App Logic -->
 <script>
 /* ============================================================
-   HNB FINANCE FILE TRACKING - v17.0 (Firebase Firestore)
+   HNB FINANCE FILE TRACKING - v18.0 (Firebase Auth + Firestore)
    ============================================================ */
 
 const DEBUG = true;
 function log(...args) { if (DEBUG) console.log('[HNB]', ...args); }
 
-const STORAGE_KEYS = { current: 'hnb_current_v17' };
 const COLLECTIONS = {
-  users: 'users',
-  files: 'files',
-  logs: 'logs',
-  payments: 'payments',
-  notifications: 'notifications',
-  meta: 'meta'
+  users: 'users', files: 'files', logs: 'logs',
+  payments: 'payments', notifications: 'notifications', meta: 'meta'
 };
 
 const PAYMENT_TYPES = ['Interducer', 'Supply', 'RMV'];
@@ -678,11 +661,11 @@ const PAYMENT_STATUS_LABELS = {
 
 let DB = { users: [], files: [], logs: [], payments: [], notifications: [] };
 let currentUser = null;
+let firebaseUid = null;
 let nextFileId = 1, nextLogId = 1, nextPayId = 1, nextUserId = 1, nextNotifId = 1;
 let selectedBMSendType = null, selectedHOSendType = null, selectedPMAction = null;
 let sendToBMModalInstance = null, handoverModalInstance = null, paymentModalInstance = null;
 let realtimeUnsubs = [];
-let firebaseIsReady = false;
 
 // ============================================================
 // FIREBASE HELPERS
@@ -764,29 +747,6 @@ async function saveCounters() {
   ]);
 }
 
-// Bulk save (simple + safe) — writes everything changed
-async function saveToStorage() {
-  try {
-    await waitForFirebase();
-    const writes = [];
-    DB.users.forEach(u => { const { _docId, ...d } = u; writes.push({ collection: COLLECTIONS.users, docId: _docId || u.id, data: d }); });
-    DB.files.forEach(f => { const { _docId, ...d } = f; writes.push({ collection: COLLECTIONS.files, docId: _docId || f.id, data: d }); });
-    DB.logs.forEach(l => { const { _docId, ...d } = l; writes.push({ collection: COLLECTIONS.logs, docId: _docId || l.id, data: d }); });
-    DB.payments.forEach(p => { const { _docId, ...d } = p; writes.push({ collection: COLLECTIONS.payments, docId: _docId || p.id, data: d }); });
-    DB.notifications.forEach(n => { const { _docId, ...d } = n; writes.push({ collection: COLLECTIONS.notifications, docId: _docId || n.id, data: d }); });
-
-    const CHUNK = 400;
-    for (let i = 0; i < writes.length; i += CHUNK) {
-      await fbBatch(writes.slice(i, i + CHUNK));
-    }
-    await saveCounters();
-  } catch (e) {
-    console.error('[HNB] Save error:', e);
-    notify('Firebase save error!', 'danger');
-  }
-}
-
-// Real-time sync
 async function startRealtimeSync() {
   await waitForFirebase();
   const { collection, onSnapshot } = window.FirebaseFns;
@@ -799,7 +759,6 @@ async function startRealtimeSync() {
       updateNotifBadge();
     }
   }));
-
   realtimeUnsubs.push(onSnapshot(collection(db, COLLECTIONS.files), snap => {
     DB.files = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
     if (currentUser) {
@@ -809,12 +768,10 @@ async function startRealtimeSync() {
       if (!document.getElementById('page-payments').classList.contains('hidden')) loadPendingPayments();
     }
   }));
-
   realtimeUnsubs.push(onSnapshot(collection(db, COLLECTIONS.logs), snap => {
     DB.logs = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
     if (currentUser && !document.getElementById('page-logs').classList.contains('hidden')) loadLogs();
   }));
-
   realtimeUnsubs.push(onSnapshot(collection(db, COLLECTIONS.payments), snap => {
     DB.payments = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
     if (currentUser) {
@@ -823,7 +780,6 @@ async function startRealtimeSync() {
       if (!document.getElementById('page-report').classList.contains('hidden')) loadPaymentReport();
     }
   }));
-
   realtimeUnsubs.push(onSnapshot(collection(db, COLLECTIONS.notifications), snap => {
     DB.notifications = snap.docs.map(d => ({ ...d.data(), _docId: d.id }));
     if (currentUser) {
@@ -832,7 +788,6 @@ async function startRealtimeSync() {
       if (!document.getElementById('page-dashboard').classList.contains('hidden')) loadDashboard();
     }
   }));
-
   console.log('[HNB] Real-time sync started ✅');
 }
 
@@ -869,7 +824,6 @@ function formatDateTime(iso) {
   const d = new Date(iso);
   return d.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
 }
-
 function timeAgo(iso) {
   if (!iso) return '';
   const sec = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -878,23 +832,19 @@ function timeAgo(iso) {
   if (sec < 86400) return Math.floor(sec/3600) + 'h ago';
   return Math.floor(sec/86400) + 'd ago';
 }
-
 function payBadge(type) {
   const map = { 'Interducer': 'interducer', 'Supply': 'supply', 'RMV': 'rmv' };
   return `<span class="pay-badge ${map[type] || ''}">${type}</span>`;
 }
-
 function payStatusBadge(status) {
   const info = PAYMENT_STATUS_LABELS[status] || PAYMENT_STATUS_LABELS['pending'];
   return `<span class="pay-status ${info.class}"><i class="bi bi-${info.icon}"></i> ${info.label}</span>`;
 }
-
 function payReportChip(type, p) {
   const info = PAYMENT_STATUS_LABELS[p.status] || PAYMENT_STATUS_LABELS['pending'];
   const amt = p.status === 'paid' && p.amount ? ` Rs.${Number(p.amount).toLocaleString()}` : '';
   return `<span class="report-pay-chip ${info.class}"><i class="bi bi-${info.icon}"></i> ${info.label}${amt}</span>`;
 }
-
 function sendTypeBadge(type) {
   if (!type) return '';
   const map = {
@@ -907,10 +857,21 @@ function sendTypeBadge(type) {
   if (!info) return '';
   return `<span class="send-indicator ${type}"><i class="bi bi-${info.icon}"></i> ${info.label}</span>`;
 }
-
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+function setLoading(btnId, isLoading, originalText) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (isLoading) {
+    btn.disabled = true;
+    btn.dataset.originalText = btn.innerHTML;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Please wait...`;
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = originalText || btn.dataset.originalText || 'Submit';
+  }
 }
 
 // ============================================================
@@ -973,9 +934,6 @@ function getMyPendingPayments() {
   return result;
 }
 
-// ============================================================
-// CREATE FORM
-// ============================================================
 function togglePayInput(type) {
   const checkbox = document.getElementById('payCheck-' + type);
   const toggle = document.getElementById('payToggle-' + type);
@@ -989,6 +947,174 @@ function togglePayInput(type) {
     document.getElementById('payAmount-' + type).value = '';
     document.getElementById('payRemarks-' + type).value = '';
   }
+}
+
+// ============================================================
+// AUTH — Firebase Authentication
+// ============================================================
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPassword').value;
+  if (!email || !pass) { notify('Please enter email and password', 'warning'); return; }
+
+  setLoading('loginBtn', true);
+  try {
+    const { signInWithEmailAndPassword } = window.FirebaseFns;
+    const auth = window.FirebaseAuth;
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    firebaseUid = cred.user.uid;
+
+    // Load user profile from Firestore
+    await loadFromStorage();
+    const user = DB.users.find(u => u.authUid === firebaseUid || u.email.toLowerCase() === email.toLowerCase());
+
+    if (!user) {
+      notify('User profile not found in database!', 'danger');
+      await window.FirebaseFns.signOut(window.FirebaseAuth);
+      setLoading('loginBtn', false);
+      return;
+    }
+
+    currentUser = user;
+    notify(`Welcome back, ${user.name}!`, 'success');
+    await startRealtimeSync();
+    enterApp();
+  } catch (e) {
+    console.error('[HNB] Login error:', e);
+    let msg = 'Login failed!';
+    if (e.code === 'auth/user-not-found') msg = 'No account found with this email';
+    else if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'Incorrect password';
+    else if (e.code === 'auth/invalid-email') msg = 'Invalid email format';
+    else if (e.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later';
+    notify(msg, 'danger');
+  } finally {
+    setLoading('loginBtn', false, '<i class="bi bi-box-arrow-in-right"></i> Sign In');
+  }
+}
+
+async function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const designation = document.getElementById('regDesignation').value;
+  const branch = document.getElementById('regBranch').value.trim().toUpperCase();
+
+  if (!name || !email || !password || !designation || !branch) { notify('Please fill all fields!', 'warning'); return; }
+  if (password.length < 6) { notify('Password must be at least 6 characters', 'warning'); return; }
+
+  setLoading('registerBtn', true);
+  try {
+    const { createUserWithEmailAndPassword } = window.FirebaseFns;
+    const auth = window.FirebaseAuth;
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = cred.user.uid;
+    firebaseUid = uid;
+
+    // Load existing users to get next ID
+    await loadFromStorage();
+    const newId = DB.users.length ? Math.max(...DB.users.map(u => u.id)) + 1 : 1;
+
+    const newUser = {
+      id: newId, authUid: uid, name, email,
+      designation, branch,
+      createdAt: new Date().toISOString()
+    };
+
+    // Save user profile in Firestore (docId = Firebase UID)
+    await fbSet(COLLECTIONS.users, uid, newUser);
+    await saveCounters();
+
+    // Sign out immediately so user can login
+    await window.FirebaseFns.signOut(auth);
+
+    notify('Account created! Please sign in.', 'success');
+    showLogin();
+    document.getElementById('regName').value = '';
+    document.getElementById('regEmail').value = '';
+    document.getElementById('regPassword').value = '';
+    document.getElementById('regBranch').value = '';
+    document.getElementById('regDesignation').value = '';
+  } catch (e) {
+    console.error('[HNB] Register error:', e);
+    let msg = 'Registration failed!';
+    if (e.code === 'auth/email-already-in-use') msg = 'This email is already registered';
+    else if (e.code === 'auth/invalid-email') msg = 'Invalid email format';
+    else if (e.code === 'auth/weak-password') msg = 'Password is too weak (min 6 chars)';
+    notify(msg, 'danger');
+  } finally {
+    setLoading('registerBtn', false, '<i class="bi bi-check-circle"></i> Register');
+  }
+}
+
+async function doForgotPassword() {
+  const email = prompt('Enter your email to receive password reset link:');
+  if (!email) return;
+  try {
+    const { sendPasswordResetEmail } = window.FirebaseFns;
+    await sendPasswordResetEmail(window.FirebaseAuth, email.trim());
+    notify('Password reset email sent! Check your inbox.', 'success');
+  } catch (e) {
+    console.error('[HNB] Reset error:', e);
+    let msg = 'Failed to send reset email';
+    if (e.code === 'auth/user-not-found') msg = 'No account found with this email';
+    else if (e.code === 'auth/invalid-email') msg = 'Invalid email format';
+    notify(msg, 'danger');
+  }
+}
+
+async function doLogout() {
+  if (!confirm('Logout?')) return;
+  try {
+    stopRealtimeSync();
+    await window.FirebaseFns.signOut(window.FirebaseAuth);
+    currentUser = null;
+    firebaseUid = null;
+    DB = { users: [], files: [], logs: [], payments: [], notifications: [] };
+    document.getElementById('appScreen').classList.add('hidden');
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    showLogin();
+    notify('Logged out', 'info');
+  } catch (e) {
+    console.error('[HNB] Logout error:', e);
+  }
+}
+
+function showRegister() { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
+function showLogin() { document.getElementById('registerForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); }
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function enterApp() {
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.remove('hidden');
+  document.getElementById('sideUserName').textContent = currentUser.name;
+  document.getElementById('sideUserDesig').textContent = currentUser.designation;
+  document.getElementById('sideUserBranch').textContent = currentUser.branch;
+  document.getElementById('topUserName').textContent = currentUser.name;
+  document.getElementById('cBranch').value = currentUser.branch;
+  updateNotifBadge();
+  showPage('dashboard');
+}
+
+function showPage(page) {
+  ['dashboard','create','search','payments','report','logs','users','view'].forEach(p => {
+    const el = document.getElementById('page-' + p);
+    if (el) el.classList.add('hidden');
+    const nav = document.getElementById('nav-' + p);
+    if (nav) nav.classList.remove('active');
+  });
+  document.getElementById('page-' + page).classList.remove('hidden');
+  const nav = document.getElementById('nav-' + page);
+  if (nav) nav.classList.add('active');
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'logs') loadLogs();
+  if (page === 'users') loadUsers();
+  if (page === 'search') doSearch();
+  if (page === 'payments') loadPendingPayments();
+  if (page === 'report') loadPaymentReport();
 }
 
 // ============================================================
@@ -1042,7 +1168,7 @@ function renderNotifDropdown() {
 }
 async function openNotifFile(notifId, fileId) {
   const n = DB.notifications.find(x => x.id === notifId);
-  if (n) { n.read = true; await fbSet(COLLECTIONS.notifications, n.id, n); }
+  if (n) { n.read = true; await fbSet(COLLECTIONS.notifications, n._docId || n.id, n); }
   document.getElementById('notifDropdown').classList.add('hidden');
   updateNotifBadge();
   if (fileId) viewFile(fileId); else loadDashboard();
@@ -1052,13 +1178,11 @@ async function markAllRead() {
   const toUpdate = DB.notifications.filter(n => n.userId === currentUser.id && !n.read);
   toUpdate.forEach(n => n.read = true);
   if (toUpdate.length) {
-    const writes = toUpdate.map(n => ({ collection: COLLECTIONS.notifications, docId: n._docId || n.id, data: { read: true } }));
-    await fbBatch(writes);
+    await fbBatch(toUpdate.map(n => ({ collection: COLLECTIONS.notifications, docId: n._docId || n.id, data: { read: true } })));
   }
   updateNotifBadge(); renderNotifDropdown();
   if (!document.getElementById('page-dashboard').classList.contains('hidden')) loadDashboard();
 }
-
 document.addEventListener('click', (e) => {
   const dd = document.getElementById('notifDropdown');
   const btn = e.target.closest('.notif-btn');
@@ -1081,99 +1205,9 @@ function getMyPendingFiles() {
       file, notif,
       fromUser: handoverLog ? handoverLog.userName : 'Unknown',
       fromDesig: handoverLog ? handoverLog.designation : '',
-      sendType: handoverLog ? handoverLog.sendType : '',
-      sendTypeLabel: handoverLog ? handoverLog.sendTypeLabel : '',
       receivedAt: notif.createdAt
     };
   }).filter(Boolean);
-}
-
-// ============================================================
-// AUTH
-// ============================================================
-async function doLogin() {
-  await loadFromStorage();
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPassword').value;
-  if (!email || !pass) { notify('Please enter email and password', 'warning'); return; }
-  const user = DB.users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === pass);
-  if (user) {
-    currentUser = user;
-    sessionStorage.setItem(STORAGE_KEYS.current, user.id);
-    notify(`Welcome back, ${user.name}!`, 'success');
-    enterApp();
-  } else { notify('Invalid email or password!', 'danger'); }
-}
-
-async function doRegister() {
-  await loadFromStorage();
-  const name = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const password = document.getElementById('regPassword').value;
-  const designation = document.getElementById('regDesignation').value;
-  const branch = document.getElementById('regBranch').value.trim().toUpperCase();
-  if (!name || !email || !password || !designation || !branch) { notify('Please fill all fields!', 'warning'); return; }
-  if (password.length < 4) { notify('Password must be at least 4 characters', 'warning'); return; }
-  if (DB.users.find(u => u.email.toLowerCase() === email.toLowerCase())) { notify('Email already exists!', 'danger'); return; }
-  const newId = DB.users.length ? Math.max(...DB.users.map(u => u.id)) + 1 : 1;
-  const newUser = { id: newId, name, email, password, designation, branch };
-  DB.users.push(newUser);
-  await fbSet(COLLECTIONS.users, newId, newUser);
-  await saveCounters();
-  notify('Account created! Please sign in.', 'success');
-  showLogin();
-  document.getElementById('regName').value = '';
-  document.getElementById('regEmail').value = '';
-  document.getElementById('regPassword').value = '';
-  document.getElementById('regBranch').value = '';
-}
-
-function doLogout() {
-  if (!confirm('Logout?')) return;
-  stopRealtimeSync();
-  currentUser = null;
-  sessionStorage.removeItem(STORAGE_KEYS.current);
-  document.getElementById('appScreen').classList.add('hidden');
-  document.getElementById('authScreen').classList.remove('hidden');
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginPassword').value = '';
-  showLogin();
-}
-
-function showRegister() { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
-function showLogin() { document.getElementById('registerForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); }
-
-// ============================================================
-// NAVIGATION
-// ============================================================
-function enterApp() {
-  document.getElementById('authScreen').classList.add('hidden');
-  document.getElementById('appScreen').classList.remove('hidden');
-  document.getElementById('sideUserName').textContent = currentUser.name;
-  document.getElementById('sideUserDesig').textContent = currentUser.designation;
-  document.getElementById('sideUserBranch').textContent = currentUser.branch;
-  document.getElementById('topUserName').textContent = currentUser.name;
-  document.getElementById('cBranch').value = currentUser.branch;
-  updateNotifBadge();
-  showPage('dashboard');
-}
-
-function showPage(page) {
-  ['dashboard','create','search','payments','report','logs','users','view'].forEach(p => {
-    const el = document.getElementById('page-' + p);
-    if (el) el.classList.add('hidden');
-    const nav = document.getElementById('nav-' + p);
-    if (nav) nav.classList.remove('active');
-  });
-  document.getElementById('page-' + page).classList.remove('hidden');
-  const nav = document.getElementById('nav-' + page);
-  if (nav) nav.classList.add('active');
-  if (page === 'dashboard') loadDashboard();
-  if (page === 'logs') loadLogs();
-  if (page === 'users') loadUsers();
-  if (page === 'search') doSearch();
-  if (page === 'payments') loadPendingPayments();
-  if (page === 'report') loadPaymentReport();
 }
 
 // ============================================================
@@ -1205,10 +1239,10 @@ function loadDashboard() {
     document.getElementById('pendingCountBadge').textContent = pending.length;
     document.getElementById('pendingBody').innerHTML = pending.map(p => `
       <tr class="unread-row">
-        <td><b>${escapeHtml(p.file.apNo)}</b><br><small class="text-muted">${escapeHtml(p.file.manualDO) || ''}</small></td>
+        <td><b>${escapeHtml(p.file.apNo)}</b></td>
         <td>${escapeHtml(p.file.customer) || '-'}</td>
         <td><b>${escapeHtml(p.fromUser)}</b><br><small class="text-muted">${escapeHtml(p.fromDesig)}</small></td>
-        <td><small>${formatDateTime(p.receivedAt)}<br><span class="text-muted">${timeAgo(p.receivedAt)}</span></small></td>
+        <td><small>${formatDateTime(p.receivedAt)}</small></td>
         <td><button class="btn btn-sm btn-primary" onclick="viewFile(${p.file.id})"><i class="bi bi-eye"></i> Open</button></td>
       </tr>`).join('');
   } else {
@@ -1228,25 +1262,20 @@ function loadDashboard() {
     return `<tr>
       <td><b>${escapeHtml(f.apNo)}</b></td>
       <td>${escapeHtml(f.nic)}</td>
-      <td>${escapeHtml(f.customer) || '<span class="text-muted">-</span>'}</td>
+      <td>${escapeHtml(f.customer) || '-'}</td>
       <td>Rs. ${Number(f.amount).toLocaleString('en-LK', {minimumFractionDigits:2})}</td>
-      <td>${payChips || '<span class="text-muted">-</span>'}</td>
+      <td>${payChips || '-'}</td>
       <td>${escapeHtml(f.branch)}</td>
       <td>${statusBadge(f.status)}</td>
       <td><button class="btn btn-sm btn-primary" onclick="viewFile(${f.id})"><i class="bi bi-eye"></i></button></td>
     </tr>`;
   }).join('');
 }
-
 function statusBadge(status) {
   const map = {
-    'Created': 'bg-secondary',
-    'In Progress': 'bg-warning text-dark',
-    'With Branch Manager': 'bg-info text-dark',
-    'Sent to Head Office': 'bg-primary',
-    'Approved': 'bg-success',
-    'Rejected': 'bg-danger',
-    'Completed': 'bg-success'
+    'Created': 'bg-secondary', 'In Progress': 'bg-warning text-dark',
+    'With Branch Manager': 'bg-info text-dark', 'Sent to Head Office': 'bg-primary',
+    'Approved': 'bg-success', 'Rejected': 'bg-danger', 'Completed': 'bg-success'
   };
   return `<span class="badge ${map[status] || 'bg-secondary'}">${status}</span>`;
 }
@@ -1257,21 +1286,17 @@ function statusBadge(status) {
 function loadPendingPayments() {
   const container = document.getElementById('pendingPaymentsContent');
   const pending = getMyPendingPayments();
-
   if (pending.length === 0) {
     container.innerHTML = `<div class="card p-3"><div class="empty-state"><i class="bi bi-check2-circle"></i><p>🎉 No pending payments! All done.</p></div></div>`;
     return;
   }
-
   const grouped = {};
   pending.forEach(item => {
     const key = item.file.id;
     if (!grouped[key]) grouped[key] = { file: item.file, payments: [] };
     grouped[key].payments.push(item.payment);
   });
-
   let html = `<div class="alert alert-warning mb-3"><i class="bi bi-info-circle"></i> You have <b>${pending.length}</b> pending payment(s) across <b>${Object.keys(grouped).length}</b> file(s).</div>`;
-
   Object.values(grouped).forEach(group => {
     html += `
       <div class="card p-3 mb-3">
@@ -1305,7 +1330,6 @@ function loadPendingPayments() {
         </div>
       </div>`;
   });
-
   container.innerHTML = html;
 }
 
@@ -1352,7 +1376,6 @@ async function createFile() {
 
   const paymentsData = {};
   let hasError = false;
-
   PAYMENT_TYPES.forEach(type => {
     const checkbox = document.getElementById('payCheck-' + type);
     if (checkbox && checkbox.checked) {
@@ -1366,75 +1389,51 @@ async function createFile() {
       paymentsData[type] = { amount: payAmount, remarks: payRemarks };
     }
   });
-
   if (hasError) return;
 
-  const fileId = nextFileId++;
-  const now = new Date().toISOString();
+  setLoading('createFileBtn', true);
+  try {
+    const fileId = nextFileId++;
+    const now = new Date().toISOString();
 
-  const newFile = {
-    id: fileId, apNo, nic, customer,
-    amount: parseFloat(amount),
-    branch, manualDO,
-    createdBy: currentUser.id,
-    status: 'Created',
-    headOfficeSent: false,
-    createdAt: now
-  };
-  DB.files.push(newFile);
+    const newFile = { id: fileId, apNo, nic, customer, amount: parseFloat(amount), branch, manualDO, createdBy: currentUser.id, status: 'Created', headOfficeSent: false, createdAt: now };
+    DB.files.push(newFile);
 
-  const newLog = {
-    id: nextLogId++, fileId,
-    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
-    action: 'Created File', location: currentUser.branch,
-    remarks: manualDO ? `Manual DO: ${manualDO}` : '', createdAt: now
-  };
-  DB.logs.push(newLog);
+    const newLog = { id: nextLogId++, fileId, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Created File', location: currentUser.branch, remarks: manualDO ? `Manual DO: ${manualDO}` : '', createdAt: now };
+    DB.logs.push(newLog);
 
-  const newPayments = [];
-  const newPaymentLogs = [];
-  PAYMENT_TYPES.forEach(type => {
-    if (paymentsData[type]) {
-      const p = {
-        id: nextPayId++, fileId, paymentType: type,
-        status: 'paid',
-        amount: paymentsData[type].amount,
-        remarks: paymentsData[type].remarks,
-        markedBy: currentUser.id, markedByName: currentUser.name, markedAt: now
-      };
-      DB.payments.push(p);
-      newPayments.push(p);
-      const lg = {
-        id: nextLogId++, fileId,
-        userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
-        action: `${type} Payment Added — Paid`,
-        location: currentUser.branch,
-        remarks: `Amount: Rs. ${paymentsData[type].amount.toLocaleString()}${paymentsData[type].remarks ? ' — ' + paymentsData[type].remarks : ''}`,
-        createdAt: now
-      };
-      DB.logs.push(lg);
-      newPaymentLogs.push(lg);
-    } else {
-      const p = {
-        id: nextPayId++, fileId, paymentType: type,
-        status: 'pending', amount: 0, remarks: '',
-        markedBy: null, markedByName: null, markedAt: null
-      };
-      DB.payments.push(p);
-      newPayments.push(p);
-    }
-  });
+    const newPayments = [];
+    const newPaymentLogs = [];
+    PAYMENT_TYPES.forEach(type => {
+      if (paymentsData[type]) {
+        const p = { id: nextPayId++, fileId, paymentType: type, status: 'paid', amount: paymentsData[type].amount, remarks: paymentsData[type].remarks, markedBy: currentUser.id, markedByName: currentUser.name, markedAt: now };
+        DB.payments.push(p);
+        newPayments.push(p);
+        const lg = { id: nextLogId++, fileId, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: `${type} Payment Added — Paid`, location: currentUser.branch, remarks: `Amount: Rs. ${paymentsData[type].amount.toLocaleString()}`, createdAt: now };
+        DB.logs.push(lg);
+        newPaymentLogs.push(lg);
+      } else {
+        const p = { id: nextPayId++, fileId, paymentType: type, status: 'pending', amount: 0, remarks: '', markedBy: null, markedByName: null, markedAt: null };
+        DB.payments.push(p);
+        newPayments.push(p);
+      }
+    });
 
-  // Save to Firestore
-  await fbSet(COLLECTIONS.files, fileId, newFile);
-  await fbSet(COLLECTIONS.logs, newLog.id, newLog);
-  for (const p of newPayments) await fbSet(COLLECTIONS.payments, p.id, p);
-  for (const lg of newPaymentLogs) await fbSet(COLLECTIONS.logs, lg.id, lg);
-  await saveCounters();
+    await fbSet(COLLECTIONS.files, fileId, newFile);
+    await fbSet(COLLECTIONS.logs, newLog.id, newLog);
+    for (const p of newPayments) await fbSet(COLLECTIONS.payments, p.id, p);
+    for (const lg of newPaymentLogs) await fbSet(COLLECTIONS.logs, lg.id, lg);
+    await saveCounters();
 
-  clearCreateForm();
-  notify(`File created! (AP: ${apNo})`, 'success');
-  setTimeout(() => openSendToBM(fileId, apNo), 300);
+    clearCreateForm();
+    notify(`File created! (AP: ${apNo})`, 'success');
+    setTimeout(() => openSendToBM(fileId, apNo), 300);
+  } catch (e) {
+    console.error('[HNB] Create file error:', e);
+    notify('Failed to create file!', 'danger');
+  } finally {
+    setLoading('createFileBtn', false, '<i class="bi bi-save"></i> Submit File');
+  }
 }
 
 function clearCreateForm() {
@@ -1445,7 +1444,7 @@ function clearCreateForm() {
   document.getElementById('cBranch').value = currentUser.branch;
   PAYMENT_TYPES.forEach(type => {
     const cb = document.getElementById('payCheck-' + type);
-    if (cb) { cb.checked = false; }
+    if (cb) cb.checked = false;
     const toggle = document.getElementById('payToggle-' + type);
     if (toggle) toggle.classList.remove('active');
     const inputs = document.getElementById('payInputs-' + type);
@@ -1489,20 +1488,14 @@ function openSendToBM(fileId, apNo) {
         <i class="bi bi-exclamation-triangle-fill"></i>
         <div>
           <div class="warning-title">No Branch Manager found in your branch!</div>
-          <div class="warning-desc">
-            Only the Branch Manager of <b>${escapeHtml(currentUser.branch)}</b> branch can receive this file.<br>
-            Please ask them to register first.<br>
-            <b>Note:</b> Click "Skip for Now" to save the file.
-          </div>
+          <div class="warning-desc">Only the Branch Manager of <b>${escapeHtml(currentUser.branch)}</b> branch can receive this file.</div>
         </div>
       </div>`;
   } else {
     sel.disabled = false;
     warningBox.innerHTML = '';
     sel.innerHTML = `<optgroup label="${currentUser.branch} Branch">`;
-    sameBranchBMs.forEach(u => {
-      sel.innerHTML += `<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.branch)}</option>`;
-    });
+    sameBranchBMs.forEach(u => { sel.innerHTML += `<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.branch)}</option>`; });
     sel.innerHTML += '</optgroup>';
   }
 
@@ -1517,20 +1510,16 @@ function selectBMSendType(type) {
 }
 async function confirmSendToBM() {
   const fileId = parseInt(document.getElementById('stFileId').value);
-  const sel = document.getElementById('stBranchManager');
-  const toUserId = parseInt(sel.value);
+  const toUserId = parseInt(document.getElementById('stBranchManager').value);
   const remarks = document.getElementById('stRemarks').value.trim();
 
-  if (hasBeenSentToBM(fileId)) { notify('This file has already been sent!', 'danger'); sendToBMModalInstance.hide(); return; }
+  if (hasBeenSentToBM(fileId)) { notify('Already sent!', 'danger'); sendToBMModalInstance.hide(); return; }
   if (!toUserId || isNaN(toUserId)) { notify('Please select a Branch Manager', 'warning'); return; }
   if (!selectedBMSendType) { notify('Please select what you are sending', 'warning'); return; }
 
   const toUser = DB.users.find(u => u.id === toUserId);
   const file = DB.files.find(f => f.id === fileId);
-  if (!toUser) { notify('Branch Manager not found', 'danger'); return; }
-  if (!file) { notify('File not found', 'danger'); return; }
-  if (toUser.designation !== 'Branch Manager') { notify('Only a Branch Manager can receive this file!', 'danger'); return; }
-  if (toUser.branch.toUpperCase() !== currentUser.branch.toUpperCase()) { notify('Only your branch manager can receive this file!', 'danger'); return; }
+  if (!toUser || !file) { notify('Not found', 'danger'); return; }
 
   const now = new Date().toISOString();
   const sendTypeLabels = { 'file': 'File Only', 'manualDO': 'Manual DO', 'both': 'File + Manual DO', 'other': 'Other' };
@@ -1538,8 +1527,7 @@ async function confirmSendToBM() {
   const logEntry = {
     id: nextLogId++, fileId,
     userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
-    action: `Sent to Branch Manager (${toUser.name})`,
-    location: toUser.branch,
+    action: `Sent to Branch Manager (${toUser.name})`, location: toUser.branch,
     handoverTo: toUser.id, handoverToName: toUser.name, handoverToDesig: toUser.designation,
     sendType: selectedBMSendType, sendTypeLabel: sendTypeLabels[selectedBMSendType],
     remarks: remarks || '', createdAt: now
@@ -1547,12 +1535,10 @@ async function confirmSendToBM() {
   DB.logs.push(logEntry);
 
   const sendTypeText = selectedBMSendType === 'manualDO' ? 'Manual DO only' : selectedBMSendType === 'file' ? 'File only' : selectedBMSendType === 'both' ? 'File + Manual DO' : 'Document';
-  await createNotification(
-    toUser.id, 'file_received',
+  await createNotification(toUser.id, 'file_received',
     `New file received: ${file.apNo} (${sendTypeText})`,
     `From ${currentUser.name} (${currentUser.designation}) — Sending: ${sendTypeText}${remarks ? ' — Note: ' + remarks : ''}`,
-    fileId
-  );
+    fileId);
 
   if (file.status === 'Created') file.status = 'In Progress';
 
@@ -1577,18 +1563,11 @@ function skipSend() {
 async function acceptFile(fileId) {
   const file = DB.files.find(f => f.id === fileId);
   if (!file) return;
-  if (!isCurrentHolder(fileId)) { notify('You are not the current holder of this file!', 'danger'); return; }
+  if (!isCurrentHolder(fileId)) { notify('You are not the current holder!', 'danger'); return; }
   const now = new Date().toISOString();
   const notifsToRead = DB.notifications.filter(n => n.userId === currentUser.id && n.fileId === fileId && !n.read);
   notifsToRead.forEach(n => n.read = true);
-  const newLog = {
-    id: nextLogId++, fileId,
-    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
-    action: 'Accepted File (In Hand)',
-    location: currentUser.branch,
-    remarks: 'File received and taken into hand',
-    createdAt: now
-  };
+  const newLog = { id: nextLogId++, fileId, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Accepted File (In Hand)', location: currentUser.branch, remarks: 'File received and taken into hand', createdAt: now };
   DB.logs.push(newLog);
   if (file.status === 'Created' || file.status === 'In Progress') file.status = 'With Branch Manager';
 
@@ -1598,7 +1577,6 @@ async function acceptFile(fileId) {
     await fbBatch(notifsToRead.map(n => ({ collection: COLLECTIONS.notifications, docId: n._docId || n.id, data: { read: true } })));
   }
   await saveCounters();
-
   notify('File accepted!', 'success');
   updateNotifBadge();
   viewFile(fileId);
@@ -1610,40 +1588,27 @@ async function acceptFile(fileId) {
 async function sendToHeadOffice(fileId) {
   const file = DB.files.find(f => f.id === fileId);
   if (!file) return;
-  if (currentUser.designation !== 'Branch Manager') { notify('Only Branch Managers can send files to Head Office!', 'danger'); return; }
+  if (currentUser.designation !== 'Branch Manager') { notify('Only Branch Managers can send to Head Office!', 'danger'); return; }
   if (!isCurrentHolder(fileId)) { notify('You are not the current holder!', 'danger'); return; }
-  if (hasBeenSentToHO(fileId)) { notify('Already sent to Head Office!', 'danger'); return; }
+  if (hasBeenSentToHO(fileId)) { notify('Already sent!', 'danger'); return; }
 
   const hoUser = DB.users.find(u => u.designation === 'Head Office');
   const now = new Date().toISOString();
   file.headOfficeSent = true;
   file.status = 'Sent to Head Office';
 
-  const newLog = {
-    id: nextLogId++, fileId,
-    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
-    action: 'Sent to Head Office',
-    location: 'Head Office',
-    handoverTo: hoUser ? hoUser.id : null,
-    handoverToName: hoUser ? hoUser.name : 'Head Office',
-    handoverToDesig: 'Head Office',
-    remarks: 'File dispatched to Head Office',
-    createdAt: now
-  };
+  const newLog = { id: nextLogId++, fileId, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Sent to Head Office', location: 'Head Office', handoverTo: hoUser ? hoUser.id : null, handoverToName: hoUser ? hoUser.name : 'Head Office', handoverToDesig: 'Head Office', remarks: 'File dispatched to Head Office', createdAt: now };
   DB.logs.push(newLog);
 
   if (hoUser) {
-    await createNotification(
-      hoUser.id, 'file_received',
+    await createNotification(hoUser.id, 'file_received',
       `New file received: ${file.apNo} (from Branch)`,
       `From ${currentUser.name} (${currentUser.designation}) — File from ${currentUser.branch} branch`,
-      fileId
-    );
+      fileId);
   }
   await fbSet(COLLECTIONS.logs, newLog.id, newLog);
   await fbSet(COLLECTIONS.files, fileId, file);
   await saveCounters();
-
   notify('File sent to Head Office!', 'success');
   updateNotifBadge();
   viewFile(fileId);
@@ -1655,8 +1620,8 @@ async function sendToHeadOffice(fileId) {
 function openHandover(id) {
   const file = DB.files.find(f => f.id === id);
   if (!file) { notify('File not found', 'danger'); return; }
-  if (!canUserAct(file)) { notify('No permission to handover!', 'danger'); return; }
-  if (hasBeenSentToHO(id)) { notify('Already sent to Head Office!', 'danger'); return; }
+  if (!canUserAct(file)) { notify('No permission!', 'danger'); return; }
+  if (hasBeenSentToHO(id)) { notify('Already sent!', 'danger'); return; }
 
   document.getElementById('hoFileId').value = id;
   document.getElementById('hoRemarks').value = '';
@@ -1673,9 +1638,7 @@ function openHandover(id) {
     sel.disabled = true;
   } else {
     sel.disabled = false;
-    otherUsers.forEach(u => {
-      sel.innerHTML += `<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.designation)} (${escapeHtml(u.branch)})</option>`;
-    });
+    otherUsers.forEach(u => { sel.innerHTML += `<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.designation)} (${escapeHtml(u.branch)})</option>`; });
   }
   if (!handoverModalInstance) handoverModalInstance = new bootstrap.Modal(document.getElementById('handoverModal'));
   handoverModalInstance.show();
@@ -1697,14 +1660,13 @@ async function confirmHandover() {
   const checkFile = DB.files.find(f => f.id === fileId);
   if (!checkFile) { notify('File not found', 'danger'); return; }
   if (!canUserAct(checkFile)) { notify('No permission!', 'danger'); return; }
-  if (hasBeenSentToHO(fileId)) { notify('Already sent to Head Office!', 'danger'); return; }
+  if (hasBeenSentToHO(fileId)) { notify('Already sent!', 'danger'); return; }
   if (!toUserId || isNaN(toUserId)) { notify('Please select a user', 'warning'); return; }
   if (!selectedHOSendType) { notify('Please select what you are sending', 'warning'); return; }
 
   const toUser = DB.users.find(u => u.id === toUserId);
   const file = DB.files.find(f => f.id === fileId);
-  if (!toUser) { notify('User not found', 'danger'); return; }
-  if (!file) { notify('File not found', 'danger'); return; }
+  if (!toUser || !file) { notify('Not found', 'danger'); return; }
 
   const now = new Date().toISOString();
   const sendTypeLabels = { 'file': 'File Only', 'manualDO': 'Manual DO', 'both': 'File + Manual DO', 'other': 'Other' };
@@ -1713,27 +1675,22 @@ async function confirmHandover() {
   const newLog = {
     id: nextLogId++, fileId,
     userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
-    action: `Handed Over to ${toUser.name}`,
-    location: toUser.branch,
+    action: `Handed Over to ${toUser.name}`, location: toUser.branch,
     handoverTo: toUser.id, handoverToName: toUser.name, handoverToDesig: toUser.designation,
     sendType: selectedHOSendType, sendTypeLabel: sendTypeLabels[selectedHOSendType],
-    remarks: remarks || (manualDO ? `Manual DO: ${manualDO}` : ''),
-    createdAt: now
+    remarks: remarks || (manualDO ? `Manual DO: ${manualDO}` : ''), createdAt: now
   };
   DB.logs.push(newLog);
 
   const sendTypeText = selectedHOSendType === 'manualDO' ? 'Manual DO only' : selectedHOSendType === 'file' ? 'File only' : selectedHOSendType === 'both' ? 'File + Manual DO' : 'Document';
-  await createNotification(
-    toUser.id, 'file_received',
+  await createNotification(toUser.id, 'file_received',
     `New file received: ${file.apNo} (${sendTypeText})`,
     `From ${currentUser.name} (${currentUser.designation}) — Sending: ${sendTypeText}${remarks ? ' — Note: ' + remarks : ''}`,
-    fileId
-  );
+    fileId);
 
   await fbSet(COLLECTIONS.logs, newLog.id, newLog);
   await fbSet(COLLECTIONS.files, fileId, file);
   await saveCounters();
-
   handoverModalInstance.hide();
   notify(`File handed over to ${toUser.name}!`, 'success');
   updateNotifBadge();
@@ -1746,7 +1703,7 @@ async function confirmHandover() {
 function openPaymentModal(fileId, payType) {
   const file = DB.files.find(f => f.id === fileId);
   if (!file) { notify('File not found', 'danger'); return; }
-  if (!canUserAct(file)) { notify('You do not have permission!', 'danger'); return; }
+  if (!canUserAct(file)) { notify('No permission!', 'danger'); return; }
 
   const existing = getPaymentRecord(fileId, payType);
   document.getElementById('pmFileId').value = fileId;
@@ -1786,14 +1743,10 @@ async function confirmPayment() {
   const amount = parseFloat(document.getElementById('pmAmount').value) || 0;
 
   if (!selectedPMAction) { notify('Please select a status', 'warning'); return; }
-  if (selectedPMAction === 'paid' && (!amount || amount <= 0)) {
-    notify('Please enter valid amount for Paid status', 'warning');
-    return;
-  }
+  if (selectedPMAction === 'paid' && (!amount || amount <= 0)) { notify('Please enter valid amount', 'warning'); return; }
 
   const file = DB.files.find(f => f.id === fileId);
-  if (!file) { notify('File not found', 'danger'); return; }
-  if (!canUserAct(file)) { notify('No permission!', 'danger'); return; }
+  if (!file || !canUserAct(file)) { notify('No permission!', 'danger'); return; }
 
   const existing = getPaymentRecord(fileId, payType);
   const now = new Date().toISOString();
@@ -1809,25 +1762,11 @@ async function confirmPayment() {
     existing.markedAt = now;
     payDoc = existing;
   } else {
-    payDoc = {
-      id: nextPayId++, fileId, paymentType: payType,
-      status: selectedPMAction,
-      amount: selectedPMAction === 'paid' ? amount : 0,
-      remarks, markedBy: currentUser.id, markedByName: currentUser.name, markedAt: now
-    };
+    payDoc = { id: nextPayId++, fileId, paymentType: payType, status: selectedPMAction, amount: selectedPMAction === 'paid' ? amount : 0, remarks, markedBy: currentUser.id, markedByName: currentUser.name, markedAt: now };
     DB.payments.push(payDoc);
   }
 
-  const newLog = {
-    id: nextLogId++, fileId,
-    userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation,
-    action: `${payType} Payment — ${statusLabel}`,
-    location: currentUser.branch,
-    remarks: selectedPMAction === 'paid' && amount > 0 
-      ? `Amount: Rs. ${amount.toLocaleString()}${remarks ? ' — ' + remarks : ''}`
-      : remarks || `Marked as ${statusLabel}`,
-    createdAt: now
-  };
+  const newLog = { id: nextLogId++, fileId, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: `${payType} Payment — ${statusLabel}`, location: currentUser.branch, remarks: selectedPMAction === 'paid' && amount > 0 ? `Amount: Rs. ${amount.toLocaleString()}` : remarks || `Marked as ${statusLabel}`, createdAt: now };
   DB.logs.push(newLog);
 
   await fbSet(COLLECTIONS.payments, payDoc._docId || payDoc.id, payDoc);
@@ -1837,7 +1776,6 @@ async function confirmPayment() {
   paymentModalInstance.hide();
   notify(`${payType} payment marked as ${statusLabel}!`, 'success');
   updateNotifBadge();
-
   if (!document.getElementById('page-payments').classList.contains('hidden')) loadPendingPayments();
   else if (!document.getElementById('page-report').classList.contains('hidden')) loadPaymentReport();
   else viewFile(fileId);
@@ -1857,14 +1795,12 @@ function doSearch() {
     );
   }
   if (results.length === 0) {
-    box.innerHTML = `<div class="card p-3"><div class="empty-state"><i class="bi bi-search"></i><p>${q ? 'No files matching your search' : 'Start typing to search files...'}</p></div></div>`;
+    box.innerHTML = `<div class="card p-3"><div class="empty-state"><i class="bi bi-search"></i><p>${q ? 'No files found' : 'Start typing to search...'}</p></div></div>`;
     return;
   }
   box.innerHTML = `
     <div class="card p-3">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="fw-semibold m-0"><i class="bi bi-list-check text-primary"></i> ${results.length} result(s)</h6>
-      </div>
+      <h6 class="fw-semibold mb-3"><i class="bi bi-list-check text-primary"></i> ${results.length} result(s)</h6>
       <div class="table-responsive">
         <table class="table">
           <thead><tr><th>AP NO</th><th>DO NO</th><th>NIC</th><th>CUSTOMER</th><th>BRANCH</th><th>PAYMENTS</th><th>STATUS</th><th>HOLDER</th><th>ACTION</th></tr></thead>
@@ -1875,14 +1811,14 @@ function doSearch() {
               const payChips = filePayments.map(p => payReportChip(p.type, p)).join('');
               return `<tr>
                 <td><b>${escapeHtml(f.apNo)}</b></td>
-                <td>${escapeHtml(f.manualDO) || '<span class="text-muted">-</span>'}</td>
+                <td>${escapeHtml(f.manualDO) || '-'}</td>
                 <td>${escapeHtml(f.nic)}</td>
-                <td>${escapeHtml(f.customer) || '<span class="text-muted">-</span>'}</td>
+                <td>${escapeHtml(f.customer) || '-'}</td>
                 <td>${escapeHtml(f.branch)}</td>
                 <td>${payChips || '-'}</td>
                 <td>${statusBadge(f.status)}</td>
-                <td>${lastLog ? `<div><b>${escapeHtml(lastLog.userName)}</b><br><small class="text-muted">${escapeHtml(lastLog.designation)}</small></div>` : '<span class="text-muted">-</span>'}</td>
-                <td><button class="btn btn-sm btn-primary" onclick="viewFile(${f.id})"><i class="bi bi-eye"></i> Open</button></td>
+                <td>${lastLog ? `<b>${escapeHtml(lastLog.userName)}</b><br><small class="text-muted">${escapeHtml(lastLog.designation)}</small>` : '-'}</td>
+                <td><button class="btn btn-sm btn-primary" onclick="viewFile(${f.id})"><i class="bi bi-eye"></i></button></td>
               </tr>`;
             }).join('')}
           </tbody>
@@ -1954,8 +1890,7 @@ function viewFile(id) {
             <i class="bi bi-check-circle-fill"></i> Accept File
           </button>
         </div>
-      </div>
-    ` : ''}
+      </div>` : ''}
 
     ${userCanSendBM ? `
       <div class="card p-3 mb-3" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:5px solid #f59e0b;">
@@ -1963,7 +1898,7 @@ function viewFile(id) {
           <div class="d-flex align-items-center gap-3">
             <i class="bi bi-info-circle-fill" style="font-size:28px;color:#d97706;"></i>
             <div>
-              <div style="font-weight:600;color:#92400e;">This file has not been sent to the Branch Manager yet.</div>
+              <div style="font-weight:600;color:#92400e;">Not yet sent to Branch Manager</div>
               <div style="font-size:13px;color:#78350f;">You can send Manual DO / File / Both.</div>
             </div>
           </div>
@@ -1971,32 +1906,7 @@ function viewFile(id) {
             <i class="bi bi-send"></i> Send to Branch Manager
           </button>
         </div>
-      </div>
-    ` : ''}
-
-    ${fileSentToBM && !fileSentToHO ? `
-      <div class="card p-3 mb-3" style="background:#f1f5f9;border-left:5px solid #64748b;">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-info-circle-fill" style="font-size:24px;color:#64748b;"></i>
-          <div>
-            <div style="font-weight:600;color:#334155;">File already sent to Branch Manager</div>
-            <div style="font-size:12px;color:#64748b;">Cannot send again to Branch Manager</div>
-          </div>
-        </div>
-      </div>
-    ` : ''}
-
-    ${fileSentToHO ? `
-      <div class="card p-3 mb-3" style="background:#dcfce7;border-left:5px solid #16a34a;">
-        <div class="d-flex align-items-center gap-3">
-          <i class="bi bi-check-circle-fill" style="font-size:24px;color:#16a34a;"></i>
-          <div>
-            <div style="font-weight:600;color:#166534;">File sent to Head Office</div>
-            <div style="font-size:12px;color:#166534;">This file has been dispatched to Head Office</div>
-          </div>
-        </div>
-      </div>
-    ` : ''}
+      </div>` : ''}
 
     ${noPermission ? `
       <div class="card p-4 mb-3">
@@ -2004,14 +1914,10 @@ function viewFile(id) {
           <i class="bi bi-lock-fill"></i>
           <div>
             <div class="np-title">You don't have permission to act on this file</div>
-            <div class="np-desc">
-              This file belongs to <b>${escapeHtml(currentHolder ? currentHolder.userName : 'another user')}</b>.
-              You can only <b>view</b> this file.
-            </div>
+            <div class="np-desc">This file belongs to <b>${escapeHtml(currentHolder ? currentHolder.userName : 'another user')}</b>.</div>
           </div>
         </div>
-      </div>
-    ` : ''}
+      </div>` : ''}
 
     <div class="row g-3">
       <div class="col-md-6">
@@ -2030,7 +1936,6 @@ function viewFile(id) {
           </table>
         </div>
       </div>
-
       <div class="col-md-6">
         <div class="card p-4 mb-3" style="background:linear-gradient(135deg,#0d6efd,#4d8bff);color:#fff;">
           <h6 class="fw-semibold mb-2"><i class="bi bi-person-badge"></i> Current Holder</h6>
@@ -2042,47 +1947,29 @@ function viewFile(id) {
                 <div style="font-size:13px;opacity:0.9;">${escapeHtml(currentHolder.designation)} • ${escapeHtml(currentHolder.location)}</div>
                 <div style="font-size:11px;opacity:0.8;margin-top:3px;"><i class="bi bi-clock"></i> ${formatDateTime(currentHolder.createdAt)}</div>
               </div>
-            </div>
-          ` : `<div class="text-white-50">Not yet handed over</div>`}
+            </div>` : `<div class="text-white-50">Not yet handed over</div>`}
         </div>
-
         ${userCanAct && !noPermission ? `
         <div class="card p-4">
-          <h6 class="fw-semibold mb-3"><i class="bi bi-lightning-charge text-warning"></i> File Actions</h6>
-
-          ${userCanHandover ? `
-            <button class="btn btn-primary w-100 mb-2" onclick="openHandover(${id})">
-              <i class="bi bi-arrow-left-right"></i> Handover to Someone
-            </button>
-          ` : ''}
-
-          ${userCanSendHO ? `
-            <button class="btn btn-success w-100 mb-2" onclick="sendToHeadOffice(${id})">
-              <i class="bi bi-building-fill"></i> Send to Head Office
-            </button>
-          ` : ''}
-
-          <label class="form-label small mt-2">Update File Status</label>
+          <h6 class="fw-semibold mb-3"><i class="bi bi-lightning-charge text-warning"></i> Actions</h6>
+          ${userCanHandover ? `<button class="btn btn-primary w-100 mb-2" onclick="openHandover(${id})"><i class="bi bi-arrow-left-right"></i> Handover</button>` : ''}
+          ${userCanSendHO ? `<button class="btn btn-success w-100 mb-2" onclick="sendToHeadOffice(${id})"><i class="bi bi-building-fill"></i> Send to Head Office</button>` : ''}
+          <label class="form-label small mt-2">Update Status</label>
           <div class="input-group mb-2">
             <select id="statusSelect" class="form-select">
-              ${['Created','In Progress','With Branch Manager','Sent to Head Office','Approved','Rejected','Completed'].map(s =>
-                `<option ${file.status===s?'selected':''}>${s}</option>`).join('')}
+              ${['Created','In Progress','With Branch Manager','Sent to Head Office','Approved','Rejected','Completed'].map(s => `<option ${file.status===s?'selected':''}>${s}</option>`).join('')}
             </select>
             <button class="btn btn-primary" onclick="updateStatus(${id})">Update</button>
           </div>
-        </div>
-        ` : ''}
+        </div>` : ''}
       </div>
     </div>
 
     <div class="card p-4 mt-3">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h6 class="fw-semibold m-0"><i class="bi bi-cash-coin text-success"></i> Payments</h6>
-        <div>
-          <span class="badge bg-primary">Total Paid: Rs. ${grandTotal.toLocaleString('en-LK', {minimumFractionDigits:2})}</span>
-        </div>
+        <span class="badge bg-primary">Total Paid: Rs. ${grandTotal.toLocaleString('en-LK', {minimumFractionDigits:2})}</span>
       </div>
-
       <div class="row g-3">
         ${filePayments.map(p => `
           <div class="col-md-4">
@@ -2098,16 +1985,9 @@ function viewFile(id) {
                   When: <b>${formatDateTime(p.markedAt)}</b>
                   ${p.remarks ? `<br>Note: <i>${escapeHtml(p.remarks)}</i>` : ''}
                 ` : p.status === 'rejected' ? `
-                  <b class="text-danger">Payment Rejected</b><br>
-                  Marked by: <b>${escapeHtml(p.markedByName || '-')}</b><br>
-                  When: <b>${formatDateTime(p.markedAt)}</b>
-                  ${p.remarks ? `<br>Reason: <i>${escapeHtml(p.remarks)}</i>` : ''}
-                ` : p.status === 'not-required' ? `
-                  <span class="text-muted">Not required</span>
-                  ${p.markedByName ? `<br>By: <b>${escapeHtml(p.markedByName)}</b>` : ''}
-                ` : `
+                  <b class="text-danger">Rejected</b><br>By: <b>${escapeHtml(p.markedByName || '-')}</b><br>When: <b>${formatDateTime(p.markedAt)}</b>
+                ` : p.status === 'not-required' ? `<span class="text-muted">Not required</span>` : `
                   <span class="text-muted">Waiting for payment</span>
-                  ${p.markedByName ? `<br>By: <b>${escapeHtml(p.markedByName)}</b><br>When: <b>${formatDateTime(p.markedAt)}</b>` : ''}
                 `}
               </div>
               ${userCanAct ? `
@@ -2115,32 +1995,27 @@ function viewFile(id) {
                   <button class="btn ${p.status === 'pending' ? 'btn-warning' : 'btn-outline-secondary'} w-100" onclick="openPaymentModal(${id}, '${p.type}')">
                     <i class="bi bi-pencil"></i> ${p.status === 'pending' ? 'Update Payment' : 'Change Status'}
                   </button>
-                </div>
-              ` : ''}
+                </div>` : ''}
             </div>
           </div>
         `).join('')}
       </div>
     </div>
 
-    <div class="row g-3 mt-3">
-      <div class="col-md-12">
-        <div class="card p-4">
-          <h6 class="fw-semibold mb-3"><i class="bi bi-diagram-3 text-primary"></i> File Timeline</h6>
-          ${logs.length === 0 ? '<div class="text-center text-muted py-4">No history yet</div>' : `
-          <div class="timeline">
-            ${logs.map(l => `
-              <div class="timeline-item">
-                <div class="tl-time"><i class="bi bi-clock"></i> ${formatDateTime(l.createdAt)} <span class="ms-2 badge bg-light text-dark">${timeAgo(l.createdAt)}</span></div>
-                <div class="tl-title">${escapeHtml(l.action)}</div>
-                <div class="tl-desc"><i class="bi bi-person"></i> <b>${escapeHtml(l.userName)}</b> (${escapeHtml(l.designation)}) • <i class="bi bi-geo-alt"></i> ${escapeHtml(l.location)}</div>
-                ${l.sendTypeLabel ? `<div class="mt-1">${sendTypeBadge(l.sendType)}</div>` : ''}
-                ${l.remarks ? `<div class="tl-desc mt-1 p-2" style="background:#f8fafc;border-radius:8px;border-left:3px solid #0d6efd;"><i class="bi bi-chat-left-text"></i> <i>${escapeHtml(l.remarks)}</i></div>` : ''}
-              </div>
-            `).join('')}
-          </div>`}
-        </div>
-      </div>
+    <div class="card p-4 mt-3">
+      <h6 class="fw-semibold mb-3"><i class="bi bi-diagram-3 text-primary"></i> File Timeline</h6>
+      ${logs.length === 0 ? '<div class="text-center text-muted py-4">No history yet</div>' : `
+      <div class="timeline">
+        ${logs.map(l => `
+          <div class="timeline-item">
+            <div class="tl-time"><i class="bi bi-clock"></i> ${formatDateTime(l.createdAt)} <span class="ms-2 badge bg-light text-dark">${timeAgo(l.createdAt)}</span></div>
+            <div class="tl-title">${escapeHtml(l.action)}</div>
+            <div class="tl-desc"><i class="bi bi-person"></i> <b>${escapeHtml(l.userName)}</b> (${escapeHtml(l.designation)}) • <i class="bi bi-geo-alt"></i> ${escapeHtml(l.location)}</div>
+            ${l.sendTypeLabel ? `<div class="mt-1">${sendTypeBadge(l.sendType)}</div>` : ''}
+            ${l.remarks ? `<div class="tl-desc mt-1 p-2" style="background:#f8fafc;border-radius:8px;border-left:3px solid #0d6efd;"><i class="bi bi-chat-left-text"></i> <i>${escapeHtml(l.remarks)}</i></div>` : ''}
+          </div>
+        `).join('')}
+      </div>`}
     </div>`;
 
   showPage('view');
@@ -2148,8 +2023,7 @@ function viewFile(id) {
 
 async function updateStatus(id) {
   const file = DB.files.find(f => f.id === id);
-  if (!file) return;
-  if (!canUserAct(file)) { notify('You do not have permission!', 'danger'); return; }
+  if (!file || !canUserAct(file)) { notify('No permission!', 'danger'); return; }
   const status = document.getElementById('statusSelect').value;
   const now = new Date().toISOString();
   file.status = status;
@@ -2158,7 +2032,7 @@ async function updateStatus(id) {
   await fbSet(COLLECTIONS.files, file._docId || id, file);
   await fbSet(COLLECTIONS.logs, newLog.id, newLog);
   await saveCounters();
-  notify('Status updated to ' + status, 'info');
+  notify('Status updated', 'info');
   viewFile(id);
 }
 
@@ -2167,22 +2041,21 @@ async function updateStatus(id) {
 // ============================================================
 async function editFile(id) {
   const file = DB.files.find(f => f.id === id);
-  if (!file) return;
-  if (!canEditDelete(file)) { notify('You do not have permission!', 'danger'); return; }
+  if (!file || !canEditDelete(file)) { notify('No permission!', 'danger'); return; }
   const newAp = prompt('AP No:', file.apNo); if (newAp === null) return;
   const newNic = prompt('NIC:', file.nic); if (newNic === null) return;
   const newCust = prompt('Customer Name:', file.customer); if (newCust === null) return;
-  const newAmt = prompt('Facility Amount:', file.amount); if (newAmt === null) return;
+  const newAmt = prompt('Amount:', file.amount); if (newAmt === null) return;
   const newBranch = prompt('Branch:', file.branch); if (newBranch === null) return;
   const newDO = prompt('Manual DO No:', file.manualDO || ''); if (newDO === null) return;
-  if (DB.files.find(f => f.id !== id && f.apNo.toLowerCase() === newAp.trim().toLowerCase())) { notify('AP No already exists!', 'danger'); return; }
+  if (DB.files.find(f => f.id !== id && f.apNo.toLowerCase() === newAp.trim().toLowerCase())) { notify('AP No exists!', 'danger'); return; }
   file.apNo = newAp.trim().toUpperCase();
   file.nic = newNic.trim().toUpperCase();
   file.customer = newCust.trim();
   file.amount = parseFloat(newAmt);
   file.branch = newBranch.trim().toUpperCase();
   file.manualDO = newDO.trim().toUpperCase();
-  const newLog = { id: nextLogId++, fileId: id, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Edited File Details', location: currentUser.branch, remarks: newDO ? `Manual DO: ${newDO}` : '', createdAt: new Date().toISOString() };
+  const newLog = { id: nextLogId++, fileId: id, userId: currentUser.id, userName: currentUser.name, designation: currentUser.designation, action: 'Edited File', location: currentUser.branch, remarks: '', createdAt: new Date().toISOString() };
   DB.logs.push(newLog);
   await fbSet(COLLECTIONS.files, file._docId || id, file);
   await fbSet(COLLECTIONS.logs, newLog.id, newLog);
@@ -2193,8 +2066,7 @@ async function editFile(id) {
 
 async function deleteFile(id) {
   const file = DB.files.find(f => f.id === id);
-  if (!file) return;
-  if (!canEditDelete(file)) { notify('You do not have permission!', 'danger'); return; }
+  if (!file || !canEditDelete(file)) { notify('No permission!', 'danger'); return; }
   if (!confirm('Delete this file permanently?')) return;
 
   const relatedLogs = DB.logs.filter(l => l.fileId === id);
@@ -2217,12 +2089,12 @@ async function deleteFile(id) {
 }
 
 // ============================================================
-// LOGS
+// LOGS / USERS
 // ============================================================
 function loadLogs() {
   const body = document.getElementById('logsBody');
   const logs = [...DB.logs].sort((a,b) => b.id - a.id);
-  if (logs.length === 0) { body.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="bi bi-journal-x"></i><p>No activity logs yet</p></div></td></tr>`; return; }
+  if (logs.length === 0) { body.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="bi bi-journal-x"></i><p>No logs yet</p></div></td></tr>`; return; }
   body.innerHTML = logs.map(l => {
     const f = DB.files.find(x => x.id === l.fileId);
     return `<tr>
@@ -2230,16 +2102,13 @@ function loadLogs() {
       <td><b>${f ? escapeHtml(f.apNo) : '-'}</b></td>
       <td>${escapeHtml(l.userName)}</td>
       <td><small>${escapeHtml(l.designation)}</small></td>
-      <td>${escapeHtml(l.action)}${l.sendTypeLabel ? `<br>${sendTypeBadge(l.sendType)}` : ''}</td>
+      <td>${escapeHtml(l.action)}</td>
       <td><span class="badge bg-secondary">${escapeHtml(l.location)}</span></td>
-      <td><small>${escapeHtml(l.remarks) || '<span class="text-muted">-</span>'}</small></td>
+      <td><small>${escapeHtml(l.remarks) || '-'}</small></td>
     </tr>`;
   }).join('');
 }
 
-// ============================================================
-// USERS
-// ============================================================
 function loadUsers() {
   const body = document.getElementById('usersBody');
   if (DB.users.length === 0) { body.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No users</td></tr>'; return; }
@@ -2256,58 +2125,38 @@ function loadUsers() {
 // CSV EXPORT
 // ============================================================
 function downloadExcel() {
-  if (DB.files.length === 0) { notify('No files to export', 'warning'); return; }
-  let csv = 'AP No,Manual DO,NIC,Customer,Facility Amount,Branch,Status,Sent to HO,';
-  csv += 'Interducer Status,Interducer Amount,Interducer By,Interducer When,';
-  csv += 'Supply Status,Supply Amount,Supply By,Supply When,';
-  csv += 'RMV Status,RMV Amount,RMV By,RMV When,';
-  csv += 'Current Holder,Created At\n';
+  if (DB.files.length === 0) { notify('No files', 'warning'); return; }
+  let csv = 'AP No,Manual DO,NIC,Customer,Amount,Branch,Status,Sent HO,Interducer,Supply,RMV,Created\n';
   DB.files.forEach(f => {
-    const lastLog = [...DB.logs].filter(l => l.fileId === f.id).sort((a,b) => b.id - a.id)[0];
     const pays = getFilePayments(f.id);
     const pI = pays.find(p => p.type === 'Interducer');
     const pS = pays.find(p => p.type === 'Supply');
     const pR = pays.find(p => p.type === 'RMV');
-    csv += [
-      `"${f.apNo}"`, `"${f.manualDO || ''}"`, `"${f.nic}"`, `"${f.customer}"`,
-      f.amount, `"${f.branch}"`, `"${f.status}"`, f.headOfficeSent ? 'YES' : 'NO',
-      `"${pI.status}"`, pI.amount || 0, `"${pI.markedByName || ''}"`, `"${pI.markedAt ? formatDateTime(pI.markedAt) : ''}"`,
-      `"${pS.status}"`, pS.amount || 0, `"${pS.markedByName || ''}"`, `"${pS.markedAt ? formatDateTime(pS.markedAt) : ''}"`,
-      `"${pR.status}"`, pR.amount || 0, `"${pR.markedByName || ''}"`, `"${pR.markedAt ? formatDateTime(pR.markedAt) : ''}"`,
-      `"${lastLog ? lastLog.userName : ''}"`,
-      formatDateTime(f.createdAt)
-    ].join(',') + '\n';
+    csv += [`"${f.apNo}"`, `"${f.manualDO || ''}"`, `"${f.nic}"`, `"${f.customer}"`, f.amount, `"${f.branch}"`, `"${f.status}"`, f.headOfficeSent ? 'YES' : 'NO',
+      `"${pI.status} ${pI.amount || 0}"`, `"${pS.status} ${pS.amount || 0}"`, `"${pR.status} ${pR.amount || 0}"`, formatDateTime(f.createdAt)].join(',') + '\n';
   });
-  downloadCSV(csv, 'hnb_files_report.csv');
-  notify('Files report downloaded!', 'success');
+  downloadCSV(csv, 'hnb_files.csv');
+  notify('Downloaded!', 'success');
 }
 function downloadLogsExcel() {
-  if (DB.logs.length === 0) { notify('No logs to export', 'warning'); return; }
-  let csv = 'Log ID,AP No,User,Designation,Action,Send Type,Location,Remarks,Date & Time\n';
+  if (DB.logs.length === 0) { notify('No logs', 'warning'); return; }
+  let csv = 'ID,AP No,User,Designation,Action,Location,Remarks,Date\n';
   DB.logs.forEach(l => {
     const f = DB.files.find(x => x.id === l.fileId);
-    csv += [l.id, `"${f ? f.apNo : '-'}"`, `"${l.userName}"`, `"${l.designation}"`, `"${l.action}"`, `"${l.sendTypeLabel || ''}"`, `"${l.location}"`, `"${l.remarks || ''}"`, formatDateTime(l.createdAt)].join(',') + '\n';
+    csv += [l.id, `"${f ? f.apNo : '-'}"`, `"${l.userName}"`, `"${l.designation}"`, `"${l.action}"`, `"${l.location}"`, `"${l.remarks || ''}"`, formatDateTime(l.createdAt)].join(',') + '\n';
   });
-  downloadCSV(csv, 'hnb_logs_report.csv');
-  notify('Logs report downloaded!', 'success');
+  downloadCSV(csv, 'hnb_logs.csv');
+  notify('Downloaded!', 'success');
 }
 function downloadPaymentsExcel() {
-  if (DB.payments.length === 0) { notify('No payments to export', 'warning'); return; }
-  let csv = 'Payment ID,AP No,Customer,Payment Type,Status,Amount (Rs.),Marked By,Date & Time,Remarks\n';
+  if (DB.payments.length === 0) { notify('No payments', 'warning'); return; }
+  let csv = 'ID,AP No,Customer,Type,Status,Amount,Marked By,Date,Remarks\n';
   DB.payments.forEach(p => {
     const f = DB.files.find(x => x.id === p.fileId);
-    csv += [
-      p.id, `"${f ? f.apNo : '-'}"`, `"${f ? f.customer : ''}"`,
-      `"${p.paymentType}"`,
-      `"${p.status || 'pending'}"`,
-      p.amount || 0,
-      `"${p.markedByName || ''}"`,
-      p.markedAt ? formatDateTime(p.markedAt) : '',
-      `"${p.remarks || ''}"`
-    ].join(',') + '\n';
+    csv += [p.id, `"${f ? f.apNo : '-'}"`, `"${f ? f.customer : ''}"`, `"${p.paymentType}"`, `"${p.status}"`, p.amount || 0, `"${p.markedByName || ''}"`, p.markedAt ? formatDateTime(p.markedAt) : '', `"${p.remarks || ''}"`].join(',') + '\n';
   });
-  downloadCSV(csv, 'hnb_payments_report.csv');
-  notify('Payments report downloaded!', 'success');
+  downloadCSV(csv, 'hnb_payments.csv');
+  notify('Downloaded!', 'success');
 }
 function downloadCSV(csv, filename) {
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -2318,45 +2167,56 @@ function downloadCSV(csv, filename) {
 }
 
 // ============================================================
-// INIT
+// INIT — Firebase Auth state listener
 // ============================================================
 window.addEventListener('load', async () => {
   try {
-    await loadFromStorage();
-    await startRealtimeSync();
-    firebaseIsReady = true;
+    await waitForFirebase();
+    const { onAuthStateChanged } = window.FirebaseFns;
+    const auth = window.FirebaseAuth;
 
-    // Hide loading overlay
-    document.getElementById('loadingOverlay').classList.add('hidden');
+    onAuthStateChanged(auth, async (fbUser) => {
+      document.getElementById('loadingOverlay').classList.add('hidden');
 
-    const saved = sessionStorage.getItem(STORAGE_KEYS.current);
-    if (saved) {
-      const u = DB.users.find(x => x.id == saved);
-      if (u) { currentUser = u; enterApp(); return; }
-      else sessionStorage.removeItem(STORAGE_KEYS.current);
-    }
-    document.getElementById('authScreen').classList.remove('hidden');
+      if (fbUser) {
+        firebaseUid = fbUser.uid;
+        await loadFromStorage();
+        const user = DB.users.find(u => u.authUid === fbUser.uid || u.email.toLowerCase() === fbUser.email.toLowerCase());
+
+        if (user) {
+          currentUser = user;
+          await startRealtimeSync();
+          enterApp();
+          return;
+        } else {
+          // Logged in to Firebase but no Firestore profile
+          console.warn('[HNB] No profile found for', fbUser.email);
+          await window.FirebaseFns.signOut(auth);
+        }
+      }
+      // Not logged in
+      document.getElementById('authScreen').classList.remove('hidden');
+    });
   } catch (e) {
     console.error('[HNB] Init error:', e);
     document.getElementById('loadingOverlay').innerHTML = `
       <div style="text-align:center;color:#fff;">
         <i class="bi bi-exclamation-triangle-fill" style="font-size:60px;color:#fbbf24;"></i>
         <h4 style="margin-top:16px;">Firebase Connection Failed</h4>
-        <p style="font-size:14px;opacity:0.8;">Check console for details. Make sure Firestore is enabled.</p>
+        <p style="font-size:14px;opacity:0.8;">Check console. Make sure Firestore + Auth are enabled.</p>
         <button class="btn btn-light mt-3" onclick="location.reload()">Retry</button>
       </div>`;
   }
 });
 
-// Debug helpers
 window.hnbDebug = {
   show: async () => { await loadFromStorage(); console.table(DB.users); console.table(DB.files); console.table(DB.payments); },
-  reset: () => { if(confirm('Clear SESSION only (Firebase data stays)?')) { sessionStorage.clear(); location.reload(); } },
+  reload: () => loadFromStorage(),
   DB: () => DB,
   currentUser: () => currentUser,
-  reload: () => loadFromStorage()
+  auth: () => window.FirebaseAuth.currentUser
 };
-console.log('%c[HNB Firebase v17] Debug: hnbDebug.show() / hnbDebug.reload()', 'color:#0d6efd;font-weight:bold;');
+console.log('%c[HNB Firebase Auth v18] Debug: hnbDebug.show()', 'color:#0d6efd;font-weight:bold;');
 </script>
 </body>
 </html>
