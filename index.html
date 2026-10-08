@@ -127,7 +127,7 @@ body{background:#f0f4f8;margin:0}
 .pay-card .pc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .pay-card .pc-type{font-weight:700;font-size:15px;color:#1e293b}
 .pay-card .pc-info{font-size:12px;color:#64748b;line-height:1.6}
-.pay-card .pc-actions{margin-top:12px}
+.pay-card .pc-actions{margin-top:12px;display:flex;gap:6px}
 .pay-add-toggle{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#f8fafc;border-radius:10px;margin-bottom:10px;cursor:pointer;border:2px solid #e2e8f0}
 .pay-add-toggle:hover{border-color:#0d6efd}
 .pay-add-toggle.active{background:#ecfdf5;border-color:#10b981}
@@ -170,9 +170,15 @@ body{background:#f0f4f8;margin:0}
 .user-row-admin .ur-name{font-weight:600;color:#1e293b;font-size:15px}
 .user-row-admin .ur-meta{font-size:12px;color:#64748b;margin-top:2px}
 .user-row-admin .ur-actions{display:flex;gap:6px;flex-wrap:wrap}
+.removed-user-row{display:flex;align-items:center;gap:12px;padding:14px;border-bottom:1px solid #f1f5f9;background:#fef2f2}
+.removed-user-row:hover{background:#fee2e2}
+.removed-user-row .rur-info{flex:1}
+.removed-user-row .rur-name{font-weight:600;color:#991b1b;font-size:15px}
+.removed-user-row .rur-meta{font-size:12px;color:#7f1d1d;margin-top:2px}
+.removed-user-row .rur-actions{display:flex;gap:6px;flex-wrap:wrap}
 .loading-overlay{position:fixed;inset:0;background:rgba(15,23,42,.75);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;gap:16px}
 .loading-overlay .spinner-border{width:60px;height:60px}
-@media(max-width:768px){.sidebar{width:70px;padding:20px 8px}.sidebar a span,.sidebar-logo span,.sidebar-sub,.user-box,.logout-btn span{display:none}.sidebar a{justify-content:center;padding:12px}.main-content{margin-left:70px}.content-area{padding:16px}.send-type-grid{grid-template-columns:1fr}.notif-dropdown{width:calc(100% - 40px);right:20px;left:20px}.home-btn-top span,.admin-badge-top span{display:none}.home-btn-top,.admin-badge-top{padding:10px 12px}.user-row-admin{flex-direction:column;align-items:flex-start}.user-row-admin .ur-actions{width:100%}}
+@media(max-width:768px){.sidebar{width:70px;padding:20px 8px}.sidebar a span,.sidebar-logo span,.sidebar-sub,.user-box,.logout-btn span{display:none}.sidebar a{justify-content:center;padding:12px}.main-content{margin-left:70px}.content-area{padding:16px}.send-type-grid{grid-template-columns:1fr}.notif-dropdown{width:calc(100% - 40px);right:20px;left:20px}.home-btn-top span,.admin-badge-top span{display:none}.home-btn-top,.admin-badge-top{padding:10px 12px}.user-row-admin,.removed-user-row{flex-direction:column;align-items:flex-start}.user-row-admin .ur-actions,.removed-user-row .rur-actions{width:100%}}
 </style>
 </head>
 <body>
@@ -222,7 +228,7 @@ body{background:#f0f4f8;margin:0}
     <a onclick="showPage('report')" id="nav-report"><i class="bi bi-file-earmark-excel"></i> <span>Reports</span></a>
     <a onclick="showPage('logs')" id="nav-logs"><i class="bi bi-journal-text"></i> <span>Activity Logs</span></a>
     <a onclick="showPage('users')" id="nav-users"><i class="bi bi-people"></i> <span>Users</span></a>
-    <a onclick="showPage('admin')" id="nav-admin" class="admin-link hidden"><i class="bi bi-shield-fill-check"></i> <span>Admin Panel</span></a>
+    <a onclick="showPage('admin')" id="nav-admin" class="admin-link hidden"><i class="bi bi-shield-fill-check"></i> <span>Admin Panel</span> <span class="nav-badge hidden" id="adminBadge">0</span></a>
     <hr>
     <a href="https://gmaphnbf.github.io/HNBFGMAP/" class="home-link" target="_blank" rel="noopener"><i class="bi bi-house-door-fill"></i> <span>Home</span> <i class="bi bi-box-arrow-up-right ms-auto" style="font-size:12px;opacity:.7"></i></a>
     <div class="user-box">
@@ -462,21 +468,18 @@ window.FirebaseFns={collection,doc,getDocs,setDoc,deleteDoc,onSnapshot,writeBatc
 window.firebaseReady=true;
 window.dispatchEvent(new Event('firebase-ready'));
 console.log('[HNB] Firebase initialized ✅');
-</script>
-
-<script>const SUPER_ADMIN_EMAIL = 'umesh.19940309@gmail.com';
-
-const COLLECTIONS={users:'users',files:'files',logs:'logs',payments:'payments',notifications:'notifications',meta:'meta'};
+</script>const SUPER_ADMIN_EMAIL = 'umesh.19940309@gmail.com';
+const COLLECTIONS={users:'users',files:'files',logs:'logs',payments:'payments',notifications:'notifications',meta:'meta',removed_users:'removed_users'};
 const PAYMENT_TYPES=['Interducer','Supply','RMV'];
 const PAYMENT_STATUS_LABELS={'pending':{label:'Pending',icon:'clock-fill',class:'pending'},'paid':{label:'Paid',icon:'check-circle-fill',class:'paid'},'rejected':{label:'Rejected',icon:'x-circle-fill',class:'rejected'},'not-required':{label:'Not Required',icon:'slash-circle-fill',class:'not-required'}};
-let DB={users:[],files:[],logs:[],payments:[],notifications:[]};
+let DB={users:[],files:[],logs:[],payments:[],notifications:[],removed_users:[]};
 let currentUser=null,firebaseUid=null;
-let nextFileId=1,nextLogId=1,nextPayId=1,nextUserId=1,nextNotifId=1;
+let nextFileId=1,nextLogId=1,nextPayId=1,nextUserId=1,nextNotifId=1,nextRemovedId=1;
 let selectedBMSendType=null,selectedHOSendType=null,selectedPMAction=null;
 let sendToBMModalInstance=null,handoverModalInstance=null,paymentModalInstance=null,editProfileModalInstance=null,photoModalInstance=null;
 let realtimeUnsubs=[];
 let photoBase64Temp=null;
-let adminSearchQuery='';
+let adminSearchQuery='',adminActiveTab='users';
 
 // ============================================================
 // HELPERS
@@ -485,22 +488,23 @@ function isSuperAdmin(){return currentUser&&currentUser.isSuperAdmin===true}
 function isAdmin(){return currentUser&&(currentUser.isAdmin===true||currentUser.isSuperAdmin===true)}
 function canManageUsers(){return isSuperAdmin()}
 function canSeeAllFiles(){return isSuperAdmin()||isAdmin()}
-
 function waitForFirebase(){return new Promise(r=>{if(window.firebaseReady)return r();window.addEventListener('firebase-ready',()=>r(),{once:true})})}
-async function loadFromStorage(){await waitForFirebase();const{collection,getDocs}=window.FirebaseFns;const db=window.FirebaseDB;try{const[uS,fS,lS,pS,nS,mS]=await Promise.all([getDocs(collection(db,COLLECTIONS.users)),getDocs(collection(db,COLLECTIONS.files)),getDocs(collection(db,COLLECTIONS.logs)),getDocs(collection(db,COLLECTIONS.payments)),getDocs(collection(db,COLLECTIONS.notifications)),getDocs(collection(db,COLLECTIONS.meta))]);DB.users=uS.docs.map(d=>({...d.data(),_docId:d.id}));DB.files=fS.docs.map(d=>({...d.data(),_docId:d.id}));DB.logs=lS.docs.map(d=>({...d.data(),_docId:d.id}));DB.payments=pS.docs.map(d=>({...d.data(),_docId:d.id}));DB.notifications=nS.docs.map(d=>({...d.data(),_docId:d.id}));mS.docs.forEach(d=>{const m=d.data();if(m.key==='nextFileId')nextFileId=m.value;if(m.key==='nextLogId')nextLogId=m.value;if(m.key==='nextPayId')nextPayId=m.value;if(m.key==='nextUserId')nextUserId=m.value;if(m.key==='nextNotifId')nextNotifId=m.value});recalculateIds();console.log('[HNB] Loaded:',{users:DB.users.length,files:DB.files.length,logs:DB.logs.length,payments:DB.payments.length})}catch(e){console.error('[HNB] Load error:',e);notify('Firebase load error!','danger')}}
+
+async function loadFromStorage(){await waitForFirebase();const{collection,getDocs}=window.FirebaseFns;const db=window.FirebaseDB;try{const[uS,fS,lS,pS,nS,mS,rS]=await Promise.all([getDocs(collection(db,COLLECTIONS.users)),getDocs(collection(db,COLLECTIONS.files)),getDocs(collection(db,COLLECTIONS.logs)),getDocs(collection(db,COLLECTIONS.payments)),getDocs(collection(db,COLLECTIONS.notifications)),getDocs(collection(db,COLLECTIONS.meta)),getDocs(collection(db,COLLECTIONS.removed_users))]);DB.users=uS.docs.map(d=>({...d.data(),_docId:d.id}));DB.files=fS.docs.map(d=>({...d.data(),_docId:d.id}));DB.logs=lS.docs.map(d=>({...d.data(),_docId:d.id}));DB.payments=pS.docs.map(d=>({...d.data(),_docId:d.id}));DB.notifications=nS.docs.map(d=>({...d.data(),_docId:d.id}));DB.removed_users=rS.docs.map(d=>({...d.data(),_docId:d.id}));mS.docs.forEach(d=>{const m=d.data();if(m.key==='nextFileId')nextFileId=m.value;if(m.key==='nextLogId')nextLogId=m.value;if(m.key==='nextPayId')nextPayId=m.value;if(m.key==='nextUserId')nextUserId=m.value;if(m.key==='nextNotifId')nextNotifId=m.value;if(m.key==='nextRemovedId')nextRemovedId=m.value});recalculateIds();console.log('[HNB] Loaded:',{users:DB.users.length,files:DB.files.length,removed:DB.removed_users.length})}catch(e){console.error('[HNB] Load error:',e);notify('Firebase load error!','danger')}}
 async function fbSet(coll,docId,data){await waitForFirebase();const{doc,setDoc}=window.FirebaseFns;await setDoc(doc(window.FirebaseDB,coll,String(docId)),data,{merge:true})}
 async function fbDelete(coll,docId){await waitForFirebase();const{doc,deleteDoc}=window.FirebaseFns;await deleteDoc(doc(window.FirebaseDB,coll,String(docId)))}
 async function fbBatch(writes){await waitForFirebase();const{writeBatch,doc}=window.FirebaseFns;const b=writeBatch(window.FirebaseDB);writes.forEach(w=>{const r=doc(window.FirebaseDB,w.collection,String(w.docId));if(w.delete)b.delete(r);else b.set(r,w.data,{merge:true})});await b.commit()}
-async function saveCounters(){await waitForFirebase();await fbBatch([{collection:COLLECTIONS.meta,docId:'nextFileId',data:{key:'nextFileId',value:nextFileId}},{collection:COLLECTIONS.meta,docId:'nextLogId',data:{key:'nextLogId',value:nextLogId}},{collection:COLLECTIONS.meta,docId:'nextPayId',data:{key:'nextPayId',value:nextPayId}},{collection:COLLECTIONS.meta,docId:'nextUserId',data:{key:'nextUserId',value:nextUserId}},{collection:COLLECTIONS.meta,docId:'nextNotifId',data:{key:'nextNotifId',value:nextNotifId}}])}
+async function saveCounters(){await waitForFirebase();await fbBatch([{collection:COLLECTIONS.meta,docId:'nextFileId',data:{key:'nextFileId',value:nextFileId}},{collection:COLLECTIONS.meta,docId:'nextLogId',data:{key:'nextLogId',value:nextLogId}},{collection:COLLECTIONS.meta,docId:'nextPayId',data:{key:'nextPayId',value:nextPayId}},{collection:COLLECTIONS.meta,docId:'nextUserId',data:{key:'nextUserId',value:nextUserId}},{collection:COLLECTIONS.meta,docId:'nextNotifId',data:{key:'nextNotifId',value:nextNotifId}},{collection:COLLECTIONS.meta,docId:'nextRemovedId',data:{key:'nextRemovedId',value:nextRemovedId}}])}
 async function startRealtimeSync(){await waitForFirebase();const{collection,onSnapshot}=window.FirebaseFns;const db=window.FirebaseDB;
 realtimeUnsubs.push(onSnapshot(collection(db,COLLECTIONS.users),s=>{DB.users=s.docs.map(d=>({...d.data(),_docId:d.id}));if(currentUser){if(!document.getElementById('page-users').classList.contains('hidden'))loadUsers();if(!document.getElementById('page-admin').classList.contains('hidden'))loadAdminPanel();updateNotifBadge();renderUserPics()}}));
 realtimeUnsubs.push(onSnapshot(collection(db,COLLECTIONS.files),s=>{DB.files=s.docs.map(d=>({...d.data(),_docId:d.id}));if(currentUser){if(!document.getElementById('page-dashboard').classList.contains('hidden'))loadDashboard();if(!document.getElementById('page-search').classList.contains('hidden'))doSearch();if(!document.getElementById('page-report').classList.contains('hidden'))loadPaymentReport();if(!document.getElementById('page-payments').classList.contains('hidden'))loadPendingPayments();if(!document.getElementById('page-admin').classList.contains('hidden'))loadAdminPanel()}}));
 realtimeUnsubs.push(onSnapshot(collection(db,COLLECTIONS.logs),s=>{DB.logs=s.docs.map(d=>({...d.data(),_docId:d.id}));if(currentUser&&!document.getElementById('page-logs').classList.contains('hidden'))loadLogs()}));
 realtimeUnsubs.push(onSnapshot(collection(db,COLLECTIONS.payments),s=>{DB.payments=s.docs.map(d=>({...d.data(),_docId:d.id}));if(currentUser){updateNotifBadge();if(!document.getElementById('page-payments').classList.contains('hidden'))loadPendingPayments();if(!document.getElementById('page-report').classList.contains('hidden'))loadPaymentReport()}}));
 realtimeUnsubs.push(onSnapshot(collection(db,COLLECTIONS.notifications),s=>{DB.notifications=s.docs.map(d=>({...d.data(),_docId:d.id}));if(currentUser){updateNotifBadge();if(!document.getElementById('notifDropdown').classList.contains('hidden'))renderNotifDropdown();if(!document.getElementById('page-dashboard').classList.contains('hidden'))loadDashboard()}}));
+realtimeUnsubs.push(onSnapshot(collection(db,COLLECTIONS.removed_users),s=>{DB.removed_users=s.docs.map(d=>({...d.data(),_docId:d.id}));if(currentUser&&!document.getElementById('page-admin').classList.contains('hidden'))loadAdminPanel();updateAdminBadge()}));
 console.log('[HNB] Real-time sync started ✅')}
 function stopRealtimeSync(){realtimeUnsubs.forEach(u=>u());realtimeUnsubs=[]}
-function recalculateIds(){nextFileId=DB.files.length?Math.max(...DB.files.map(f=>f.id))+1:1;nextLogId=DB.logs.length?Math.max(...DB.logs.map(l=>l.id))+1:1;nextPayId=DB.payments.length?Math.max(...DB.payments.map(p=>p.id))+1:1;nextUserId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;nextNotifId=DB.notifications.length?Math.max(...DB.notifications.map(n=>n.id))+1:1}
+function recalculateIds(){nextFileId=DB.files.length?Math.max(...DB.files.map(f=>f.id))+1:1;nextLogId=DB.logs.length?Math.max(...DB.logs.map(l=>l.id))+1:1;nextPayId=DB.payments.length?Math.max(...DB.payments.map(p=>p.id))+1:1;nextUserId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;nextNotifId=DB.notifications.length?Math.max(...DB.notifications.map(n=>n.id))+1:1;nextRemovedId=DB.removed_users.length?Math.max(...DB.removed_users.map(r=>r.id))+1:1}
 function notify(msg,type='success'){const colors={success:'linear-gradient(135deg,#10b981,#34d399)',danger:'linear-gradient(135deg,#ef4444,#f87171)',warning:'linear-gradient(135deg,#f59e0b,#fbbf24)',info:'linear-gradient(135deg,#0d6efd,#4d8bff)'};const icons={success:'check-circle-fill',danger:'exclamation-triangle-fill',warning:'exclamation-circle-fill',info:'info-circle-fill'};const t=document.createElement('div');t.className='toast-notify';t.style.background=colors[type];t.innerHTML=`<i class="bi bi-${icons[type]}"></i> ${msg}`;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='.3s'},2800);setTimeout(()=>t.remove(),3200)}
 function formatDateTime(iso){if(!iso)return '-';const d=new Date(iso);return d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true})}
 function timeAgo(iso){if(!iso)return'';const s=Math.floor((Date.now()-new Date(iso).getTime())/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago'}
@@ -523,17 +527,7 @@ function canUserAct(f){if(canSeeAllFiles())return true;return isCreator(f)||isCu
 function canSendToBM(f){if(canSeeAllFiles())return false;return isCreator(f)&&!hasBeenSentToBM(f.id)&&currentUser.designation==='Marketing Officer'}
 function canEditDelete(f){if(canSeeAllFiles())return true;return isCreator(f)||currentUser.designation==='Head Office'}
 function canSendHO(f){if(canSeeAllFiles())return false;return currentUser.designation==='Branch Manager'&&isCurrentHolder(f.id)&&!hasBeenSentToHO(f.id)}
-function isFileVisibleToUser(file){
-  if(!currentUser)return false;
-  if(canSeeAllFiles())return true;
-  if(file.createdBy===currentUser.id)return true;
-  if(isCurrentHolder(file.id))return true;
-  const hi=DB.logs.some(l=>l.fileId===file.id&&(l.userId===currentUser.id||l.handoverTo===currentUser.id));
-  if(hi)return true;
-  const hn=DB.notifications.some(n=>n.fileId===file.id&&n.userId===currentUser.id);
-  if(hn)return true;
-  return false;
-}
+function isFileVisibleToUser(file){if(!currentUser)return false;if(canSeeAllFiles())return true;if(file.createdBy===currentUser.id)return true;if(isCurrentHolder(file.id))return true;const hi=DB.logs.some(l=>l.fileId===file.id&&(l.userId===currentUser.id||l.handoverTo===currentUser.id));if(hi)return true;const hn=DB.notifications.some(n=>n.fileId===file.id&&n.userId===currentUser.id);if(hn)return true;return false}
 function getVisibleFiles(){if(!currentUser)return[];if(canSeeAllFiles())return DB.files;return DB.files.filter(f=>isFileVisibleToUser(f))}
 function getVisibleLogs(){if(!currentUser)return[];if(canSeeAllFiles())return DB.logs;const vids=getVisibleFiles().map(f=>f.id);return DB.logs.filter(l=>vids.includes(l.fileId))}
 function getVisiblePayments(){if(!currentUser)return[];if(canSeeAllFiles())return DB.payments;const vids=getVisibleFiles().map(f=>f.id);return DB.payments.filter(p=>vids.includes(p.fileId))}
@@ -549,6 +543,20 @@ function togglePayInput(type){const cb=document.getElementById('payCheck-'+type)
 function autoFillSupplyAmount(){const amt=document.getElementById('cAmount').value;const sa=document.getElementById('payAmount-Supply');if(sa)sa.value=amt||''}
 
 // ============================================================
+// REMOVED USER CHECK
+// ============================================================
+function getRemovedRecord(email){return DB.removed_users.find(r=>r.email&&r.email.toLowerCase()===email.toLowerCase())}
+
+async function notifySuperAdmin(title,message,type,refId){
+  const sa=DB.users.find(u=>u.isSuperAdmin);
+  if(!sa)return;
+  const notif={id:nextNotifId++,userId:sa.id,type:type||'admin_alert',title,message,fileId:refId||0,read:false,createdAt:new Date().toISOString()};
+  DB.notifications.push(notif);
+  await fbSet(COLLECTIONS.notifications,notif.id,notif);
+  await saveCounters();
+}
+
+// ============================================================
 // AUTH
 // ============================================================
 async function doLogin(){
@@ -562,15 +570,44 @@ async function doLogin(){
     const cred=await signInWithEmailAndPassword(auth,email,pass);
     firebaseUid=cred.user.uid;
     await loadFromStorage();
-    let user=DB.users.find(u=>u.authUid===firebaseUid||u.email.toLowerCase()===email.toLowerCase());
     const isSuper=(email.toLowerCase()===SUPER_ADMIN_EMAIL.toLowerCase());
+    // ⭐ REMOVED USER CHECK (Super Admin හැර)
+    const removedRec=getRemovedRecord(email);
+    if(removedRec&&!isSuper){
+      if(removedRec.status==='blocked'){
+        await window.FirebaseFns.signOut(auth);
+        notify('🚫 Your account has been permanently blocked. Contact admin.','danger');
+        setLoading('loginBtn',false,'<i class="bi bi-box-arrow-in-right"></i> Sign In');
+        return;
+      }
+      if(removedRec.status==='pending'){
+        // Log the login attempt
+        removedRec.lastAttemptAt=new Date().toISOString();
+        removedRec.attemptCount=(removedRec.attemptCount||0)+1;
+        await fbSet(COLLECTIONS.removed_users,removedRec._docId||removedRec.id,removedRec);
+        // Notify Super Admin
+        await notifySuperAdmin(
+          `🔔 Removed user login attempt: ${removedRec.name||email}`,
+          `${removedRec.name||email} tried to login. Review and approve/block.`,
+          'admin_removed_user_login',
+          removedRec.id
+        );
+        await window.FirebaseFns.signOut(auth);
+        notify('⚠️ Your account has been removed. Super Admin notified. Please wait for approval.','warning');
+        setLoading('loginBtn',false,'<i class="bi bi-box-arrow-in-right"></i> Sign In');
+        return;
+      }
+    }
+    // Normal flow
+    let user=DB.users.find(u=>u.authUid===firebaseUid||u.email.toLowerCase()===email.toLowerCase());
     if(!user){
       console.warn('[HNB] Auto-creating profile...');
       const newId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;
       user={id:newId,authUid:firebaseUid,name:email.split('@')[0],email:email.toLowerCase(),designation:isSuper?'Head Office':'Marketing Officer',branch:isSuper?'HEAD OFFICE':'COLOMBO',profileComplete:true,photo:null,isSuperAdmin:isSuper,isAdmin:isSuper,createdAt:new Date().toISOString()};
-      try{await fbSet(COLLECTIONS.users,firebaseUid,user);await saveCounters();if(isSuper)notify('👑 Super Admin access granted!','success');else notify('Profile auto-created.','warning')}catch(err){console.error('[HNB] Auto-create failed:',err);notify('Profile save failed. Check rules!','danger')}
-    }else{
-      if(isSuper&&!user.isSuperAdmin){user.isSuperAdmin=true;user.isAdmin=true;await fbSet(COLLECTIONS.users,user._docId||firebaseUid,user);notify('👑 Super Admin access granted!','success')}
+      try{await fbSet(COLLECTIONS.users,firebaseUid,user);await saveCounters()}catch(err){console.error('[HNB] Auto-create failed:',err)}
+    }else if(isSuper&&!user.isSuperAdmin){
+      user.isSuperAdmin=true;user.isAdmin=true;
+      await fbSet(COLLECTIONS.users,user._docId||firebaseUid,user);
     }
     currentUser=user;
     notify(`Welcome back, ${user.name}!`,'success');
@@ -599,7 +636,10 @@ async function doRegister(){
     const newId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;
     const isSuper=(email.toLowerCase()===SUPER_ADMIN_EMAIL.toLowerCase());
     const newUser={id:newId,authUid:uid,name,email:email.toLowerCase(),designation,branch,profileComplete:true,photo:null,isSuperAdmin:isSuper,isAdmin:isSuper,createdAt:new Date().toISOString()};
-    try{await fbSet(COLLECTIONS.users,uid,newUser);await saveCounters();console.log('[HNB] Profile saved ✅');if(isSuper)notify('👑 Super Admin account created!','success')}catch(err){console.error('[HNB] Save failed:',err);notify('Registration OK but profile save failed!','danger')}
+    try{await fbSet(COLLECTIONS.users,uid,newUser);await saveCounters()}catch(err){console.error('[HNB] Save failed:',err)}
+    // Removed record එකේ තිබුනොත් delete
+    const rr=getRemovedRecord(email);
+    if(rr){await fbDelete(COLLECTIONS.removed_users,rr._docId||rr.id)}
     await window.FirebaseFns.signOut(auth);
     notify('Account created! Please sign in.','success');
     showLogin();
@@ -610,7 +650,7 @@ async function doRegister(){
 
 async function doForgotPassword(){const email=prompt('Enter your email for reset link:');if(!email)return;try{const{sendPasswordResetEmail}=window.FirebaseFns;await sendPasswordResetEmail(window.FirebaseAuth,email.trim());notify('Password reset email sent!','success')}catch(e){console.error(e);let msg='Failed to send reset email';if(e.code==='auth/user-not-found')msg='No account found';else if(e.code==='auth/invalid-email')msg='Invalid email';notify(msg,'danger')}}
 
-async function doLogout(){if(!confirm('Logout?'))return;try{stopRealtimeSync();await window.FirebaseFns.signOut(window.FirebaseAuth);currentUser=null;firebaseUid=null;DB={users:[],files:[],logs:[],payments:[],notifications:[]};document.getElementById('appScreen').classList.add('hidden');document.getElementById('authScreen').classList.remove('hidden');document.getElementById('loginEmail').value='';document.getElementById('loginPassword').value='';showLogin();notify('Logged out','info')}catch(e){console.error('[HNB] Logout error:',e)}}
+async function doLogout(){if(!confirm('Logout?'))return;try{stopRealtimeSync();await window.FirebaseFns.signOut(window.FirebaseAuth);currentUser=null;firebaseUid=null;DB={users:[],files:[],logs:[],payments:[],notifications:[],removed_users:[]};document.getElementById('appScreen').classList.add('hidden');document.getElementById('authScreen').classList.remove('hidden');document.getElementById('loginEmail').value='';document.getElementById('loginPassword').value='';showLogin();notify('Logged out','info')}catch(e){console.error('[HNB] Logout error:',e)}}
 
 function showRegister(){document.getElementById('loginForm').classList.add('hidden');document.getElementById('registerForm').classList.remove('hidden')}
 function showLogin(){document.getElementById('registerForm').classList.add('hidden');document.getElementById('loginForm').classList.remove('hidden')}
@@ -621,7 +661,7 @@ function showLogin(){document.getElementById('registerForm').classList.add('hidd
 function openEditProfile(){if(!currentUser)return;document.getElementById('epName').value=currentUser.name||'';document.getElementById('epDesignation').value=currentUser.designation||'Marketing Officer';document.getElementById('epBranch').value=currentUser.branch||'';if(!editProfileModalInstance)editProfileModalInstance=new bootstrap.Modal(document.getElementById('editProfileModal'));editProfileModalInstance.show()}
 async function saveProfile(){const name=document.getElementById('epName').value.trim();const designation=document.getElementById('epDesignation').value;const branch=document.getElementById('epBranch').value.trim().toUpperCase();if(!name||!designation||!branch){notify('Please fill all fields','warning');return}try{currentUser.name=name;currentUser.designation=designation;currentUser.branch=branch;currentUser.profileComplete=true;await fbSet(COLLECTIONS.users,currentUser._docId||firebaseUid,currentUser);if(editProfileModalInstance)editProfileModalInstance.hide();notify('Profile updated!','success');document.getElementById('sideUserName').textContent=currentUser.name;document.getElementById('sideUserDesig').textContent=currentUser.designation;document.getElementById('sideUserBranch').textContent=currentUser.branch;document.getElementById('topUserName').textContent=currentUser.name;document.getElementById('cBranch').value=currentUser.branch;renderUserPics();loadUsers()}catch(e){console.error(e);notify('Failed to save profile','danger')}}
 function openPhotoUpload(){photoBase64Temp=null;document.getElementById('photoInput').value='';const prev=document.getElementById('photoPreview');prev.innerHTML=getUserPicHtml(currentUser,'lg');if(!photoModalInstance)photoModalInstance=new bootstrap.Modal(document.getElementById('photoModal'));photoModalInstance.show()}
-function previewPhoto(e){const file=e.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){notify('Please select an image file','warning');return}const reader=new FileReader();reader.onload=function(ev){const img=new Image();img.onload=function(){const canvas=document.createElement('canvas');const MAX=400;let w=img.width,h=img.height;if(w>h){if(w>MAX){h=h*MAX/w;w=MAX}}else{if(h>MAX){w=w*MAX/h;h=MAX}}canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);let quality=0.8;let base64=canvas.toDataURL('image/jpeg',quality);while(base64.length>200*1024&&quality>0.3){quality-=0.1;base64=canvas.toDataURL('image/jpeg',quality)}photoBase64Temp=base64;document.getElementById('photoPreview').innerHTML=`<img src="${base64}" class="profile-pic-lg">`;const kb=Math.round(base64.length/1024);notify(`Photo loaded (${kb}KB)`,'success')};img.src=ev.target.result};reader.readAsDataURL(file)}
+function previewPhoto(e){const file=e.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){notify('Please select an image file','warning');return}const reader=new FileReader();reader.onload=function(ev){const img=new Image();img.onload=function(){const canvas=document.createElement('canvas');const MAX=400;let w=img.width,h=img.height;if(w>h){if(w>MAX){h=h*MAX/w;w=MAX}}else{if(h>MAX){w=w*MAX/h;h=MAX}}canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,w,h);let quality=0.8;let base64=canvas.toDataURL('image/jpeg',quality);while(base64.length>200*1024&&quality>0.3){quality-=0.1;base64=canvas.toDataURL('image/jpeg',quality)}photoBase64Temp=base64;document.getElementById('photoPreview').innerHTML=`<img src="${base64}" class="profile-pic-lg">`};img.src=ev.target.result};reader.readAsDataURL(file)}
 async function savePhoto(){if(!photoBase64Temp){notify('Please select a photo first','warning');return}try{currentUser.photo=photoBase64Temp;await fbSet(COLLECTIONS.users,currentUser._docId||firebaseUid,currentUser);if(photoModalInstance)photoModalInstance.hide();notify('Profile photo updated!','success');renderUserPics();loadUsers()}catch(e){console.error(e);notify('Failed to save photo','danger')}}
 
 // ============================================================
@@ -635,22 +675,19 @@ function enterApp(){
   document.getElementById('sideUserBranch').textContent=currentUser.branch;
   document.getElementById('topUserName').textContent=currentUser.name;
   document.getElementById('cBranch').value=currentUser.branch;
-  // Admin badge
   const ab=document.getElementById('adminBadgeContainer');
   if(isSuperAdmin())ab.innerHTML='<span class="admin-badge-top"><i class="bi bi-shield-fill-check"></i> <span>Super Admin</span></span>';
   else if(isAdmin())ab.innerHTML='<span class="admin-badge-top" style="background:linear-gradient(135deg,#0d6efd,#4d8bff)"><i class="bi bi-shield-fill"></i> <span>Admin</span></span>';
   else ab.innerHTML='';
-  // Admin nav link
   const navAdmin=document.getElementById('nav-admin');
   if(canManageUsers())navAdmin.classList.remove('hidden');else navAdmin.classList.add('hidden');
-  // Dashboard labels
   document.getElementById('statTotalLabel').textContent=canSeeAllFiles()?'ALL FILES':'MY FILES';
   document.getElementById('recentFilesTitle').textContent=canSeeAllFiles()?'All Recent Files':'My Recent Files';
   renderUserPics();
   updateNotifBadge();
+  updateAdminBadge();
   showPage('dashboard');
 }
-
 function showPage(page){
   ['dashboard','create','search','payments','report','logs','users','view','admin'].forEach(p=>{const el=document.getElementById('page-'+p);if(el)el.classList.add('hidden');const nav=document.getElementById('nav-'+p);if(nav)nav.classList.remove('active')});
   document.getElementById('page-'+page).classList.remove('hidden');
@@ -663,6 +700,12 @@ function showPage(page){
   if(page==='report')loadPaymentReport();
   if(page==='admin')loadAdminPanel();
 }
+function updateAdminBadge(){
+  if(!canManageUsers())return;
+  const pendingCount=DB.removed_users.filter(r=>r.status==='pending').length;
+  const b=document.getElementById('adminBadge');
+  if(b){if(pendingCount>0){b.textContent=pendingCount;b.classList.remove('hidden')}else b.classList.add('hidden')}
+}
 
 // ============================================================
 // NOTIFICATIONS
@@ -672,8 +715,16 @@ function getMyNotifications(){if(!currentUser)return[];return DB.notifications.f
 function getUnreadCount(){if(!currentUser)return 0;return DB.notifications.filter(n=>n.userId===currentUser.id&&!n.read).length}
 function updateNotifBadge(){const c=getUnreadCount();const b=document.getElementById('notifCount');const db_=document.getElementById('dashBadge');const pb=document.getElementById('payBadge');const pc=getMyPendingPaymentCount();if(b){if(c>0){b.textContent=c;b.classList.remove('hidden')}else b.classList.add('hidden')}if(db_){if(c>0){db_.textContent=c;db_.classList.remove('hidden')}else db_.classList.add('hidden')}if(pb){if(pc>0){pb.textContent=pc;pb.classList.remove('hidden')}else pb.classList.add('hidden')}}
 function toggleNotif(){const dd=document.getElementById('notifDropdown');if(dd.classList.contains('hidden')){renderNotifDropdown();dd.classList.remove('hidden')}else dd.classList.add('hidden')}
-function renderNotifDropdown(){const b=document.getElementById('notifBody');const n=getMyNotifications().slice(0,20);if(n.length===0){b.innerHTML='<div class="notif-empty"><i class="bi bi-bell-slash"></i><div>No notifications yet</div></div>';return}b.innerHTML=n.map(x=>`<div class="notif-item ${x.read?'':'unread'}" onclick="openNotifFile(${x.id},${x.fileId})"><div class="notif-icon"><i class="bi bi-${x.type==='file_received'?'inbox-fill':'bell-fill'}"></i></div><div class="notif-content"><div class="notif-title">${escapeHtml(x.title)}</div><div class="notif-desc">${escapeHtml(x.message)}</div><div class="notif-time"><i class="bi bi-clock"></i> ${timeAgo(x.createdAt)}</div></div></div>`).join('')}
-async function openNotifFile(nid,fid){const n=DB.notifications.find(x=>x.id===nid);if(n){n.read=true;await fbSet(COLLECTIONS.notifications,n._docId||n.id,n)}document.getElementById('notifDropdown').classList.add('hidden');updateNotifBadge();if(fid)viewFile(fid);else loadDashboard()}
+function renderNotifDropdown(){const b=document.getElementById('notifBody');const n=getMyNotifications().slice(0,20);if(n.length===0){b.innerHTML='<div class="notif-empty"><i class="bi bi-bell-slash"></i><div>No notifications yet</div></div>';return}b.innerHTML=n.map(x=>`<div class="notif-item ${x.read?'':'unread'}" onclick="openNotifFile(${x.id},${x.fileId})"><div class="notif-icon" style="${x.type==='admin_alert'||x.type==='admin_removed_user_login'?'background:linear-gradient(135deg,#f59e0b,#fbbf24)':''}"><i class="bi bi-${x.type==='admin_alert'||x.type==='admin_removed_user_login'?'shield-fill-exclamation':x.type==='file_received'?'inbox-fill':'bell-fill'}"></i></div><div class="notif-content"><div class="notif-title">${escapeHtml(x.title)}</div><div class="notif-desc">${escapeHtml(x.message)}</div><div class="notif-time"><i class="bi bi-clock"></i> ${timeAgo(x.createdAt)}</div></div></div>`).join('')}
+async function openNotifFile(nid,fid){
+  const n=DB.notifications.find(x=>x.id===nid);
+  if(n){n.read=true;await fbSet(COLLECTIONS.notifications,n._docId||n.id,n)}
+  document.getElementById('notifDropdown').classList.add('hidden');
+  updateNotifBadge();
+  if(n&&(n.type==='admin_alert'||n.type==='admin_removed_user_login')){showPage('admin')}
+  else if(fid)viewFile(fid);
+  else loadDashboard();
+}
 async function markAllRead(){if(!currentUser)return;const u=DB.notifications.filter(n=>n.userId===currentUser.id&&!n.read);u.forEach(n=>n.read=true);if(u.length)await fbBatch(u.map(n=>({collection:COLLECTIONS.notifications,docId:n._docId||n.id,data:{read:true}})));updateNotifBadge();renderNotifDropdown();if(!document.getElementById('page-dashboard').classList.contains('hidden'))loadDashboard()}
 document.addEventListener('click',e=>{const dd=document.getElementById('notifDropdown');const btn=e.target.closest('.notif-btn');if(dd&&!dd.classList.contains('hidden')&&!e.target.closest('.notif-dropdown')&&!btn)dd.classList.add('hidden')});
 function getMyPendingFiles(){if(!currentUser)return[];const pn=DB.notifications.filter(n=>n.userId===currentUser.id&&!n.read&&n.type==='file_received');const pids=[...new Set(pn.map(n=>n.fileId))];return pids.map(fid=>{const file=DB.files.find(f=>f.id===fid);const notif=pn.find(n=>n.fileId===fid);if(!file)return null;const hl=[...DB.logs].reverse().find(l=>l.fileId===fid&&l.handoverTo===currentUser.id);return{file,notif,fromUser:hl?hl.userName:'Unknown',fromDesig:hl?hl.designation:'',receivedAt:notif.createdAt}}).filter(Boolean)}
@@ -681,7 +732,7 @@ function getMyPendingFiles(){if(!currentUser)return[];const pn=DB.notifications.
 // ============================================================
 // DASHBOARD
 // ============================================================
-function loadDashboard(){const wb=document.getElementById('profileWarning');if(currentUser&&currentUser.profileComplete===false){wb.innerHTML='<div class="alert-banner" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left-color:#0d6efd"><i class="bi bi-person-exclamation alert-icon" style="color:#1e40af"></i><div class="alert-content"><div class="alert-title" style="color:#1e3a8a">Complete your profile!</div><div class="alert-desc" style="color:#1e40af">Your profile was auto-created. Please update your details.</div></div><button class="btn btn-primary btn-sm" onclick="showPage(\'users\');openEditProfile();"><i class="bi bi-pencil"></i> Update</button></div>'}else wb.innerHTML='';
+function loadDashboard(){const wb=document.getElementById('profileWarning');if(currentUser&&currentUser.profileComplete===false){wb.innerHTML='<div class="alert-banner" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left-color:#0d6efd"><i class="bi bi-person-exclamation alert-icon" style="color:#1e40af"></i><div class="alert-content"><div class="alert-title" style="color:#1e3a8a">Complete your profile!</div><div class="alert-desc" style="color:#1e40af">Your profile was auto-created.</div></div><button class="btn btn-primary btn-sm" onclick="showPage(\'users\');openEditProfile();"><i class="bi bi-pencil"></i> Update</button></div>'}else wb.innerHTML='';
 const vf=getVisibleFiles();
 document.getElementById('statTotal').textContent=vf.length;
 document.getElementById('statPending').textContent=getUnreadCount();
@@ -695,117 +746,23 @@ function statusBadge(s){const m={'Created':'bg-secondary','In Progress':'bg-warn
 // ============================================================
 // PENDING PAYMENTS
 // ============================================================
-function loadPendingPayments(){
-  const c=document.getElementById('pendingPaymentsContent');
-  let allPending=getMyPendingPayments();
-  const q=(document.getElementById('pendingPaySearch')?.value||'').trim().toLowerCase();
-  if(q){
-    allPending=allPending.filter(item=>{
-      const f=item.file;const p=item.payment;
-      return (f.apNo||'').toLowerCase().includes(q)||(f.nic||'').toLowerCase().includes(q)||(f.customer||'').toLowerCase().includes(q)||String(f.amount||'').includes(q)||String(p.amount||'').includes(q)||(p.type||'').toLowerCase().includes(q)||(f.branch||'').toLowerCase().includes(q)||(f.manualDO||'').toLowerCase().includes(q);
-    });
-  }
-  if(allPending.length===0){
-    if(q){c.innerHTML=`<div class="card p-3"><div class="empty-state"><i class="bi bi-search"></i><p>No pending payments found for "<b>${escapeHtml(q)}</b>"</p></div></div>`}
-    else{c.innerHTML='<div class="card p-3"><div class="empty-state"><i class="bi bi-check2-circle"></i><p>🎉 No pending payments! All done.</p></div></div>'}
-    return;
-  }
-  const g={};
-  allPending.forEach(item=>{const k=item.file.id;if(!g[k])g[k]={file:item.file,payments:[]};g[k].payments.push(item.payment)});
-  let h=`<div class="alert alert-warning mb-3"><i class="bi bi-info-circle"></i> ${q?`Found <b>${allPending.length}</b> pending payment(s) across <b>${Object.keys(g).length}</b> file(s) for "<b>${escapeHtml(q)}</b>"`:`You have <b>${allPending.length}</b> pending payment(s) across <b>${Object.keys(g).length}</b> file(s).`}</div>`;
-  Object.values(g).forEach(gr=>{
-    const totalPending=gr.payments.reduce((s,p)=>s+Number(p.amount||0),0);
-    const owner=DB.users.find(u=>u.id===gr.file.createdBy);
-    h+=`<div class="card p-3 mb-3">
-      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <h6 class="fw-semibold m-0">
-          <i class="bi bi-file-earmark-text text-primary"></i> 
-          ${escapeHtml(gr.file.apNo)} — ${escapeHtml(gr.file.customer)||'No name'}
-          <br><small class="text-muted">NIC: ${escapeHtml(gr.file.nic)} • Branch: ${escapeHtml(gr.file.branch)} • File: Rs. ${Number(gr.file.amount||0).toLocaleString('en-LK',{minimumFractionDigits:2})}${canSeeAllFiles()&&owner?` • Owner: ${escapeHtml(owner.name)}`:''}</small>
-        </h6>
-        <button class="btn btn-sm btn-outline-primary" onclick="viewFile(${gr.file.id})"><i class="bi bi-eye"></i> View File</button>
-      </div>
-      <div class="table-responsive mb-2">
-        <table class="table table-sm mb-0">
-          <thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
-          <tbody>
-            ${gr.payments.map(p=>`<tr><td>${payBadge(p.type)}</td><td><b>Rs. ${Number(p.amount||0).toLocaleString('en-LK',{minimumFractionDigits:2})}</b></td><td>${payStatusBadge(p.status)}</td><td><button class="btn btn-warning btn-sm" onclick="openPaymentModal(${gr.file.id},'${p.type}')"><i class="bi bi-cash-coin"></i> Update</button></td></tr>`).join('')}
-          </tbody>
-          <tfoot><tr style="background:#fef3c7;"><td colspan="3" class="text-end"><b>Total Pending:</b></td><td><b>Rs. ${totalPending.toLocaleString('en-LK',{minimumFractionDigits:2})}</b></td></tr></tfoot>
-        </table>
-      </div>
-    </div>`;
-  });
-  c.innerHTML=h;
-}
+function loadPendingPayments(){const c=document.getElementById('pendingPaymentsContent');let allPending=getMyPendingPayments();const q=(document.getElementById('pendingPaySearch')?.value||'').trim().toLowerCase();if(q){allPending=allPending.filter(item=>{const f=item.file;const p=item.payment;return (f.apNo||'').toLowerCase().includes(q)||(f.nic||'').toLowerCase().includes(q)||(f.customer||'').toLowerCase().includes(q)||String(f.amount||'').includes(q)||String(p.amount||'').includes(q)||(p.type||'').toLowerCase().includes(q)||(f.branch||'').toLowerCase().includes(q)||(f.manualDO||'').toLowerCase().includes(q)})}if(allPending.length===0){if(q){c.innerHTML=`<div class="card p-3"><div class="empty-state"><i class="bi bi-search"></i><p>No pending payments found for "<b>${escapeHtml(q)}</b>"</p></div></div>`}else{c.innerHTML='<div class="card p-3"><div class="empty-state"><i class="bi bi-check2-circle"></i><p>🎉 No pending payments! All done.</p></div></div>'}return}const g={};allPending.forEach(item=>{const k=item.file.id;if(!g[k])g[k]={file:item.file,payments:[]};g[k].payments.push(item.payment)});let h=`<div class="alert alert-warning mb-3"><i class="bi bi-info-circle"></i> ${q?`Found <b>${allPending.length}</b> pending payment(s) across <b>${Object.keys(g).length}</b> file(s) for "<b>${escapeHtml(q)}</b>"`:`You have <b>${allPending.length}</b> pending payment(s) across <b>${Object.keys(g).length}</b> file(s).`}</div>`;Object.values(g).forEach(gr=>{const totalPending=gr.payments.reduce((s,p)=>s+Number(p.amount||0),0);const owner=DB.users.find(u=>u.id===gr.file.createdBy);h+=`<div class="card p-3 mb-3"><div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2"><h6 class="fw-semibold m-0"><i class="bi bi-file-earmark-text text-primary"></i> ${escapeHtml(gr.file.apNo)} — ${escapeHtml(gr.file.customer)||'No name'}<br><small class="text-muted">NIC: ${escapeHtml(gr.file.nic)} • Branch: ${escapeHtml(gr.file.branch)}${canSeeAllFiles()&&owner?` • Owner: ${escapeHtml(owner.name)}`:''}</small></h6><button class="btn btn-sm btn-outline-primary" onclick="viewFile(${gr.file.id})"><i class="bi bi-eye"></i> View File</button></div><div class="table-responsive mb-2"><table class="table table-sm mb-0"><thead><tr><th>Type</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>${gr.payments.map(p=>`<tr><td>${payBadge(p.type)}</td><td><b>Rs. ${Number(p.amount||0).toLocaleString('en-LK',{minimumFractionDigits:2})}</b></td><td>${payStatusBadge(p.status)}</td><td><button class="btn btn-warning btn-sm" onclick="openPaymentModal(${gr.file.id},'${p.type}')"><i class="bi bi-cash-coin"></i> Update</button></td></tr>`).join('')}</tbody><tfoot><tr style="background:#fef3c7;"><td colspan="3" class="text-end"><b>Total Pending:</b></td><td><b>Rs. ${totalPending.toLocaleString('en-LK',{minimumFractionDigits:2})}</b></td></tr></tfoot></table></div></div>`});c.innerHTML=h}
 function clearPendingPaySearch(){const el=document.getElementById('pendingPaySearch');if(el)el.value='';loadPendingPayments()}
 function loadPaymentReport(){const b=document.getElementById('reportPaymentsBody');const vf=getVisibleFiles();if(vf.length===0){b.innerHTML='<tr><td colspan="5" class="text-center text-muted py-4">No files yet</td></tr>';return}b.innerHTML=[...vf].sort((a,b)=>b.id-a.id).map(f=>{const ps=getFilePayments(f.id);const gp=t=>ps.find(p=>p.type===t);const rc=p=>{const i=PAYMENT_STATUS_LABELS[p.status]||PAYMENT_STATUS_LABELS['pending'];const a=p.amount?`<br><small class="text-muted">Rs. ${Number(p.amount).toLocaleString()}</small>`:'';return `<span class="report-pay-chip ${i.class}"><i class="bi bi-${i.icon}"></i> ${i.label}</span>${a}`};return `<tr><td><b>${escapeHtml(f.apNo)}</b></td><td>${escapeHtml(f.customer)||'-'}</td><td>${rc(gp('Interducer'))}</td><td>${rc(gp('Supply'))}</td><td>${rc(gp('RMV'))}</td></tr>`}).join('')}
 
 // ============================================================
 // CREATE FILE
 // ============================================================
-async function createFile(){
-  const apNo=document.getElementById('cApNo').value.trim().toUpperCase();
-  const nic=document.getElementById('cNic').value.trim().toUpperCase();
-  const customer=document.getElementById('cCustomer').value.trim();
-  const amount=document.getElementById('cAmount').value;
-  const branch=document.getElementById('cBranch').value.trim().toUpperCase();
-  const manualDO=document.getElementById('cManualDO').value.trim().toUpperCase();
-  if(!apNo||!nic||!amount||!branch){notify('Please fill AP No, NIC, Amount and Branch','warning');return}
-  if(DB.files.find(f=>f.apNo.toLowerCase()===apNo.toLowerCase())){notify(`AP No "${apNo}" already exists!`,'danger');return}
-  const supplyAmount=parseFloat(document.getElementById('payAmount-Supply').value)||parseFloat(amount);
-  const supplyRemarks=document.getElementById('payRemarks-Supply').value.trim();
-  const interducerChecked=document.getElementById('payCheck-Interducer').checked;
-  const rmvChecked=document.getElementById('payCheck-RMV').checked;
-  let interducerAmount=0,interducerRemarks='',rmvAmount=0,rmvRemarks='';
-  if(interducerChecked){interducerAmount=parseFloat(document.getElementById('payAmount-Interducer').value)||0;interducerRemarks=document.getElementById('payRemarks-Interducer').value.trim();if(interducerAmount<=0){notify('Please enter valid Interducer amount','warning');return}}
-  if(rmvChecked){rmvAmount=parseFloat(document.getElementById('payAmount-RMV').value)||0;rmvRemarks=document.getElementById('payRemarks-RMV').value.trim();if(rmvAmount<=0){notify('Please enter valid RMV amount','warning');return}}
-  setLoading('createFileBtn',true);
-  try{
-    const fid=nextFileId++;const now=new Date().toISOString();
-    const newFile={id:fid,apNo,nic,customer,amount:parseFloat(amount),branch,manualDO,createdBy:currentUser.id,status:'Created',headOfficeSent:false,createdAt:now};
-    DB.files.push(newFile);
-    const newLog={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:'Created File',location:currentUser.branch,remarks:manualDO?`Manual DO: ${manualDO}`:'',createdAt:now};
-    DB.logs.push(newLog);
-    const newPayments=[];
-    newPayments.push({id:nextPayId++,fileId:fid,paymentType:'Supply',status:'pending',amount:supplyAmount,remarks:supplyRemarks,markedBy:null,markedByName:null,markedAt:null,createdAt:now});
-    newPayments.push({id:nextPayId++,fileId:fid,paymentType:'Interducer',status:'pending',amount:interducerAmount,remarks:interducerRemarks,markedBy:null,markedByName:null,markedAt:null,createdAt:now});
-    newPayments.push({id:nextPayId++,fileId:fid,paymentType:'RMV',status:'pending',amount:rmvAmount,remarks:rmvRemarks,markedBy:null,markedByName:null,markedAt:null,createdAt:now});
-    newPayments.forEach(p=>DB.payments.push(p));
-    await fbSet(COLLECTIONS.files,fid,newFile);
-    await fbSet(COLLECTIONS.logs,newLog.id,newLog);
-    for(const p of newPayments) await fbSet(COLLECTIONS.payments,p.id,p);
-    await saveCounters();
-    clearCreateForm();
-    notify(`File created! (AP: ${apNo})`,'success');
-    setTimeout(()=>openSendToBM(fid,apNo),300);
-  }catch(e){console.error('[HNB] Create error:',e);notify('Failed to create file!','danger')}
-  finally{setLoading('createFileBtn',false,'<i class="bi bi-save"></i> Submit File')}
-}
-function clearCreateForm(){
-  ['cApNo','cNic','cCustomer','cAmount','cManualDO'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
-  document.getElementById('cBranch').value=currentUser.branch;
-  const sc=document.getElementById('payCheck-Supply');if(sc)sc.checked=true;
-  document.getElementById('payAmount-Supply').value='';document.getElementById('payRemarks-Supply').value='';
-  const ic=document.getElementById('payCheck-Interducer');if(ic)ic.checked=false;
-  document.getElementById('payToggle-Interducer').classList.remove('active');document.getElementById('payInputs-Interducer').classList.remove('show');
-  document.getElementById('payAmount-Interducer').value='';document.getElementById('payRemarks-Interducer').value='';
-  const rc=document.getElementById('payCheck-RMV');if(rc)rc.checked=false;
-  document.getElementById('payToggle-RMV').classList.remove('active');document.getElementById('payInputs-RMV').classList.remove('show');
-  document.getElementById('payAmount-RMV').value='';document.getElementById('payRemarks-RMV').value='';
-}
+async function createFile(){const apNo=document.getElementById('cApNo').value.trim().toUpperCase();const nic=document.getElementById('cNic').value.trim().toUpperCase();const customer=document.getElementById('cCustomer').value.trim();const amount=document.getElementById('cAmount').value;const branch=document.getElementById('cBranch').value.trim().toUpperCase();const manualDO=document.getElementById('cManualDO').value.trim().toUpperCase();if(!apNo||!nic||!amount||!branch){notify('Please fill AP No, NIC, Amount and Branch','warning');return}if(DB.files.find(f=>f.apNo.toLowerCase()===apNo.toLowerCase())){notify(`AP No "${apNo}" already exists!`,'danger');return}const supplyAmount=parseFloat(document.getElementById('payAmount-Supply').value)||parseFloat(amount);const supplyRemarks=document.getElementById('payRemarks-Supply').value.trim();const interducerChecked=document.getElementById('payCheck-Interducer').checked;const rmvChecked=document.getElementById('payCheck-RMV').checked;let interducerAmount=0,interducerRemarks='',rmvAmount=0,rmvRemarks='';if(interducerChecked){interducerAmount=parseFloat(document.getElementById('payAmount-Interducer').value)||0;interducerRemarks=document.getElementById('payRemarks-Interducer').value.trim();if(interducerAmount<=0){notify('Please enter valid Interducer amount','warning');return}}if(rmvChecked){rmvAmount=parseFloat(document.getElementById('payAmount-RMV').value)||0;rmvRemarks=document.getElementById('payRemarks-RMV').value.trim();if(rmvAmount<=0){notify('Please enter valid RMV amount','warning');return}}setLoading('createFileBtn',true);try{const fid=nextFileId++;const now=new Date().toISOString();const newFile={id:fid,apNo,nic,customer,amount:parseFloat(amount),branch,manualDO,createdBy:currentUser.id,status:'Created',headOfficeSent:false,createdAt:now};DB.files.push(newFile);const newLog={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:'Created File',location:currentUser.branch,remarks:manualDO?`Manual DO: ${manualDO}`:'',createdAt:now};DB.logs.push(newLog);const newPayments=[];newPayments.push({id:nextPayId++,fileId:fid,paymentType:'Supply',status:'pending',amount:supplyAmount,remarks:supplyRemarks,markedBy:null,markedByName:null,markedAt:null,createdAt:now});newPayments.push({id:nextPayId++,fileId:fid,paymentType:'Interducer',status:'pending',amount:interducerAmount,remarks:interducerRemarks,markedBy:null,markedByName:null,markedAt:null,createdAt:now});newPayments.push({id:nextPayId++,fileId:fid,paymentType:'RMV',status:'pending',amount:rmvAmount,remarks:rmvRemarks,markedBy:null,markedByName:null,markedAt:null,createdAt:now});newPayments.forEach(p=>DB.payments.push(p));await fbSet(COLLECTIONS.files,fid,newFile);await fbSet(COLLECTIONS.logs,newLog.id,newLog);for(const p of newPayments) await fbSet(COLLECTIONS.payments,p.id,p);await saveCounters();clearCreateForm();notify(`File created! (AP: ${apNo})`,'success');setTimeout(()=>openSendToBM(fid,apNo),300)}catch(e){console.error('[HNB] Create error:',e);notify('Failed to create file!','danger')}finally{setLoading('createFileBtn',false,'<i class="bi bi-save"></i> Submit File')}}
+function clearCreateForm(){['cApNo','cNic','cCustomer','cAmount','cManualDO'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});document.getElementById('cBranch').value=currentUser.branch;const sc=document.getElementById('payCheck-Supply');if(sc)sc.checked=true;document.getElementById('payAmount-Supply').value='';document.getElementById('payRemarks-Supply').value='';const ic=document.getElementById('payCheck-Interducer');if(ic)ic.checked=false;document.getElementById('payToggle-Interducer').classList.remove('active');document.getElementById('payInputs-Interducer').classList.remove('show');document.getElementById('payAmount-Interducer').value='';document.getElementById('payRemarks-Interducer').value='';const rc=document.getElementById('payCheck-RMV');if(rc)rc.checked=false;document.getElementById('payToggle-RMV').classList.remove('active');document.getElementById('payInputs-RMV').classList.remove('show');document.getElementById('payAmount-RMV').value='';document.getElementById('payRemarks-RMV').value=''}
 
 // ============================================================
-// SEND TO BM
+// SEND TO BM / ACCEPT / SEND HO / HANDOVER
 // ============================================================
 function openSendToBM(fid,apNo){const file=DB.files.find(f=>f.id===fid);if(!file){notify('File not found!','danger');return}if(hasBeenSentToBM(fid)){notify('Already sent!','warning');return}if(!isCreator(file)&&!canSeeAllFiles()){notify('Only creator can send!','danger');return}document.getElementById('stFileId').value=fid;document.getElementById('stApNo').textContent=apNo;document.getElementById('stRemarks').value='';selectedBMSendType=null;document.querySelectorAll('#bmSendTypeGrid .send-type-card').forEach(c=>c.classList.remove('selected'));const sel=document.getElementById('stBranchManager');const wb=document.getElementById('noManagerWarning');sel.innerHTML='';const bms=DB.users.filter(u=>u.designation==='Branch Manager'&&u.id!==currentUser.id&&u.branch.toUpperCase()===file.branch.toUpperCase());if(bms.length===0){sel.innerHTML='<option value="">-- No Branch Manager available --</option>';sel.disabled=true;wb.innerHTML='<div class="no-manager-warning"><i class="bi bi-exclamation-triangle-fill"></i><div><div class="warning-title">No Branch Manager found!</div><div class="warning-desc">Only BM of <b>'+escapeHtml(file.branch)+'</b> branch can receive.</div></div></div>'}else{sel.disabled=false;wb.innerHTML='';sel.innerHTML='<option value="">-- Select BM --</option>';bms.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.branch)}</option>`})}if(!sendToBMModalInstance)sendToBMModalInstance=new bootstrap.Modal(document.getElementById('sendToBMModal'));sendToBMModalInstance.show()}
 function selectBMSendType(t){selectedBMSendType=t;document.querySelectorAll('#bmSendTypeGrid .send-type-card').forEach(c=>c.classList.remove('selected'));const card=document.querySelector(`#bmSendTypeGrid .send-type-card[data-type="${t}"]`);if(card)card.classList.add('selected')}
 async function confirmSendToBM(){const fid=parseInt(document.getElementById('stFileId').value);const toUid=parseInt(document.getElementById('stBranchManager').value);const remarks=document.getElementById('stRemarks').value.trim();if(hasBeenSentToBM(fid)){notify('Already sent!','danger');sendToBMModalInstance.hide();return}if(!toUid||isNaN(toUid)){notify('Select BM','warning');return}if(!selectedBMSendType){notify('Select type','warning');return}const toUser=DB.users.find(u=>u.id===toUid);const file=DB.files.find(f=>f.id===fid);if(!toUser||!file){notify('Not found','danger');return}const now=new Date().toISOString();const stl={file:'File Only',manualDO:'Manual DO',both:'File + Manual DO',other:'Other'};const le={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Sent to Branch Manager (${toUser.name})`,location:toUser.branch,handoverTo:toUser.id,handoverToName:toUser.name,handoverToDesig:toUser.designation,sendType:selectedBMSendType,sendTypeLabel:stl[selectedBMSendType],remarks:remarks||'',createdAt:now};DB.logs.push(le);const stt=stl[selectedBMSendType];await createNotification(toUser.id,'file_received',`New file: ${file.apNo} (${stt})`,`From ${currentUser.name} — ${stt}${remarks?' — '+remarks:''}`,fid);if(file.status==='Created')file.status='In Progress';await fbSet(COLLECTIONS.logs,le.id,le);await fbSet(COLLECTIONS.files,fid,file);await saveCounters();sendToBMModalInstance.hide();notify(`Sent to ${toUser.name}!`,'success');updateNotifBadge();viewFile(fid)}
 function skipSend(){const fid=parseInt(document.getElementById('stFileId').value);sendToBMModalInstance.hide();if(fid)viewFile(fid)}
-
-// ============================================================
-// ACCEPT / SEND HO / HANDOVER
-// ============================================================
 async function acceptFile(fid){const file=DB.files.find(f=>f.id===fid);if(!file)return;if(!isCurrentHolder(fid)&&!canSeeAllFiles()){notify('Not current holder!','danger');return}const now=new Date().toISOString();const nr=DB.notifications.filter(n=>n.userId===currentUser.id&&n.fileId===fid&&!n.read);nr.forEach(n=>n.read=true);const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:'Accepted File (In Hand)',location:currentUser.branch,remarks:'File received',createdAt:now};DB.logs.push(nl);if(file.status==='Created'||file.status==='In Progress')file.status='With Branch Manager';await fbSet(COLLECTIONS.logs,nl.id,nl);await fbSet(COLLECTIONS.files,fid,file);if(nr.length)await fbBatch(nr.map(n=>({collection:COLLECTIONS.notifications,docId:n._docId||n.id,data:{read:true}})));await saveCounters();notify('File accepted!','success');updateNotifBadge();viewFile(fid)}
 async function sendToHeadOffice(fid){const file=DB.files.find(f=>f.id===fid);if(!file)return;if(currentUser.designation!=='Branch Manager'&&!canSeeAllFiles()){notify('Only BM can send!','danger');return}if(!isCurrentHolder(fid)&&!canSeeAllFiles()){notify('Not current holder!','danger');return}if(hasBeenSentToHO(fid)){notify('Already sent!','danger');return}const ho=DB.users.find(u=>u.designation==='Head Office');const now=new Date().toISOString();file.headOfficeSent=true;file.status='Sent to Head Office';const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:'Sent to Head Office',location:'Head Office',handoverTo:ho?ho.id:null,handoverToName:ho?ho.name:'Head Office',handoverToDesig:'Head Office',remarks:'File dispatched to HO',createdAt:now};DB.logs.push(nl);if(ho)await createNotification(ho.id,'file_received',`New file: ${file.apNo} (from Branch)`,`From ${currentUser.name} — ${currentUser.branch}`,fid);await fbSet(COLLECTIONS.logs,nl.id,nl);await fbSet(COLLECTIONS.files,fid,file);await saveCounters();notify('Sent to HO!','success');updateNotifBadge();viewFile(fid)}
 function openHandover(id){const file=DB.files.find(f=>f.id===id);if(!file){notify('Not found','danger');return}if(!canUserAct(file)){notify('No permission!','danger');return}if(hasBeenSentToHO(id)){notify('Already sent!','danger');return}document.getElementById('hoFileId').value=id;document.getElementById('hoRemarks').value='';document.getElementById('hoManualDO').value='';document.getElementById('manualDOGroup').classList.add('hidden');selectedHOSendType=null;document.querySelectorAll('#hoSendTypeGrid .send-type-card').forEach(c=>c.classList.remove('selected'));const sel=document.getElementById('hoUser');sel.innerHTML='<option value="">-- Select User --</option>';const ou=DB.users.filter(u=>u.id!==currentUser.id);if(ou.length===0){sel.innerHTML='<option value="">-- No users --</option>';sel.disabled=true}else{sel.disabled=false;ou.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.designation)} (${escapeHtml(u.branch)})</option>`})}if(!handoverModalInstance)handoverModalInstance=new bootstrap.Modal(document.getElementById('handoverModal'));handoverModalInstance.show()}
@@ -830,45 +787,69 @@ function clearSearch(){document.getElementById('searchInput').value='';doSearch(
 // VIEW FILE
 // ============================================================
 function viewFile(id){const file=DB.files.find(f=>f.id===id);if(!file){notify('File not found','danger');return}const canFullyAccess=isFileVisibleToUser(file);const viewOnly=!canFullyAccess&&!canSeeAllFiles();const logs=DB.logs.filter(l=>l.fileId===id).sort((a,b)=>b.id-a.id);const fp=getFilePayments(file.id);const uic=isCreator(file);const uca=canUserAct(file)&&!viewOnly;const uced=canEditDelete(file)&&!viewOnly;const ucsbm=canSendToBM(file)&&!viewOnly;const uch=uca&&!hasBeenSentToHO(file.id);const ucho=canSendHO(file)&&!viewOnly;const lh=logs.find(l=>l.handoverTo);const ch=lh?{userName:lh.handoverToName,designation:lh.handoverToDesig,location:lh.location,createdAt:lh.createdAt,userId:lh.handoverTo}:null;const hpn=DB.notifications.some(n=>n.userId===currentUser.id&&n.fileId===id&&!n.read&&n.type==='file_received');const np=!uca&&!uic;const totals={Interducer:0,Supply:0,RMV:0};fp.forEach(p=>{if(p.status==='paid')totals[p.type]+=p.amount});const gt=totals.Interducer+totals.Supply+totals.RMV;const owner=DB.users.find(u=>u.id===file.createdBy);
-document.getElementById('viewContent').innerHTML=`${viewOnly?`<div class="view-only-banner"><i class="bi bi-eye-slash-fill"></i><div><div class="vo-title">View Only Mode</div><div class="vo-desc">You can view this file's details but cannot edit, handover, or update payments.</div></div></div>`:''}
-${canSeeAllFiles()?`<div class="alert-banner" style="background:linear-gradient(135deg,#fef3c7,#fde68a)"><i class="bi bi-shield-fill-check alert-icon"></i><div class="alert-content"><div class="alert-title">${isSuperAdmin()?'👑 Super Admin':'🛡️ Admin'} Access</div><div class="alert-desc">You have full control over this file. Owner: <b>${escapeHtml(owner?owner.name:'Unknown')}</b></div></div></div>`:''}
+document.getElementById('viewContent').innerHTML=`${viewOnly?`<div class="view-only-banner"><i class="bi bi-eye-slash-fill"></i><div><div class="vo-title">View Only Mode</div><div class="vo-desc">You can view but cannot edit/handover.</div></div></div>`:''}
+${canSeeAllFiles()?`<div class="alert-banner" style="background:linear-gradient(135deg,#fef3c7,#fde68a)"><i class="bi bi-shield-fill-check alert-icon"></i><div class="alert-content"><div class="alert-title">${isSuperAdmin()?'👑 Super Admin':'🛡️ Admin'} Access</div><div class="alert-desc">You have full control. Owner: <b>${escapeHtml(owner?owner.name:'Unknown')}</b></div></div></div>`:''}
 <div class="page-title d-flex justify-content-between align-items-center"><div class="d-flex align-items-center gap-3"><div class="icon-circle"><i class="bi bi-file-earmark-text"></i></div>File #${file.id} — ${escapeHtml(file.apNo)}</div><div class="d-flex gap-2">${uced?`<button class="btn btn-warning btn-sm" onclick="editFile(${id})"><i class="bi bi-pencil"></i> Edit</button><button class="btn btn-danger btn-sm" onclick="deleteFile(${id})"><i class="bi bi-trash"></i> Delete</button>`:''}<button class="btn btn-outline-secondary btn-sm" onclick="showPage('dashboard')"><i class="bi bi-arrow-left"></i> Back</button></div></div>
-${hpn&&!viewOnly?`<div class="card p-3 mb-3" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left:5px solid #0d6efd"><div class="d-flex align-items-center justify-content-between flex-wrap gap-2"><div class="d-flex align-items-center gap-3"><i class="bi bi-inbox-fill" style="font-size:28px;color:#1e40af"></i><div><div style="font-weight:600;color:#1e3a8a">This file was sent to you!</div><div style="font-size:13px;color:#1e40af">Please accept it to start working.</div></div></div><button class="btn btn-primary" onclick="acceptFile(${id})"><i class="bi bi-check-circle-fill"></i> Accept File</button></div></div>`:''}
-${ucsbm?`<div class="card p-3 mb-3" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:5px solid #f59e0b"><div class="d-flex align-items-center justify-content-between flex-wrap gap-2"><div class="d-flex align-items-center gap-3"><i class="bi bi-info-circle-fill" style="font-size:28px;color:#d97706"></i><div><div style="font-weight:600;color:#92400e">Not yet sent to Branch Manager</div><div style="font-size:13px;color:#78350f">Send Manual DO / File / Both.</div></div></div><button class="btn btn-warning" style="color:#fff" onclick="openSendToBM(${id},'${escapeHtml(file.apNo)}')"><i class="bi bi-send"></i> Send to BM</button></div></div>`:''}
+${hpn&&!viewOnly?`<div class="card p-3 mb-3" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left:5px solid #0d6efd"><div class="d-flex align-items-center justify-content-between flex-wrap gap-2"><div class="d-flex align-items-center gap-3"><i class="bi bi-inbox-fill" style="font-size:28px;color:#1e40af"></i><div><div style="font-weight:600;color:#1e3a8a">This file was sent to you!</div><div style="font-size:13px;color:#1e40af">Please accept.</div></div></div><button class="btn btn-primary" onclick="acceptFile(${id})"><i class="bi bi-check-circle-fill"></i> Accept File</button></div></div>`:''}
+${ucsbm?`<div class="card p-3 mb-3" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:5px solid #f59e0b"><div class="d-flex align-items-center justify-content-between flex-wrap gap-2"><div class="d-flex align-items-center gap-3"><i class="bi bi-info-circle-fill" style="font-size:28px;color:#d97706"></i><div><div style="font-weight:600;color:#92400e">Not yet sent to BM</div></div></div><button class="btn btn-warning" style="color:#fff" onclick="openSendToBM(${id},'${escapeHtml(file.apNo)}')"><i class="bi bi-send"></i> Send to BM</button></div></div>`:''}
 <div class="row g-3"><div class="col-md-6"><div class="card p-4"><h6 class="fw-semibold mb-3"><i class="bi bi-info-circle text-primary"></i> File Details</h6><table class="table table-sm mb-0"><tr><th width="45%" class="text-muted">AP No</th><td><b>${escapeHtml(file.apNo)}</b></td></tr><tr><th class="text-muted">Manual DO No</th><td>${escapeHtml(file.manualDO)||'<span class="text-muted">Not assigned</span>'}</td></tr><tr><th class="text-muted">NIC</th><td>${escapeHtml(file.nic)}</td></tr><tr><th class="text-muted">Customer</th><td>${escapeHtml(file.customer)||'-'}</td></tr><tr><th class="text-muted">Amount</th><td><b class="text-success">Rs. ${Number(file.amount).toLocaleString('en-LK',{minimumFractionDigits:2})}</b></td></tr><tr><th class="text-muted">Branch</th><td>${escapeHtml(file.branch)}</td></tr><tr><th class="text-muted">Status</th><td>${statusBadge(file.status)}</td></tr><tr><th class="text-muted">Owner</th><td>${owner?escapeHtml(owner.name)+' ('+escapeHtml(owner.email)+')':'-'}</td></tr><tr><th class="text-muted">Sent to HO</th><td>${file.headOfficeSent?'<span class="badge bg-success">Yes</span>':'<span class="badge bg-secondary">No</span>'}</td></tr><tr><th class="text-muted">Created</th><td><small>${formatDateTime(file.createdAt)}</small></td></tr></table></div></div>
 <div class="col-md-6"><div class="card p-4 mb-3" style="background:linear-gradient(135deg,#0d6efd,#4d8bff);color:#fff"><h6 class="fw-semibold mb-2"><i class="bi bi-person-badge"></i> Current Holder</h6>${ch?`<div class="d-flex align-items-center gap-3"><i class="bi bi-person-circle" style="font-size:42px;opacity:.9"></i><div><div style="font-size:17px;font-weight:600">${escapeHtml(ch.userName)}${ch.userId===currentUser.id?' (You)':''}</div><div style="font-size:13px;opacity:.9">${escapeHtml(ch.designation)} • ${escapeHtml(ch.location)}</div><div style="font-size:11px;opacity:.8;margin-top:3px"><i class="bi bi-clock"></i> ${formatDateTime(ch.createdAt)}</div></div></div>`:'<div class="text-white-50">Not yet handed over</div>'}</div>
 ${uca&&!np?`<div class="card p-4"><h6 class="fw-semibold mb-3"><i class="bi bi-lightning-charge text-warning"></i> Actions</h6>${uch?`<button class="btn btn-primary w-100 mb-2" onclick="openHandover(${id})"><i class="bi bi-arrow-left-right"></i> Handover</button>`:''}${ucho?`<button class="btn btn-success w-100 mb-2" onclick="sendToHeadOffice(${id})"><i class="bi bi-building-fill"></i> Send to Head Office</button>`:''}<label class="form-label small mt-2">Update Status</label><div class="input-group mb-2"><select id="statusSelect" class="form-select">${['Created','In Progress','With Branch Manager','Sent to Head Office','Approved','Rejected','Completed'].map(s=>`<option ${file.status===s?'selected':''}>${s}</option>`).join('')}</select><button class="btn btn-primary" onclick="updateStatus(${id})">Update</button></div></div>`:''}</div></div>
-<div class="card p-4 mt-3"><div class="d-flex justify-content-between align-items-center mb-3"><h6 class="fw-semibold m-0"><i class="bi bi-cash-coin text-success"></i> Payments</h6><span class="badge bg-primary">Total Paid: Rs. ${gt.toLocaleString('en-LK',{minimumFractionDigits:2})}</span></div><div class="row g-3">${fp.map(p=>`<div class="col-md-4"><div class="pay-card ${p.status}"><div class="pc-header"><span class="pc-type">${payBadge(p.type)}</span>${payStatusBadge(p.status)}</div><div class="pc-info">${p.status==='paid'?`Amount: <b class="text-success">Rs. ${Number(p.amount).toLocaleString('en-LK',{minimumFractionDigits:2})}</b><br>Marked by: <b>${escapeHtml(p.markedByName||'-')}</b><br>When: <b>${formatDateTime(p.markedAt)}</b>${p.remarks?`<br>Note: <i>${escapeHtml(p.remarks)}</i>`:''}`:p.status==='rejected'?`<b class="text-danger">Rejected</b><br>By: <b>${escapeHtml(p.markedByName||'-')}</b><br>When: <b>${formatDateTime(p.markedAt)}</b>`:p.status==='not-required'?`<span class="text-muted">Not required</span>`:`Amount: <b>Rs. ${Number(p.amount||0).toLocaleString('en-LK',{minimumFractionDigits:2})}</b><br><span class="text-muted">Waiting for payment</span>${p.remarks?`<br>Note: <i>${escapeHtml(p.remarks)}</i>`:''}`}</div>${uca?`<div class="pc-actions"><button class="btn ${p.status==='pending'?'btn-warning':'btn-outline-secondary'} w-100" onclick="openPaymentModal(${id},'${p.type}')"><i class="bi bi-pencil"></i> ${p.status==='pending'?'Update Payment':'Change Status'}</button></div>`:''}</div></div>`).join('')}</div></div>
+<div class="card p-4 mt-3"><div class="d-flex justify-content-between align-items-center mb-3"><h6 class="fw-semibold m-0"><i class="bi bi-cash-coin text-success"></i> Payments</h6><span class="badge bg-primary">Total Paid: Rs. ${gt.toLocaleString('en-LK',{minimumFractionDigits:2})}</span></div><div class="row g-3">${fp.map(p=>`<div class="col-md-4"><div class="pay-card ${p.status}"><div class="pc-header"><span class="pc-type">${payBadge(p.type)}</span>${payStatusBadge(p.status)}</div><div class="pc-info">${p.status==='paid'?`Amount: <b class="text-success">Rs. ${Number(p.amount).toLocaleString('en-LK',{minimumFractionDigits:2})}</b><br>Marked by: <b>${escapeHtml(p.markedByName||'-')}</b><br>When: <b>${formatDateTime(p.markedAt)}</b>${p.remarks?`<br>Note: <i>${escapeHtml(p.remarks)}</i>`:''}`:p.status==='rejected'?`<b class="text-danger">Rejected</b><br>By: <b>${escapeHtml(p.markedByName||'-')}</b><br>When: <b>${formatDateTime(p.markedAt)}</b>`:p.status==='not-required'?`<span class="text-muted">Not required</span>`:`Amount: <b>Rs. ${Number(p.amount||0).toLocaleString('en-LK',{minimumFractionDigits:2})}</b><br><span class="text-muted">Waiting</span>${p.remarks?`<br>Note: <i>${escapeHtml(p.remarks)}</i>`:''}`}</div>${uca?`<div class="pc-actions"><button class="btn ${p.status==='pending'?'btn-warning':'btn-outline-secondary'} btn-sm flex-fill" onclick="openPaymentModal(${id},'${p.type}')"><i class="bi bi-pencil"></i> ${p.status==='pending'?'Update':'Change'}</button>${isSuperAdmin()?`<button class="btn btn-danger btn-sm" onclick="deletePayment(${id},'${p.type}')" title="Delete payment"><i class="bi bi-trash"></i></button>`:''}</div>`:''}</div></div>`).join('')}</div></div>
 <div class="card p-4 mt-3"><h6 class="fw-semibold mb-3"><i class="bi bi-diagram-3 text-primary"></i> File Timeline</h6>${logs.length===0?'<div class="text-center text-muted py-4">No history yet</div>':`<div class="timeline">${logs.map(l=>`<div class="timeline-item"><div class="tl-time"><i class="bi bi-clock"></i> ${formatDateTime(l.createdAt)} <span class="ms-2 badge bg-light text-dark">${timeAgo(l.createdAt)}</span></div><div class="tl-title">${escapeHtml(l.action)}</div><div class="tl-desc"><i class="bi bi-person"></i> <b>${escapeHtml(l.userName)}</b> (${escapeHtml(l.designation)}) • <i class="bi bi-geo-alt"></i> ${escapeHtml(l.location)}</div>${l.remarks?`<div class="tl-desc mt-1 p-2" style="background:#f8fafc;border-radius:8px;border-left:3px solid #0d6efd"><i class="bi bi-chat-left-text"></i> <i>${escapeHtml(l.remarks)}</i></div>`:''}</div>`).join('')}</div>`}</div>`;
 showPage('view')}
 
 async function updateStatus(id){const file=DB.files.find(f=>f.id===id);if(!file||!canUserAct(file)){notify('No permission!','danger');return}const status=document.getElementById('statusSelect').value;const now=new Date().toISOString();file.status=status;const nl={id:nextLogId++,fileId:id,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:'Status changed to '+status,location:currentUser.branch,remarks:isSuperAdmin()?'(by Super Admin)':isAdmin()?'(by Admin)':'',createdAt:now};DB.logs.push(nl);await fbSet(COLLECTIONS.files,file._docId||id,file);await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();notify('Status updated','info');viewFile(id)}
 async function editFile(id){const file=DB.files.find(f=>f.id===id);if(!file||!canEditDelete(file)){notify('No permission!','danger');return}const na=prompt('AP No:',file.apNo);if(na===null)return;const nn=prompt('NIC:',file.nic);if(nn===null)return;const nc=prompt('Customer Name:',file.customer);if(nc===null)return;const nam=prompt('Amount:',file.amount);if(nam===null)return;const nb=prompt('Branch:',file.branch);if(nb===null)return;const nd=prompt('Manual DO No:',file.manualDO||'');if(nd===null)return;if(DB.files.find(f=>f.id!==id&&f.apNo.toLowerCase()===na.trim().toLowerCase())){notify('AP No exists!','danger');return}file.apNo=na.trim().toUpperCase();file.nic=nn.trim().toUpperCase();file.customer=nc.trim();file.amount=parseFloat(nam);file.branch=nb.trim().toUpperCase();file.manualDO=nd.trim().toUpperCase();const nl={id:nextLogId++,fileId:id,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:isSuperAdmin()?'Edited File (by Super Admin)':isAdmin()?'Edited File (by Admin)':'Edited File',location:currentUser.branch,remarks:'',createdAt:new Date().toISOString()};DB.logs.push(nl);await fbSet(COLLECTIONS.files,file._docId||id,file);await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();notify('File updated!','success');viewFile(id)}
-async function deleteFile(id){const file=DB.files.find(f=>f.id===id);if(!file||!canEditDelete(file)){notify('No permission!','danger');return}if(!confirm('Delete this file permanently?'))return;const rl=DB.logs.filter(l=>l.fileId===id);const rp=DB.payments.filter(p=>p.fileId===id);const rn=DB.notifications.filter(n=>n.fileId===id);DB.files=DB.files.filter(f=>f.id!==id);DB.logs=DB.logs.filter(l=>l.fileId!==id);DB.payments=DB.payments.filter(p=>p.fileId!==id);DB.notifications=DB.notifications.filter(n=>n.fileId!==id);await fbDelete(COLLECTIONS.files,file._docId||id);for(const l of rl)await fbDelete(COLLECTIONS.logs,l._docId||l.id);for(const p of rp)await fbDelete(COLLECTIONS.payments,p._docId||p.id);for(const n of rn)await fbDelete(COLLECTIONS.notifications,n._docId||n.id);notify('File deleted','success');updateNotifBadge();showPage('dashboard')}
+async function deleteFile(id){const file=DB.files.find(f=>f.id===id);if(!file||!canEditDelete(file)){notify('No permission!','danger');return}if(!confirm('⚠️ Delete this file permanently?\n\n• File details\n• All logs\n• All payments\n• All notifications\n\nThis cannot be undone!'))return;const rl=DB.logs.filter(l=>l.fileId===id);const rp=DB.payments.filter(p=>p.fileId===id);const rn=DB.notifications.filter(n=>n.fileId===id);DB.files=DB.files.filter(f=>f.id!==id);DB.logs=DB.logs.filter(l=>l.fileId!==id);DB.payments=DB.payments.filter(p=>p.fileId!==id);DB.notifications=DB.notifications.filter(n=>n.fileId!==id);await fbDelete(COLLECTIONS.files,file._docId||id);for(const l of rl)await fbDelete(COLLECTIONS.logs,l._docId||l.id);for(const p of rp)await fbDelete(COLLECTIONS.payments,p._docId||p.id);for(const n of rn)await fbDelete(COLLECTIONS.notifications,n._docId||n.id);const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Deleted File: ${file.apNo}`,location:'System',remarks:isSuperAdmin()?'(by Super Admin)':'(by Admin)',createdAt:new Date().toISOString()};await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();notify('File deleted','success');updateNotifBadge();showPage('dashboard')}
+
+// ⭐ Super Admin — Payment Delete
+async function deletePayment(fid,pt){
+  if(!isSuperAdmin()){notify('Only Super Admin can delete payments!','danger');return}
+  const rec=getPaymentRecord(fid,pt);
+  if(!rec){notify('Payment not found','warning');return}
+  const file=DB.files.find(f=>f.id===fid);
+  if(!confirm(`⚠️ Delete ${pt} payment for ${file?file.apNo:'?'}?\n\nThis cannot be undone!`))return;
+  DB.payments=DB.payments.filter(p=>!(p.fileId===fid&&p.paymentType===pt));
+  await fbDelete(COLLECTIONS.payments,rec._docId||rec.id);
+  const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Deleted ${pt} Payment`,location:'System',remarks:isSuperAdmin()?'(by Super Admin)':'',createdAt:new Date().toISOString()};
+  DB.logs.push(nl);await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();
+  notify(`${pt} payment deleted`,'success');
+  viewFile(fid);
+}
 
 // ============================================================
 // LOGS / USERS
 // ============================================================
 function loadLogs(){const body=document.getElementById('logsBody');const logs=[...getVisibleLogs()].sort((a,b)=>b.id-a.id);if(logs.length===0){body.innerHTML='<tr><td colspan="7"><div class="empty-state"><i class="bi bi-journal-x"></i><p>No logs yet</p></div></td></tr>';return}body.innerHTML=logs.map(l=>{const f=DB.files.find(x=>x.id===l.fileId);return `<tr><td><small><b>${formatDateTime(l.createdAt)}</b><br><span class="text-muted">${timeAgo(l.createdAt)}</span></small></td><td><b>${f?escapeHtml(f.apNo):'-'}</b></td><td>${escapeHtml(l.userName)}</td><td><small>${escapeHtml(l.designation)}</small></td><td>${escapeHtml(l.action)}</td><td><span class="badge bg-secondary">${escapeHtml(l.location)}</span></td><td><small>${escapeHtml(l.remarks)||'-'}</small></td></tr>`}).join('')}
 
-function loadUsers(){const body=document.getElementById('usersBody');if(currentUser){document.getElementById('myProfileName').textContent=currentUser.name||'-';document.getElementById('myProfileEmail').textContent=currentUser.email||'-';document.getElementById('myProfileDesig').textContent=currentUser.designation||'-';document.getElementById('myProfileBranch').textContent=currentUser.branch||'-'}renderUserPics();if(DB.users.length===0){body.innerHTML='<tr><td colspan="6" class="text-center text-muted py-4">No users</td></tr>';return}body.innerHTML=DB.users.map(u=>{let roleBadge='<span class="badge bg-secondary">User</span>';if(u.isSuperAdmin)roleBadge='<span class="badge bg-warning text-dark"><i class="bi bi-shield-fill-check"></i> Super Admin</span>';else if(u.isAdmin)roleBadge='<span class="badge bg-primary"><i class="bi bi-shield-fill"></i> Admin</span>';return `<tr><td>${getUserPicHtml(u,'sm')}</td><td><i class="bi bi-person-circle text-primary"></i> <b>${escapeHtml(u.name)}</b>${u.id===currentUser.id?' <span class="badge bg-info">You</span>':''}</td><td>${escapeHtml(u.email)}</td><td><span class="badge bg-primary">${escapeHtml(u.designation)}</span></td><td>${escapeHtml(u.branch)}</td><td>${roleBadge}</td></tr>`}).join('')}
+function loadUsers(){
+  const body=document.getElementById('usersBody');
+  if(currentUser){document.getElementById('myProfileName').textContent=currentUser.name||'-';document.getElementById('myProfileEmail').textContent=currentUser.email||'-';document.getElementById('myProfileDesig').textContent=currentUser.designation||'-';document.getElementById('myProfileBranch').textContent=currentUser.branch||'-'}
+  renderUserPics();
+  // ⭐ SUPER ADMIN ට users list එකේ Super Admin ව පෙන්නනවා, normal අයට නෑ
+  let usersToShow=DB.users;
+  if(!canManageUsers()){
+    usersToShow=DB.users.filter(u=>!u.isSuperAdmin);  // normal users ට super admin hide
+  }
+  if(usersToShow.length===0){body.innerHTML='<tr><td colspan="6" class="text-center text-muted py-4">No users</td></tr>';return}
+  body.innerHTML=usersToShow.map(u=>{let roleBadge='<span class="badge bg-secondary">User</span>';if(u.isSuperAdmin)roleBadge='<span class="badge bg-warning text-dark"><i class="bi bi-shield-fill-check"></i> Super Admin</span>';else if(u.isAdmin)roleBadge='<span class="badge bg-primary"><i class="bi bi-shield-fill"></i> Admin</span>';return `<tr><td>${getUserPicHtml(u,'sm')}</td><td><i class="bi bi-person-circle text-primary"></i> <b>${escapeHtml(u.name)}</b>${u.id===currentUser.id?' <span class="badge bg-info">You</span>':''}</td><td>${escapeHtml(u.email)}</td><td><span class="badge bg-primary">${escapeHtml(u.designation)}</span></td><td>${escapeHtml(u.branch)}</td><td>${roleBadge}</td></tr>`}).join('')
+}
 
 // ============================================================
-// ⭐ ADMIN PANEL
+// ⭐ ADMIN PANEL — TABS (Users / Removed)
 // ============================================================
 function loadAdminPanel(){
   if(!canManageUsers()){document.getElementById('adminContent').innerHTML='<div class="card p-4"><div class="empty-state"><i class="bi bi-lock-fill"></i><p>Access denied.</p></div></div>';return}
   const totalUsers=DB.users.length;
   const totalAdmins=DB.users.filter(u=>u.isAdmin||u.isSuperAdmin).length;
   const totalFiles=DB.files.length;
-  const totalPayments=DB.payments.length;
   const totalPending=DB.payments.filter(p=>p.status==='pending'&&p.amount>0).length;
-  const superAdmin=DB.users.find(u=>u.isSuperAdmin);
-  const filtered=DB.users.filter(u=>{
-    if(!adminSearchQuery)return true;
-    const q=adminSearchQuery.toLowerCase();
-    return (u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)||(u.designation||'').toLowerCase().includes(q)||(u.branch||'').toLowerCase().includes(q);
-  }).sort((a,b)=>b.id-a.id);
+  const removedPending=DB.removed_users.filter(r=>r.status==='pending').length;
+  const removedBlocked=DB.removed_users.filter(r=>r.status==='blocked').length;
+  const filtered=DB.users.filter(u=>{if(!adminSearchQuery)return true;const q=adminSearchQuery.toLowerCase();return (u.name||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)||(u.designation||'').toLowerCase().includes(q)||(u.branch||'').toLowerCase().includes(q)}).sort((a,b)=>b.id-a.id);
+  const filteredRemoved=DB.removed_users.filter(r=>{if(!adminSearchQuery)return true;const q=adminSearchQuery.toLowerCase();return (r.name||'').toLowerCase().includes(q)||(r.email||'').toLowerCase().includes(q)}).sort((a,b)=>b.id-a.id);
+  
   let h=`
     <div class="alert" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border-left:5px solid #f59e0b;border-radius:14px;padding:16px 20px;margin-bottom:24px">
       <div class="d-flex align-items-center gap-3">
@@ -880,51 +861,49 @@ function loadAdminPanel(){
       </div>
     </div>
     <div class="row g-3 mb-4">
-      <div class="col-md-3 col-sm-6"><div class="admin-stat-box"><div class="asb-label"><i class="bi bi-people-fill"></i> Total Users</div><div class="asb-value">${totalUsers}</div></div></div>
+      <div class="col-md-3 col-sm-6"><div class="admin-stat-box"><div class="asb-label"><i class="bi bi-people-fill"></i> Users</div><div class="asb-value">${totalUsers}</div></div></div>
       <div class="col-md-3 col-sm-6"><div class="admin-stat-box"><div class="asb-label"><i class="bi bi-shield-fill"></i> Admins</div><div class="asb-value">${totalAdmins}</div></div></div>
-      <div class="col-md-3 col-sm-6"><div class="admin-stat-box"><div class="asb-label"><i class="bi bi-files"></i> Total Files</div><div class="asb-value">${totalFiles}</div></div></div>
-      <div class="col-md-3 col-sm-6"><div class="admin-stat-box"><div class="asb-label"><i class="bi bi-cash-coin"></i> Pending Payments</div><div class="asb-value">${totalPending}</div></div></div>
+      <div class="col-md-3 col-sm-6"><div class="admin-stat-box"><div class="asb-label"><i class="bi bi-files"></i> Files</div><div class="asb-value">${totalFiles}</div></div></div>
+      <div class="col-md-3 col-sm-6"><div class="admin-stat-box"><div class="asb-label"><i class="bi bi-person-x-fill"></i> Removed</div><div class="asb-value">${DB.removed_users.length}</div></div></div>
     </div>
+    <ul class="nav nav-tabs mb-3" style="border-bottom:2px solid #e2e8f0">
+      <li class="nav-item"><a class="nav-link ${adminActiveTab==='users'?'active':''}" style="cursor:pointer;font-weight:600" onclick="adminActiveTab='users';loadAdminPanel()"><i class="bi bi-people-fill"></i> Users (${DB.users.length})</a></li>
+      <li class="nav-item"><a class="nav-link ${adminActiveTab==='removed'?'active':''}" style="cursor:pointer;font-weight:600" onclick="adminActiveTab='removed';loadAdminPanel()"><i class="bi bi-person-x-fill"></i> Removed Users (${DB.removed_users.length})${removedPending>0?` <span class="badge bg-danger">${removedPending}</span>`:''}</a></li>
+    </ul>
     <div class="card p-3 mb-3">
       <div class="row g-2 align-items-center">
-        <div class="col-md-8"><input type="text" id="adminUserSearch" class="form-control" placeholder="Search users by name, email, designation, or branch..." value="${escapeHtml(adminSearchQuery)}" oninput="adminSearchQuery=this.value;loadAdminPanel()"></div>
+        <div class="col-md-8"><input type="text" class="form-control" placeholder="Search ${adminActiveTab==='users'?'users':'removed users'}..." value="${escapeHtml(adminSearchQuery)}" oninput="adminSearchQuery=this.value;loadAdminPanel()"></div>
         <div class="col-md-4 d-flex gap-2"><button class="btn btn-primary flex-fill" onclick="loadAdminPanel()"><i class="bi bi-search"></i> Search</button><button class="btn btn-outline-secondary" onclick="adminSearchQuery='';loadAdminPanel()"><i class="bi bi-x-lg"></i></button></div>
       </div>
-    </div>
-    <div class="card p-0">
-      <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
-        <h6 class="fw-semibold m-0"><i class="bi bi-people-fill text-primary"></i> User Management (${filtered.length})</h6>
-        <span class="badge bg-warning text-dark"><i class="bi bi-shield-fill-check"></i> Super Admin Only</span>
-      </div>
-      <div style="max-height:600px;overflow-y:auto">`;
-  if(filtered.length===0){h+='<div class="empty-state"><i class="bi bi-people"></i><p>No users found</p></div>'}
-  else{
-    filtered.forEach(u=>{
-      const isMe=u.id===currentUser.id;
-      const isSA=u.isSuperAdmin;
-      const isA=u.isAdmin&&!u.isSuperAdmin;
+    </div>`;
+  
+  if(adminActiveTab==='users'){
+    h+=`<div class="card p-0"><div class="d-flex justify-content-between align-items-center p-3 border-bottom"><h6 class="fw-semibold m-0"><i class="bi bi-people-fill text-primary"></i> User Management (${filtered.length})</h6><span class="badge bg-warning text-dark"><i class="bi bi-shield-fill-check"></i> Super Admin Only</span></div><div style="max-height:600px;overflow-y:auto">`;
+    if(filtered.length===0){h+='<div class="empty-state"><i class="bi bi-people"></i><p>No users found</p></div>'}
+    else{filtered.forEach(u=>{
+      const isMe=u.id===currentUser.id;const isSA=u.isSuperAdmin;const isA=u.isAdmin&&!u.isSuperAdmin;
       let roleBadge='<span class="badge bg-secondary">User</span>';
       if(isSA)roleBadge='<span class="badge bg-warning text-dark"><i class="bi bi-shield-fill-check"></i> Super Admin</span>';
       else if(isA)roleBadge='<span class="badge bg-primary"><i class="bi bi-shield-fill"></i> Admin</span>';
       const filesCount=DB.files.filter(f=>f.createdBy===u.id).length;
-      h+=`<div class="user-row-admin">
-        ${getUserPicHtml(u,'sm')}
-        <div class="ur-info">
-          <div class="ur-name">${escapeHtml(u.name)} ${isMe?'<span class="badge bg-info">You</span>':''} ${roleBadge}</div>
-          <div class="ur-meta"><i class="bi bi-envelope"></i> ${escapeHtml(u.email)} • <i class="bi bi-briefcase"></i> ${escapeHtml(u.designation)} • <i class="bi bi-geo-alt"></i> ${escapeHtml(u.branch)} • <i class="bi bi-files"></i> ${filesCount} files</div>
-        </div>
-        <div class="ur-actions">
-          <button class="btn btn-sm btn-outline-info" onclick="viewUserActivity(${u.id})" title="View Activity"><i class="bi bi-eye"></i></button>
-          ${!isMe&&!isSA?`<button class="btn btn-sm ${isA?'btn-warning':'btn-success'}" onclick="toggleAdmin(${u.id})" title="${isA?'Remove Admin':'Make Admin'}"><i class="bi bi-${isA?'shield-slash-fill':'shield-fill'}"></i> ${isA?'Remove Admin':'Make Admin'}</button>`:''}
-          ${!isMe&&!isSA?`<button class="btn btn-sm btn-danger" onclick="removeUser(${u.id})" title="Remove User"><i class="bi bi-person-x-fill"></i> Remove</button>`:''}
-          ${isMe?`<span class="badge bg-info">You cannot modify yourself</span>`:''}
-          ${isSA&&!isMe?`<span class="badge bg-warning text-dark">Protected</span>`:''}
-        </div>
-      </div>`;
-    });
+      h+=`<div class="user-row-admin">${getUserPicHtml(u,'sm')}<div class="ur-info"><div class="ur-name">${escapeHtml(u.name)} ${isMe?'<span class="badge bg-info">You</span>':''} ${roleBadge}</div><div class="ur-meta"><i class="bi bi-envelope"></i> ${escapeHtml(u.email)} • <i class="bi bi-briefcase"></i> ${escapeHtml(u.designation)} • <i class="bi bi-geo-alt"></i> ${escapeHtml(u.branch)} • <i class="bi bi-files"></i> ${filesCount} files</div></div><div class="ur-actions"><button class="btn btn-sm btn-outline-info" onclick="viewUserActivity(${u.id})" title="View Activity"><i class="bi bi-eye"></i></button>${!isMe&&!isSA?`<button class="btn btn-sm ${isA?'btn-warning':'btn-success'}" onclick="toggleAdmin(${u.id})"><i class="bi bi-${isA?'shield-slash-fill':'shield-fill'}"></i> ${isA?'Remove Admin':'Make Admin'}</button>`:''}${!isMe&&!isSA?`<button class="btn btn-sm btn-danger" onclick="removeUser(${u.id})"><i class="bi bi-person-x-fill"></i> Remove</button>`:''}${isMe?'<span class="badge bg-info">Cannot modify self</span>':''}${isSA&&!isMe?'<span class="badge bg-warning text-dark">Protected</span>':''}</div></div>`;
+    })}
+    h+=`</div></div>`;
   }
-  h+=`</div></div>`;
+  
+  if(adminActiveTab==='removed'){
+    h+=`<div class="card p-0"><div class="d-flex justify-content-between align-items-center p-3 border-bottom"><h6 class="fw-semibold m-0"><i class="bi bi-person-x-fill text-danger"></i> Removed Users (${filteredRemoved.length})</h6><div><span class="badge bg-warning text-dark">Pending: ${removedPending}</span> <span class="badge bg-danger">Blocked: ${removedBlocked}</span></div></div><div style="max-height:600px;overflow-y:auto">`;
+    if(filteredRemoved.length===0){h+='<div class="empty-state"><i class="bi bi-person-check"></i><p>No removed users</p></div>'}
+    else{filteredRemoved.forEach(r=>{
+      const statusBadge=r.status==='pending'?'<span class="badge bg-warning text-dark"><i class="bi bi-clock-fill"></i> Pending</span>':r.status==='blocked'?'<span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Blocked</span>':'<span class="badge bg-secondary">'+escapeHtml(r.status)+'</span>';
+      const attempts=r.attemptCount||0;
+      h+=`<div class="removed-user-row"><div style="width:44px;height:44px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;color:#dc2626;font-size:20px;flex-shrink:0"><i class="bi bi-person-x-fill"></i></div><div class="rur-info"><div class="rur-name">${escapeHtml(r.name||'Unknown')} ${statusBadge}</div><div class="rur-meta"><i class="bi bi-envelope"></i> ${escapeHtml(r.email)} • Removed: ${formatDateTime(r.removedAt)} • By: ${escapeHtml(r.removedByName||'Unknown')}${attempts>0?` • <span style="color:#dc2626;font-weight:600">Login attempts: ${attempts}</span>${r.lastAttemptAt?' (last: '+timeAgo(r.lastAttemptAt)+')':''}`:''}</div></div><div class="rur-actions">${r.status==='pending'?`<button class="btn btn-sm btn-success" onclick="approveRemovedUser(${r.id})"><i class="bi bi-check-circle-fill"></i> Approve</button>`:''}${r.status==='blocked'?`<button class="btn btn-sm btn-success" onclick="approveRemovedUser(${r.id})"><i class="bi bi-arrow-counterclockwise"></i> Unblock</button>`:''}${r.status!=='blocked'?`<button class="btn btn-sm btn-danger" onclick="blockRemovedUser(${r.id})"><i class="bi bi-shield-slash-fill"></i> Block</button>`:''}<button class="btn btn-sm btn-outline-danger" onclick="deleteRemovedRecord(${r.id})"><i class="bi bi-trash"></i></button></div></div>`;
+    })}
+    h+=`</div></div>`;
+  }
+  
   document.getElementById('adminContent').innerHTML=h;
+  updateAdminBadge();
 }
 
 async function toggleAdmin(uid){
@@ -934,14 +913,7 @@ async function toggleAdmin(uid){
   if(user.id===currentUser.id){notify('Cannot modify yourself','danger');return}
   const makeAdmin=!user.isAdmin;
   if(!confirm(`${makeAdmin?'Make':'Remove'} ${user.name} ${makeAdmin?'an Admin':'from Admin'}?`))return;
-  try{
-    user.isAdmin=makeAdmin;
-    await fbSet(COLLECTIONS.users,user._docId||user.authUid,user);
-    const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`${makeAdmin?'Made Admin':'Removed Admin'}: ${user.name}`,location:'Admin Panel',remarks:`Target: ${user.email}`,createdAt:new Date().toISOString()};
-    await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();
-    notify(`${user.name} ${makeAdmin?'is now an Admin ✅':'is no longer an Admin'}`,makeAdmin?'success':'warning');
-    loadAdminPanel();loadUsers();
-  }catch(e){console.error(e);notify('Failed to update','danger')}
+  try{user.isAdmin=makeAdmin;await fbSet(COLLECTIONS.users,user._docId||user.authUid,user);const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`${makeAdmin?'Made Admin':'Removed Admin'}: ${user.name}`,location:'Admin Panel',remarks:`Target: ${user.email}`,createdAt:new Date().toISOString()};await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();notify(`${user.name} ${makeAdmin?'is now an Admin ✅':'removed from Admin'}`,makeAdmin?'success':'warning');loadAdminPanel();loadUsers()}catch(e){console.error(e);notify('Failed','danger')}
 }
 
 async function removeUser(uid){
@@ -949,18 +921,65 @@ async function removeUser(uid){
   if(!user){notify('User not found','danger');return}
   if(user.isSuperAdmin){notify('Cannot remove Super Admin','danger');return}
   if(user.id===currentUser.id){notify('Cannot remove yourself','danger');return}
-  if(!confirm(`Remove ${user.name} (${user.email})?\n\n• Firebase Auth account will be DELETED\n• User profile will be DELETED\n• Files, logs, payments will REMAIN (for history)\n\nContinue?`))return;
+  if(!confirm(`⚠️ Remove ${user.name} (${user.email})?\n\n• User profile will be DELETED from Firestore\n• Firebase Auth account will REMAIN (client-side cannot delete)\n• User will be added to "Removed Users" list\n• User will be BLOCKED from logging in\n• Super Admin can Approve/Block later\n\nContinue?`))return;
   try{
     const filesCount=DB.files.filter(f=>f.createdBy===uid).length;
-    const logsCount=DB.logs.filter(l=>l.userId===uid).length;
-    // Delete from Firestore users
+    // Add to removed_users
+    const rec={id:nextRemovedId++,userId:user.id,authUid:user.authUid,name:user.name,email:user.email.toLowerCase(),designation:user.designation,branch:user.branch,photo:user.photo||null,removedBy:currentUser.id,removedByName:currentUser.name,removedAt:new Date().toISOString(),status:'pending',attemptCount:0,lastAttemptAt:null,hadFiles:filesCount};
+    DB.removed_users.push(rec);
+    await fbSet(COLLECTIONS.removed_users,rec.id,rec);
+    // Delete from users
     await fbDelete(COLLECTIONS.users,user._docId||user.authUid);
-    // Log the removal
-    const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Removed User: ${user.name}`,location:'Admin Panel',remarks:`Email: ${user.email} • Had ${filesCount} files, ${logsCount} logs (kept)`,createdAt:new Date().toISOString()};
-    await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();
-    notify(`${user.name} removed successfully ✅`,'success');
+    // Log
+    const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Removed User: ${user.name}`,location:'Admin Panel',remarks:`Email: ${user.email} • Had ${filesCount} files (kept)`,createdAt:new Date().toISOString()};
+    await fbSet(COLLECTIONS.logs,nl.id,nl);
+    await saveCounters();
+    notify(`${user.name} removed. Review in "Removed Users" tab.`,'warning');
     loadAdminPanel();loadUsers();
   }catch(e){console.error(e);notify('Failed to remove user','danger')}
+}
+
+async function approveRemovedUser(rid){
+  const rec=DB.removed_users.find(r=>r.id===rid);
+  if(!rec){notify('Record not found','danger');return}
+  if(!confirm(`Approve ${rec.name}? They will be able to login again.`))return;
+  try{
+    // Delete removed record
+    DB.removed_users=DB.removed_users.filter(r=>r.id!==rid);
+    await fbDelete(COLLECTIONS.removed_users,rec._docId||rid);
+    const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Approved Removed User: ${rec.name}`,location:'Admin Panel',remarks:`Email: ${rec.email} • User can login again`,createdAt:new Date().toISOString()};
+    await fbSet(COLLECTIONS.logs,nl.id,nl);
+    await saveCounters();
+    notify(`${rec.name} approved. Can login again.`,'success');
+    loadAdminPanel();updateAdminBadge();
+  }catch(e){console.error(e);notify('Failed','danger')}
+}
+
+async function blockRemovedUser(rid){
+  const rec=DB.removed_users.find(r=>r.id===rid);
+  if(!rec){notify('Record not found','danger');return}
+  if(!confirm(`Permanently BLOCK ${rec.name}? They will never be able to login again.`))return;
+  try{
+    rec.status='blocked';rec.blockedAt=new Date().toISOString();rec.blockedBy=currentUser.id;
+    await fbSet(COLLECTIONS.removed_users,rec._docId||rid,rec);
+    const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Blocked User: ${rec.name}`,location:'Admin Panel',remarks:`Email: ${rec.email} • Permanent block`,createdAt:new Date().toISOString()};
+    await fbSet(COLLECTIONS.logs,nl.id,nl);
+    await saveCounters();
+    notify(`${rec.name} permanently blocked.`,'danger');
+    loadAdminPanel();
+  }catch(e){console.error(e);notify('Failed','danger')}
+}
+
+async function deleteRemovedRecord(rid){
+  const rec=DB.removed_users.find(r=>r.id===rid);
+  if(!rec){notify('Record not found','danger');return}
+  if(!confirm(`Delete removed-user record for ${rec.name}?\n\n⚠️ Warning: If user has an active Firebase Auth account, they may still be able to login!`))return;
+  try{
+    DB.removed_users=DB.removed_users.filter(r=>r.id!==rid);
+    await fbDelete(COLLECTIONS.removed_users,rec._docId||rid);
+    notify('Record deleted','success');
+    loadAdminPanel();updateAdminBadge();
+  }catch(e){console.error(e);notify('Failed','danger')}
 }
 
 function viewUserActivity(uid){
@@ -969,32 +988,11 @@ function viewUserActivity(uid){
   const userFiles=DB.files.filter(f=>f.createdBy===uid);
   const userLogs=DB.logs.filter(l=>l.userId===uid).sort((a,b)=>b.id-a.id).slice(0,20);
   const userNotifs=DB.notifications.filter(n=>n.userId===uid&&!n.read);
-  let h=`<div class="page-title d-flex justify-content-between align-items-center"><div class="d-flex align-items-center gap-3"><div class="icon-circle" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)"><i class="bi bi-person-lines-fill"></i></div>User Activity: ${escapeHtml(user.name)}</div><button class="btn btn-outline-secondary btn-sm" onclick="showPage('admin')"><i class="bi bi-arrow-left"></i> Back to Admin</button></div>
-    <div class="card p-4 mb-3">
-      <div class="d-flex align-items-center gap-4">
-        ${getUserPicHtml(user,'lg')}
-        <div>
-          <h5 class="fw-semibold mb-1">${escapeHtml(user.name)} ${user.isSuperAdmin?'<span class="badge bg-warning text-dark">Super Admin</span>':user.isAdmin?'<span class="badge bg-primary">Admin</span>':'<span class="badge bg-secondary">User</span>'}</h5>
-          <div class="text-muted small"><i class="bi bi-envelope"></i> ${escapeHtml(user.email)}</div>
-          <div class="text-muted small"><i class="bi bi-briefcase"></i> ${escapeHtml(user.designation)} • <i class="bi bi-geo-alt"></i> ${escapeHtml(user.branch)}</div>
-          <div class="text-muted small"><i class="bi bi-calendar"></i> Joined: ${formatDateTime(user.createdAt)}</div>
-        </div>
-      </div>
-    </div>
-    <div class="row g-3 mb-3">
-      <div class="col-md-4"><div class="admin-stat-box"><div class="asb-label">Files Created</div><div class="asb-value">${userFiles.length}</div></div></div>
-      <div class="col-md-4"><div class="admin-stat-box"><div class="asb-label">Total Activities</div><div class="asb-value">${DB.logs.filter(l=>l.userId===uid).length}</div></div></div>
-      <div class="col-md-4"><div class="admin-stat-box"><div class="asb-label">Unread Notifications</div><div class="asb-value">${userNotifs.length}</div></div></div>
-    </div>
-    <div class="card p-3 mb-3">
-      <h6 class="fw-semibold mb-3"><i class="bi bi-files text-primary"></i> Recent Files (${userFiles.length})</h6>
-      ${userFiles.length===0?'<div class="text-muted text-center py-3">No files</div>':`<div class="table-responsive"><table class="table table-sm"><thead><tr><th>AP NO</th><th>Customer</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>${userFiles.slice(0,10).map(f=>`<tr><td><b>${escapeHtml(f.apNo)}</b></td><td>${escapeHtml(f.customer)||'-'}</td><td>Rs. ${Number(f.amount).toLocaleString()}</td><td>${statusBadge(f.status)}</td><td><button class="btn btn-sm btn-primary" onclick="viewFile(${f.id})"><i class="bi bi-eye"></i></button></td></tr>`).join('')}</tbody></table></div>`}
-    </div>
-    <div class="card p-3">
-      <h6 class="fw-semibold mb-3"><i class="bi bi-journal-text text-primary"></i> Recent Activities</h6>
-      ${userLogs.length===0?'<div class="text-muted text-center py-3">No activities</div>':`<div class="timeline">${userLogs.map(l=>`<div class="timeline-item"><div class="tl-time">${formatDateTime(l.createdAt)} • ${timeAgo(l.createdAt)}</div><div class="tl-title">${escapeHtml(l.action)}</div><div class="tl-desc">${escapeHtml(l.location)}${l.remarks?' • '+escapeHtml(l.remarks):''}</div></div>`).join('')}</div>`}
-    </div>`;
-  document.getElementById('viewContent').innerHTML=h;
+  document.getElementById('viewContent').innerHTML=`<div class="page-title d-flex justify-content-between align-items-center"><div class="d-flex align-items-center gap-3"><div class="icon-circle" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)"><i class="bi bi-person-lines-fill"></i></div>User Activity: ${escapeHtml(user.name)}</div><button class="btn btn-outline-secondary btn-sm" onclick="showPage('admin')"><i class="bi bi-arrow-left"></i> Back</button></div>
+    <div class="card p-4 mb-3"><div class="d-flex align-items-center gap-4">${getUserPicHtml(user,'lg')}<div><h5 class="fw-semibold mb-1">${escapeHtml(user.name)} ${user.isSuperAdmin?'<span class="badge bg-warning text-dark">Super Admin</span>':user.isAdmin?'<span class="badge bg-primary">Admin</span>':'<span class="badge bg-secondary">User</span>'}</h5><div class="text-muted small"><i class="bi bi-envelope"></i> ${escapeHtml(user.email)}</div><div class="text-muted small"><i class="bi bi-briefcase"></i> ${escapeHtml(user.designation)} • <i class="bi bi-geo-alt"></i> ${escapeHtml(user.branch)}</div><div class="text-muted small"><i class="bi bi-calendar"></i> Joined: ${formatDateTime(user.createdAt)}</div></div></div></div>
+    <div class="row g-3 mb-3"><div class="col-md-4"><div class="admin-stat-box"><div class="asb-label">Files Created</div><div class="asb-value">${userFiles.length}</div></div></div><div class="col-md-4"><div class="admin-stat-box"><div class="asb-label">Total Activities</div><div class="asb-value">${DB.logs.filter(l=>l.userId===uid).length}</div></div></div><div class="col-md-4"><div class="admin-stat-box"><div class="asb-label">Unread Notifs</div><div class="asb-value">${userNotifs.length}</div></div></div></div>
+    <div class="card p-3 mb-3"><h6 class="fw-semibold mb-3"><i class="bi bi-files text-primary"></i> Recent Files (${userFiles.length})</h6>${userFiles.length===0?'<div class="text-muted text-center py-3">No files</div>':`<div class="table-responsive"><table class="table table-sm"><thead><tr><th>AP NO</th><th>Customer</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>${userFiles.slice(0,10).map(f=>`<tr><td><b>${escapeHtml(f.apNo)}</b></td><td>${escapeHtml(f.customer)||'-'}</td><td>Rs. ${Number(f.amount).toLocaleString()}</td><td>${statusBadge(f.status)}</td><td><button class="btn btn-sm btn-primary" onclick="viewFile(${f.id})"><i class="bi bi-eye"></i></button></td></tr>`).join('')}</tbody></table></div>`}</div>
+    <div class="card p-3"><h6 class="fw-semibold mb-3"><i class="bi bi-journal-text text-primary"></i> Recent Activities</h6>${userLogs.length===0?'<div class="text-muted text-center py-3">No activities</div>':`<div class="timeline">${userLogs.map(l=>`<div class="timeline-item"><div class="tl-time">${formatDateTime(l.createdAt)} • ${timeAgo(l.createdAt)}</div><div class="tl-title">${escapeHtml(l.action)}</div><div class="tl-desc">${escapeHtml(l.location)}${l.remarks?' • '+escapeHtml(l.remarks):''}</div></div>`).join('')}</div>`}</div>`;
   showPage('view');
 }
 
@@ -1002,7 +1000,7 @@ function viewUserActivity(uid){
 // CSV EXPORT
 // ============================================================
 function downloadExcel(){const vf=getVisibleFiles();if(vf.length===0){notify('No files','warning');return}let csv='AP No,Manual DO,NIC,Customer,Amount,Branch,Status,Owner,Sent HO,Interducer Status,Interducer Amount,Supply Status,Supply Amount,RMV Status,RMV Amount,Created\n';vf.forEach(f=>{const p=getFilePayments(f.id);const pI=p.find(x=>x.type==='Interducer');const pS=p.find(x=>x.type==='Supply');const pR=p.find(x=>x.type==='RMV');const owner=DB.users.find(u=>u.id===f.createdBy);csv+=[`"${f.apNo}"`,`"${f.manualDO||''}"`,`"${f.nic}"`,`"${f.customer}"`,f.amount,`"${f.branch}"`,`"${f.status}"`,`"${owner?owner.name:'-'}"`,f.headOfficeSent?'YES':'NO',`"${pI.status}"`,pI.amount||0,`"${pS.status}"`,pS.amount||0,`"${pR.status}"`,pR.amount||0,formatDateTime(f.createdAt)].join(',')+'\n'});downloadCSV(csv,'hnb_files.csv');notify('Downloaded!','success')}
-function downloadPendingPaymentsExcel(){const vf=getVisibleFiles();const q=(document.getElementById('pendingPaySearch')?.value||'').trim().toLowerCase();let rows=[];vf.forEach(f=>{const p=getFilePayments(f.id);let pending=p.filter(x=>x.status==='pending'&&x.amount>0);if(q){const matches=(f.apNo||'').toLowerCase().includes(q)||(f.nic||'').toLowerCase().includes(q)||(f.customer||'').toLowerCase().includes(q)||String(f.amount||'').includes(q)||(f.branch||'').toLowerCase().includes(q);if(!matches)return}pending.forEach(pp=>{rows.push({apNo:f.apNo,nic:f.nic,customer:f.customer||'-',branch:f.branch,fileAmount:f.amount,payType:pp.type,payAmount:pp.amount,payStatus:pp.status,remarks:pp.remarks||''})})});if(rows.length===0){notify('No pending payments','warning');return}let csv='AP No,NIC,Customer,Branch,File Amount,Payment Type,Pending Amount,Status,Remarks\n';rows.forEach(r=>{csv+=[`"${r.apNo}"`,`"${r.nic}"`,`"${r.customer}"`,`"${r.branch}"`,r.fileAmount,`"${r.payType}"`,r.payAmount,`"${r.payStatus}"`,`"${r.remarks}"`].join(',')+'\n'});downloadCSV(csv,'hnb_pending_payments.csv');notify(`Downloaded ${rows.length} pending payment(s)!`,'success')}
+function downloadPendingPaymentsExcel(){const vf=getVisibleFiles();const q=(document.getElementById('pendingPaySearch')?.value||'').trim().toLowerCase();let rows=[];vf.forEach(f=>{const p=getFilePayments(f.id);let pending=p.filter(x=>x.status==='pending'&&x.amount>0);if(q){const matches=(f.apNo||'').toLowerCase().includes(q)||(f.nic||'').toLowerCase().includes(q)||(f.customer||'').toLowerCase().includes(q)||String(f.amount||'').includes(q)||(f.branch||'').toLowerCase().includes(q);if(!matches)return}pending.forEach(pp=>{rows.push({apNo:f.apNo,nic:f.nic,customer:f.customer||'-',branch:f.branch,fileAmount:f.amount,payType:pp.type,payAmount:pp.amount,payStatus:pp.status,remarks:pp.remarks||''})})});if(rows.length===0){notify('No pending payments','warning');return}let csv='AP No,NIC,Customer,Branch,File Amount,Payment Type,Pending Amount,Status,Remarks\n';rows.forEach(r=>{csv+=[`"${r.apNo}"`,`"${r.nic}"`,`"${r.customer}"`,`"${r.branch}"`,r.fileAmount,`"${r.payType}"`,r.payAmount,`"${r.payStatus}"`,`"${r.remarks}"`].join(',')+'\n'});downloadCSV(csv,'hnb_pending_payments.csv');notify(`Downloaded ${rows.length}!`,'success')}
 function downloadLogsExcel(){const vl=getVisibleLogs();if(vl.length===0){notify('No logs','warning');return}let csv='ID,AP No,User,Designation,Action,Location,Remarks,Date\n';vl.forEach(l=>{const f=DB.files.find(x=>x.id===l.fileId);csv+=[l.id,`"${f?f.apNo:'-'}"`,`"${l.userName}"`,`"${l.designation}"`,`"${l.action}"`,`"${l.location}"`,`"${l.remarks||''}"`,formatDateTime(l.createdAt)].join(',')+'\n'});downloadCSV(csv,'hnb_logs.csv');notify('Downloaded!','success')}
 function downloadPaymentsExcel(){const vp=getVisiblePayments();if(vp.length===0){notify('No payments','warning');return}let csv='ID,AP No,Customer,Type,Status,Amount,Marked By,Date,Remarks\n';vp.forEach(p=>{const f=DB.files.find(x=>x.id===p.fileId);csv+=[p.id,`"${f?f.apNo:'-'}"`,`"${f?f.customer:''}"`,`"${p.paymentType}"`,`"${p.status}"`,p.amount||0,`"${p.markedByName||''}"`,p.markedAt?formatDateTime(p.markedAt):'',`"${p.remarks||''}"`].join(',')+'\n'});downloadCSV(csv,'hnb_payments.csv');notify('Downloaded!','success')}
 function downloadCSV(csv,filename){const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=filename;link.click()}
@@ -1010,10 +1008,12 @@ function downloadCSV(csv,filename){const blob=new Blob(['\uFEFF'+csv],{type:'tex
 // ============================================================
 // INIT
 // ============================================================
-window.addEventListener('load',async()=>{try{await waitForFirebase();const{onAuthStateChanged}=window.FirebaseFns;const auth=window.FirebaseAuth;onAuthStateChanged(auth,async fbUser=>{document.getElementById('loadingOverlay').classList.add('hidden');if(fbUser){firebaseUid=fbUser.uid;await loadFromStorage();let user=DB.users.find(u=>u.authUid===fbUser.uid||u.email.toLowerCase()===fbUser.email.toLowerCase());const isSuper=(fbUser.email.toLowerCase()===SUPER_ADMIN_EMAIL.toLowerCase());if(!user){console.warn('[HNB] Auto-creating profile...');const newId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;user={id:newId,authUid:fbUser.uid,name:fbUser.email.split('@')[0],email:fbUser.email.toLowerCase(),designation:isSuper?'Head Office':'Marketing Officer',branch:isSuper?'HEAD OFFICE':'COLOMBO',profileComplete:true,photo:null,isSuperAdmin:isSuper,isAdmin:isSuper,createdAt:new Date().toISOString()};try{await fbSet(COLLECTIONS.users,fbUser.uid,user);await saveCounters()}catch(err){console.error('[HNB] Auto-create failed:',err)}}else if(isSuper&&!user.isSuperAdmin){user.isSuperAdmin=true;user.isAdmin=true;await fbSet(COLLECTIONS.users,user._docId||firebaseUid,user)}currentUser=user;await startRealtimeSync();enterApp();return}document.getElementById('authScreen').classList.remove('hidden')})}catch(e){console.error('[HNB] Init error:',e);document.getElementById('loadingOverlay').innerHTML='<div style="text-align:center;color:#fff"><i class="bi bi-exclamation-triangle-fill" style="font-size:60px;color:#fbbf24"></i><h4 style="margin-top:16px">Firebase Connection Failed</h4><p style="font-size:14px;opacity:.8">Check console.</p><button class="btn btn-light mt-3" onclick="location.reload()">Retry</button></div>'}});
+window.addEventListener('load',async()=>{try{await waitForFirebase();const{onAuthStateChanged}=window.FirebaseFns;const auth=window.FirebaseAuth;onAuthStateChanged(auth,async fbUser=>{document.getElementById('loadingOverlay').classList.add('hidden');if(fbUser){firebaseUid=fbUser.uid;await loadFromStorage();const isSuper=(fbUser.email.toLowerCase()===SUPER_ADMIN_EMAIL.toLowerCase());const rr=getRemovedRecord(fbUser.email);if(rr&&!isSuper&&rr.status==='blocked'){await window.FirebaseFns.signOut(auth);document.getElementById('authScreen').classList.remove('hidden');notify('🚫 Account permanently blocked.','danger');return}if(rr&&!isSuper&&rr.status==='pending'){await window.FirebaseFns.signOut(auth);document.getElementById('authScreen').classList.remove('hidden');notify('⚠️ Account removed. Contact admin.','warning');return}let user=DB.users.find(u=>u.authUid===fbUser.uid||u.email.toLowerCase()===fbUser.email.toLowerCase());if(!user){console.warn('[HNB] Auto-creating profile...');const newId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;user={id:newId,authUid:fbUser.uid,name:fbUser.email.split('@')[0],email:fbUser.email.toLowerCase(),designation:isSuper?'Head Office':'Marketing Officer',branch:isSuper?'HEAD OFFICE':'COLOMBO',profileComplete:true,photo:null,isSuperAdmin:isSuper,isAdmin:isSuper,createdAt:new Date().toISOString()};try{await fbSet(COLLECTIONS.users,fbUser.uid,user);await saveCounters()}catch(err){console.error('[HNB] Auto-create failed:',err)}}else if(isSuper&&!user.isSuperAdmin){user.isSuperAdmin=true;user.isAdmin=true;await fbSet(COLLECTIONS.users,user._docId||firebaseUid,user)}currentUser=user;await startRealtimeSync();enterApp();return}document.getElementById('authScreen').classList.remove('hidden')})}catch(e){console.error('[HNB] Init error:',e);document.getElementById('loadingOverlay').innerHTML='<div style="text-align:center;color:#fff"><i class="bi bi-exclamation-triangle-fill" style="font-size:60px;color:#fbbf24"></i><h4 style="margin-top:16px">Firebase Connection Failed</h4><p style="font-size:14px;opacity:.8">Check console.</p><button class="btn btn-light mt-3" onclick="location.reload()">Retry</button></div>'}});
 
-window.hnbDebug={show:async()=>{await loadFromStorage();console.table(DB.users);console.table(DB.files);console.table(DB.payments);console.log('Current user:',currentUser);console.log('Is Super Admin:',isSuperAdmin())},reload:()=>loadFromStorage(),DB:()=>DB,currentUser:()=>currentUser,auth:()=>window.FirebaseAuth.currentUser};
-console.log('%c[HNB v24 - Super Admin Panel]','color:#f59e0b;font-weight:bold');
+window.hnbDebug={show:async()=>{await loadFromStorage();console.table(DB.users);console.table(DB.files);console.table(DB.removed_users)},reload:()=>loadFromStorage(),DB:()=>DB,currentUser:()=>currentUser,isSuperAdmin:()=>isSuperAdmin()};
+console.log('%c[HNB v25 - Super Admin + Removed Users]','color:#f59e0b;font-weight:bold');
 </script>
 </body>
 </html>
+
+<script>
