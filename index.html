@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0d6efd">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>HNB Finance - File Tracking System</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -181,32 +181,18 @@ body{background:#f0f4f8;margin:0}
 .removed-user-row .rur-actions{display:flex;gap:6px;flex-wrap:wrap}
 .loading-overlay{position:fixed;inset:0;background:rgba(15,23,42,.75);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;gap:16px}
 .loading-overlay .spinner-border{width:60px;height:60px}
-
-/* Mobile elements — hidden on desktop by default */
 .mobile-menu-btn,.mobile-bottom-nav,.mobile-overlay,.sidebar .mobile-close{display:none}
-
-/* ============================================================
-   MOBILE RESPONSIVE (max-width: 768px)
-   ============================================================ */
 @media(max-width:768px){
   *{-webkit-tap-highlight-color:transparent}
   body{overflow-x:hidden}
-  
-  /* Sidebar off-canvas */
   .sidebar{width:260px;transform:translateX(-100%);box-shadow:4px 0 20px rgba(0,0,0,.3);z-index:200;padding:20px 16px}
   .sidebar.mobile-open{transform:translateX(0)}
   .sidebar a span,.sidebar-logo span,.sidebar-sub,.user-box,.logout-btn span{display:inline}
   .sidebar a{justify-content:flex-start;padding:12px 16px}
   .sidebar .mobile-close{display:flex}
-  
-  /* Overlay */
   .mobile-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199}
   .mobile-overlay.show{display:block}
-  
-  /* Main content */
   .main-content{margin-left:0;padding-bottom:80px}
-  
-  /* Topbar */
   .topbar{padding:12px 16px;gap:8px}
   .topbar h5{font-size:14px}
   .topbar h5 i{font-size:16px}
@@ -218,30 +204,18 @@ body{background:#f0f4f8;margin:0}
   .notif-btn{width:38px;height:38px;font-size:18px}
   .topbar .user-info{padding:6px 10px;font-size:12px}
   .topbar .user-info span:not(.profile-pic){display:none}
-  
-  /* Hamburger */
   .mobile-menu-btn{display:flex;background:transparent;border:none;font-size:24px;color:#0d6efd;padding:4px 8px;cursor:pointer;align-items:center;justify-content:center}
-  
-  /* Content */
   .content-area{padding:16px}
-  
-  /* Page title */
   .page-title{font-size:18px;margin-bottom:16px;flex-wrap:wrap;gap:8px}
   .page-title .icon-circle{width:38px;height:38px;font-size:18px}
   .page-title .d-flex.gap-2{width:100%}
-  
-  /* Stats — 2 columns */
   .stat-card{padding:16px}
   .stat-card .icon-box{width:44px;height:44px;font-size:20px;margin-bottom:10px}
   .stat-card .stat-label{font-size:11px}
   .stat-card .stat-value{font-size:22px}
-  
-  /* Cards */
   .card{border-radius:12px}
   .card.p-4{padding:16px}
   .card.p-3{padding:12px}
-  
-  /* Tables → Card layout */
   .table-responsive{overflow-x:visible}
   .table.mobile-cards thead{display:none}
   .table.mobile-cards,.table.mobile-cards tbody,.table.mobile-cards tr,.table.mobile-cards td{display:block;width:100%}
@@ -250,56 +224,36 @@ body{background:#f0f4f8;margin:0}
   .table.mobile-cards td::before{content:attr(data-label);font-weight:600;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.3px;flex-shrink:0}
   .table.mobile-cards td:empty{display:none}
   .table.mobile-cards tr.unread-row{background:#fff7ed;border-color:#f59e0b}
-  
-  /* Regular tables fallback */
   .table:not(.mobile-cards){font-size:12px}
   .table:not(.mobile-cards) thead th{padding:8px 10px;font-size:10px}
   .table:not(.mobile-cards) tbody td{padding:10px}
-  
-  /* Buttons */
   .btn{padding:10px 16px;font-size:13px;min-height:42px}
   .btn-sm{padding:6px 12px;font-size:12px;min-height:34px}
-  
-  /* Forms */
   .form-control,.form-select{padding:12px 14px;font-size:16px}
   .form-label{font-size:12px}
-  
-  /* Modals fullscreen */
   .modal-dialog{margin:0;max-width:100%}
   .modal-content{border-radius:0;min-height:100vh}
   .modal-header{border-radius:0;padding:16px}
   .modal-body{padding:16px}
   .modal-footer{padding:12px 16px}
-  
-  /* Notifications fullscreen */
   .notif-dropdown{width:100%;right:0;left:0;top:60px;border-radius:0 0 16px 16px;max-height:calc(100vh - 60px)}
-  
-  /* Payment cards */
   .pay-card{padding:14px}
   .pay-card .pc-type{font-size:14px}
-  
-  /* Send-type grid */
   .send-type-grid{grid-template-columns:1fr 1fr;gap:8px}
   .send-type-card{padding:12px 8px}
   .send-type-card i{font-size:24px;margin-bottom:4px}
   .send-type-card .type-title{font-size:12px}
   .send-type-card .type-desc{font-size:10px}
-  
-  /* PM Action grid */
   .pm-action-grid{grid-template-columns:1fr 1fr;gap:8px}
   .pm-action-card{padding:10px 6px}
   .pm-action-card i{font-size:20px}
   .pm-action-card .pm-title{font-size:12px}
   .pm-action-card .pm-desc{font-size:9px}
-  
-  /* Timeline */
   .timeline{padding-left:24px}
   .timeline-item::before{left:-24px;width:12px;height:12px}
   .timeline-item .tl-time{font-size:11px}
   .timeline-item .tl-title{font-size:13px}
   .timeline-item .tl-desc{font-size:12px}
-  
-  /* Admin Panel */
   .admin-stat-box{padding:14px}
   .admin-stat-box .asb-value{font-size:22px}
   .admin-stat-box .asb-label{font-size:10px}
@@ -309,27 +263,17 @@ body{background:#f0f4f8;margin:0}
   .user-row-admin .ur-actions .btn,.removed-user-row .rur-actions .btn{flex:1;min-width:0}
   .ur-name{font-size:14px}
   .ur-meta{font-size:11px;line-height:1.5}
-  
-  /* Nav tabs */
   .nav-tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .nav-tabs .nav-link{white-space:nowrap;font-size:12px;padding:10px 12px}
   .nav-tabs::-webkit-scrollbar{height:0}
-  
-  /* Profile */
   .d-flex.align-items-center.gap-4{flex-direction:column;align-items:flex-start;gap:16px}
   .profile-pic-lg{width:60px;height:60px}
   .profile-pic{width:34px;height:34px}
-  
-  /* View File */
   #viewContent .page-title{flex-direction:column;align-items:flex-start}
   #viewContent .page-title .d-flex.gap-2{width:100%}
-  
-  /* Empty state */
   .empty-state{padding:40px 16px}
   .empty-state i{font-size:48px}
   .empty-state p{font-size:13px}
-  
-  /* Misc */
   .row.g-3>[class*="col-"]{padding-left:6px;padding-right:6px}
   .row.g-3{--bs-gutter-x:12px}
   .badge{font-size:10px;padding:4px 8px}
@@ -337,8 +281,6 @@ body{background:#f0f4f8;margin:0}
   .alert-banner .alert-title{font-size:13px}
   .alert-banner .alert-desc{font-size:11px}
   .alert-banner .btn{padding:6px 10px;font-size:11px;min-height:32px}
-  
-  /* Bottom Navigation */
   .mobile-bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;box-shadow:0 -4px 20px rgba(0,0,0,.08);z-index:150;padding:6px 0 max(6px,env(safe-area-inset-bottom));justify-content:space-around;align-items:center}
   .mobile-bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;color:#64748b;text-decoration:none;font-size:10px;font-weight:500;cursor:pointer;transition:all .2s;position:relative;min-height:48px;gap:2px}
   .mobile-bottom-nav a i{font-size:20px}
@@ -634,6 +576,7 @@ body{background:#f0f4f8;margin:0}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
@@ -652,7 +595,15 @@ window.dispatchEvent(new Event('firebase-ready'));
 console.log('[HNB] Firebase initialized ✅');
 </script>
 
-<script>const SUPER_ADMIN_EMAIL='umesh.19940309@gmail.com';
+<script>// ============================================================
+// EMAILJS CONFIG
+// ============================================================
+const EMAILJS_CONFIG = {
+  serviceId: 'service_sqxgjla',
+  templateId: 'template_xqm9ntq',
+  publicKey: 'whYuOFSUreqUHagm7'
+};
+const SUPER_ADMIN_EMAIL='umesh.19940309@gmail.com';
 const COLLECTIONS={users:'users',files:'files',logs:'logs',payments:'payments',notifications:'notifications',meta:'meta',removed_users:'removed_users'};
 const PAYMENT_TYPES=['Interducer','Supply','RMV'];
 const PAYMENT_STATUS_LABELS={'pending':{label:'Pending',icon:'clock-fill',class:'pending'},'paid':{label:'Paid',icon:'check-circle-fill',class:'paid'},'rejected':{label:'Rejected',icon:'x-circle-fill',class:'rejected'},'not-required':{label:'Not Required',icon:'slash-circle-fill',class:'not-required'}};
@@ -699,6 +650,111 @@ function getUserPicHtml(user,size='sm'){if(!user)return `<div class="profile-pic
 function renderUserPics(){if(!currentUser)return;const sp=document.getElementById('sideUserPicContainer');if(sp)sp.innerHTML=getUserPicHtml(currentUser,'sidebar');const tp=document.getElementById('topUserPicContainer');if(tp)tp.innerHTML=getUserPicHtml(currentUser,'sm');const mp=document.getElementById('myProfilePicContainer');if(mp)mp.innerHTML=getUserPicHtml(currentUser,'lg')}
 
 // ============================================================
+// EMAILJS — Send Email Notification
+// ============================================================
+function initEmailJS(){
+  try{
+    if(typeof emailjs!=='undefined'){
+      emailjs.init(EMAILJS_CONFIG.publicKey);
+      console.log('%c[HNB Email] EmailJS initialized ✅','color:#10b981;font-weight:bold');
+    }else{
+      console.warn('[HNB Email] EmailJS SDK not loaded');
+    }
+  }catch(e){console.error('[HNB Email] Init error:',e)}
+}
+async function sendEmailNotification(toEmail, toName, subject, message, fromName){
+  if(!toEmail){console.warn('[HNB Email] No recipient email');return false}
+  if(typeof emailjs==='undefined'){console.warn('[HNB Email] SDK missing');return false}
+  try{
+    const templateParams={
+      to_email: toEmail,
+      to_name: toName||'User',
+      subject: subject,
+      message: message,
+      from_name: fromName||(currentUser?currentUser.name:'System'),
+      reply_to: currentUser?currentUser.email:'noreply@hnb.lk',
+      sent_time: new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true})
+    };
+    const response=await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams);
+    console.log('[HNB Email] Sent ✅',response.status,response.text);
+    return true;
+  }catch(e){
+    console.error('[HNB Email] Failed:',e);
+    return false;
+  }
+}
+
+// ============================================================
+// EMAIL TRIGGERS
+// ============================================================
+async function emailFileSentToBM(file, toUser){
+  const subject=`New File Received: ${file.apNo}`;
+  const message=`A new file has been sent to you.\n\n📁 AP No: ${file.apNo}\n👤 Customer: ${file.customer||'N/A'}\n💰 Amount: Rs. ${Number(file.amount).toLocaleString()}\n🏢 Branch: ${file.branch}\n📄 Manual DO: ${file.manualDO||'N/A'}\n\nPlease log in to the system to review and accept this file.`;
+  await sendEmailNotification(toUser.email, toUser.name, subject, message);
+}
+async function emailFileHandover(file, toUser){
+  const subject=`File Handover: ${file.apNo}`;
+  const message=`A file has been handed over to you.\n\n📁 AP No: ${file.apNo}\n👤 Customer: ${file.customer||'N/A'}\n💰 Amount: Rs. ${Number(file.amount).toLocaleString()}\n🏢 Branch: ${file.branch}\n\nPlease log in to the system to accept this file.`;
+  await sendEmailNotification(toUser.email, toUser.name, subject, message);
+}
+async function emailFileAccepted(file, creator){
+  const subject=`File Accepted: ${file.apNo}`;
+  const message=`Your file has been accepted by ${currentUser.name}.\n\n📁 AP No: ${file.apNo}\n👤 Customer: ${file.customer||'N/A'}\n👤 Accepted By: ${currentUser.name} (${currentUser.designation})\n🏢 Branch: ${currentUser.branch}\n\nLog in to track progress.`;
+  await sendEmailNotification(creator.email, creator.name, subject, message);
+}
+async function emailSentToHO(file, hoUser){
+  const subject=`File Received from Branch: ${file.apNo}`;
+  const message=`A file has been dispatched to Head Office.\n\n📁 AP No: ${file.apNo}\n👤 Customer: ${file.customer||'N/A'}\n💰 Amount: Rs. ${Number(file.amount).toLocaleString()}\n🏢 From Branch: ${currentUser.branch}\n\nSent by: ${currentUser.name} (${currentUser.designation})`;
+  await sendEmailNotification(hoUser.email, hoUser.name, subject, message);
+}
+async function emailPaymentUpdate(file, payType, statusLabel){
+  const creator=DB.users.find(u=>u.id===file.createdBy);
+  if(!creator||!creator.email)return;
+  const subject=`Payment Update: ${payType} - ${statusLabel}`;
+  const message=`A payment status has been updated.\n\n📁 AP No: ${file.apNo}\n👤 Customer: ${file.customer||'N/A'}\n💳 Payment: ${payType}\n✅ Status: ${statusLabel}\n👤 Updated By: ${currentUser.name}\n\nLog in to view full details.`;
+  await sendEmailNotification(creator.email, creator.name, subject, message);
+}
+async function emailUserRemoved(removedUser){
+  const sa=DB.users.find(u=>u.isSuperAdmin);
+  if(!sa||!sa.email)return;
+  const subject=`User Removed: ${removedUser.name}`;
+  const message=`A user has been removed from the system.\n\n👤 Name: ${removedUser.name}\n📧 Email: ${removedUser.email}\n💼 Designation: ${removedUser.designation||'N/A'}\n🏢 Branch: ${removedUser.branch||'N/A'}\n\nPlease review and approve/block in the Admin Panel.`;
+  await sendEmailNotification(sa.email, sa.name, subject, message);
+}
+async function emailRemovedUserLoginAttempt(rec){
+  const sa=DB.users.find(u=>u.isSuperAdmin);
+  if(!sa||!sa.email)return;
+  const subject=`⚠️ Removed User Login Attempt: ${rec.name}`;
+  const message=`A removed user tried to log in.\n\n👤 Name: ${rec.name}\n📧 Email: ${rec.email}\n🔄 Attempt Count: ${rec.attemptCount||1}\n⏰ Last Attempt: ${new Date().toLocaleString('en-GB')}\n\nReview in Admin Panel → Removed Users tab.`;
+  await sendEmailNotification(sa.email, sa.name, subject, message);
+}
+
+// ============================================================
+// ENTER KEY SUPPORT
+// ============================================================
+function setupEnterKeySupport(){
+  const ids=['loginEmail','loginPassword','regName','regEmail','regPassword','regDesignation','regBranch','searchInput','pendingPaySearch','cApNo','cNic','cCustomer','cAmount','cBranch','cManualDO'];
+  const map={};
+  ids.forEach(id=>{map[id]=document.getElementById(id)});
+  if(map.loginEmail)map.loginEmail.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.loginPassword)map.loginPassword.focus()}});
+  if(map.loginPassword)map.loginPassword.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doLogin()}});
+  if(map.regName)map.regName.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.regEmail)map.regEmail.focus()}});
+  if(map.regEmail)map.regEmail.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.regPassword)map.regPassword.focus()}});
+  if(map.regPassword)map.regPassword.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.regDesignation)map.regDesignation.focus()}});
+  if(map.regDesignation)map.regDesignation.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.regBranch)map.regBranch.focus()}});
+  if(map.regBranch)map.regBranch.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doRegister()}});
+  if(map.searchInput)map.searchInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doSearch()}});
+  if(map.pendingPaySearch)map.pendingPaySearch.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();loadPendingPayments()}});
+  if(map.cApNo)map.cApNo.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.cNic)map.cNic.focus()}});
+  if(map.cNic)map.cNic.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.cCustomer)map.cCustomer.focus()}});
+  if(map.cCustomer)map.cCustomer.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.cAmount)map.cAmount.focus()}});
+  if(map.cAmount)map.cAmount.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.cBranch)map.cBranch.focus()}});
+  if(map.cBranch)map.cBranch.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();if(map.cManualDO)map.cManualDO.focus()}});
+  if(map.cManualDO)map.cManualDO.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();createFile()}});
+  console.log('%c[HNB] Enter key support added ✅','color:#10b981;font-weight:bold');
+}
+
+// ============================================================
 // PERMISSIONS
 // ============================================================
 function isCreator(f){return f.createdBy===currentUser.id}
@@ -724,9 +780,6 @@ function getMyPendingPayments(){if(!currentUser)return[];const r=[];getVisibleFi
 function togglePayInput(type){const cb=document.getElementById('payCheck-'+type);const tg=document.getElementById('payToggle-'+type);const inp=document.getElementById('payInputs-'+type);if(!cb||cb.disabled)return;if(cb.checked){tg.classList.add('active');inp.classList.add('show')}else{tg.classList.remove('active');inp.classList.remove('show');document.getElementById('payAmount-'+type).value='';document.getElementById('payRemarks-'+type).value=''}}
 function autoFillSupplyAmount(){const amt=document.getElementById('cAmount').value;const sa=document.getElementById('payAmount-Supply');if(sa)sa.value=amt||''}
 
-// ============================================================
-// REMOVED USER CHECK
-// ============================================================
 function getRemovedRecord(email){return DB.removed_users.find(r=>r.email&&r.email.toLowerCase()===email.toLowerCase())}
 async function notifySuperAdmin(title,message,type,refId){const sa=DB.users.find(u=>u.isSuperAdmin);if(!sa)return;const notif={id:nextNotifId++,userId:sa.id,type:type||'admin_alert',title,message,fileId:refId||0,read:false,createdAt:new Date().toISOString()};DB.notifications.push(notif);await fbSet(COLLECTIONS.notifications,notif.id,notif);await saveCounters()}
 
@@ -758,22 +811,19 @@ async function doLogin(){
         removedRec.attemptCount=(removedRec.attemptCount||0)+1;
         await fbSet(COLLECTIONS.removed_users,removedRec._docId||removedRec.id,removedRec);
         await notifySuperAdmin(`🔔 Removed user login attempt: ${removedRec.name||email}`,`${removedRec.name||email} tried to login. Review and approve/block.`,'admin_removed_user_login',removedRec.id);
+        await emailRemovedUserLoginAttempt(removedRec);
         await window.FirebaseFns.signOut(auth);
-        notify('⚠️ Your account has been removed. Super Admin notified. Please wait for approval.','warning');
+        notify('⚠️ Your account has been removed. Super Admin notified.','warning');
         setLoading('loginBtn',false,'<i class="bi bi-box-arrow-in-right"></i> Sign In');
         return;
       }
     }
     let user=DB.users.find(u=>u.authUid===firebaseUid||u.email.toLowerCase()===email.toLowerCase());
     if(!user){
-      console.warn('[HNB] Auto-creating profile...');
       const newId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;
       user={id:newId,authUid:firebaseUid,name:email.split('@')[0],email:email.toLowerCase(),designation:isSuper?'Head Office':'Marketing Officer',branch:isSuper?'HEAD OFFICE':'COLOMBO',profileComplete:true,photo:null,isSuperAdmin:isSuper,isAdmin:isSuper,createdAt:new Date().toISOString()};
       try{await fbSet(COLLECTIONS.users,firebaseUid,user);await saveCounters()}catch(err){console.error('[HNB] Auto-create failed:',err)}
-    }else if(isSuper&&!user.isSuperAdmin){
-      user.isSuperAdmin=true;user.isAdmin=true;
-      await fbSet(COLLECTIONS.users,user._docId||firebaseUid,user);
-    }
+    }else if(isSuper&&!user.isSuperAdmin){user.isSuperAdmin=true;user.isAdmin=true;await fbSet(COLLECTIONS.users,user._docId||firebaseUid,user)}
     currentUser=user;
     notify(`Welcome back, ${user.name}!`,'success');
     await startRealtimeSync();
@@ -873,17 +923,14 @@ function showPage(page){
   setTimeout(applyMobileTableLabels,100);
   if(isMobile())closeMobileSidebar();
 }
-function updateAdminBadge(){if(!canManageUsers())return;const pendingCount=DB.removed_users.filter(r=>r.status==='pending').length;const b=document.getElementById('adminBadge');if(b){if(pendingCount>0){b.textContent=pendingCount;b.classList.remove('hidden')}else b.classList.add('hidden')}}
+function updateAdminBadge(){if(!canManageUsers())return;const pendingCount=DB.removed_users.filter(r=>r.status==='pending').length;const b=document.getElementById('adminBadge');if(b){if(pendingCount>0){b.textContent=pendingCount;b.classList.remove('hidden')}else b.classList.add('hidden')}}}
 
 // ============================================================
 // MOBILE NAVIGATION
 // ============================================================
 function openMobileSidebar(){document.getElementById('sidebar').classList.add('mobile-open');document.getElementById('mobileOverlay').classList.add('show')}
 function closeMobileSidebar(){document.getElementById('sidebar').classList.remove('mobile-open');document.getElementById('mobileOverlay').classList.remove('show')}
-function mobileNavGo(page){
-  if(page==='more'){showMoreMenu();return}
-  showPage(page);
-}
+function mobileNavGo(page){if(page==='more'){showMoreMenu();return}showPage(page)}
 function showMoreMenu(){
   const pages=[{id:'report',icon:'file-earmark-excel',label:'Reports'},{id:'logs',icon:'journal-text',label:'Activity Logs'},{id:'users',icon:'people',label:'Users'}];
   if(canManageUsers())pages.push({id:'admin',icon:'shield-fill-check',label:'Admin Panel'});
@@ -920,17 +967,8 @@ function applyMobileTableLabels(){
   const sr=document.getElementById('searchResults');
   if(sr){sr.querySelectorAll('table').forEach(table=>{if(!table.classList.contains('mobile-cards'))table.classList.add('mobile-cards');const labels=['AP NO','DO NO','NIC','Customer','Branch','Payments','Status','Holder','Access','Action'];table.querySelectorAll('tbody tr').forEach(tr=>{tr.querySelectorAll('td').forEach((td,i)=>{if(!td.hasAttribute('data-label'))td.setAttribute('data-label',labels[i]||'')})})})}
 }
-function updateMobileNavActive(page){
-  if(!isMobile())return;
-  document.querySelectorAll('.mobile-bottom-nav a').forEach(a=>a.classList.remove('active'));
-  const el=document.getElementById('mnav-'+page);
-  if(el)el.classList.add('active');
-}
-function updateMobilePayBadge(){
-  const pc=getMyPendingPaymentCount();
-  const el=document.getElementById('mPayBadge');
-  if(el){if(pc>0){el.textContent=pc>99?'99+':pc;el.classList.remove('hidden')}else el.classList.add('hidden')}
-}
+function updateMobileNavActive(page){if(!isMobile())return;document.querySelectorAll('.mobile-bottom-nav a').forEach(a=>a.classList.remove('active'));const el=document.getElementById('mnav-'+page);if(el)el.classList.add('active')}
+function updateMobilePayBadge(){const pc=getMyPendingPaymentCount();const el=document.getElementById('mPayBadge');if(el){if(pc>0){el.textContent=pc>99?'99+':pc;el.classList.remove('hidden')}else el.classList.add('hidden')}}
 
 // ============================================================
 // NOTIFICATIONS
@@ -949,7 +987,7 @@ function getMyPendingFiles(){if(!currentUser)return[];const pn=DB.notifications.
 // ============================================================
 // DASHBOARD
 // ============================================================
-function loadDashboard(){const wb=document.getElementById('profileWarning');if(currentUser&&currentUser.profileComplete===false){wb.innerHTML='<div class="alert-banner" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left-color:#0d6efd"><i class="bi bi-person-exclamation alert-icon" style="color:#1e40af"></i><div class="alert-content"><div class="alert-title" style="color:#1e3a8a">Complete your profile!</div><div class="alert-desc" style="color:#1e40af">Your profile was auto-created.</div></div><button class="btn btn-primary btn-sm" onclick="showPage(\'users\');openEditProfile();"><i class="bi bi-pencil"></i> Update</button></div>'}else wb.innerHTML='';
+function loadDashboard(){const wb=document.getElementById('profileWarning');if(currentUser&&currentUser.profileComplete===false){wb.innerHTML='<div class="alert-banner" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-left-color:#0d6efd"><i class="bi bi-person-exclamation alert-icon" style="color:#1e40af"></i><div class="alert-content"><div class="alert-title" style="color:#1e3a8a">Complete your profile!</div></div><button class="btn btn-primary btn-sm" onclick="showPage(\'users\');openEditProfile();"><i class="bi bi-pencil"></i> Update</button></div>'}else wb.innerHTML='';
 const vf=getVisibleFiles();
 document.getElementById('statTotal').textContent=vf.length;
 document.getElementById('statPending').textContent=getUnreadCount();
@@ -974,17 +1012,29 @@ async function createFile(){const apNo=document.getElementById('cApNo').value.tr
 function clearCreateForm(){['cApNo','cNic','cCustomer','cAmount','cManualDO'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});document.getElementById('cBranch').value=currentUser.branch;const sc=document.getElementById('payCheck-Supply');if(sc)sc.checked=true;document.getElementById('payAmount-Supply').value='';document.getElementById('payRemarks-Supply').value='';const ic=document.getElementById('payCheck-Interducer');if(ic)ic.checked=false;document.getElementById('payToggle-Interducer').classList.remove('active');document.getElementById('payInputs-Interducer').classList.remove('show');document.getElementById('payAmount-Interducer').value='';document.getElementById('payRemarks-Interducer').value='';const rc=document.getElementById('payCheck-RMV');if(rc)rc.checked=false;document.getElementById('payToggle-RMV').classList.remove('active');document.getElementById('payInputs-RMV').classList.remove('show');document.getElementById('payAmount-RMV').value='';document.getElementById('payRemarks-RMV').value=''}
 
 // ============================================================
-// SEND TO BM / ACCEPT / SEND HO / HANDOVER
+// SEND TO BM
 // ============================================================
 function openSendToBM(fid,apNo){const file=DB.files.find(f=>f.id===fid);if(!file){notify('File not found!','danger');return}if(hasBeenSentToBM(fid)){notify('Already sent!','warning');return}if(!isCreator(file)&&!canSeeAllFiles()){notify('Only creator can send!','danger');return}document.getElementById('stFileId').value=fid;document.getElementById('stApNo').textContent=apNo;document.getElementById('stRemarks').value='';selectedBMSendType=null;document.querySelectorAll('#bmSendTypeGrid .send-type-card').forEach(c=>c.classList.remove('selected'));const sel=document.getElementById('stBranchManager');const wb=document.getElementById('noManagerWarning');sel.innerHTML='';const bms=DB.users.filter(u=>u.designation==='Branch Manager'&&u.id!==currentUser.id&&u.branch.toUpperCase()===file.branch.toUpperCase());if(bms.length===0){sel.innerHTML='<option value="">-- No Branch Manager available --</option>';sel.disabled=true;wb.innerHTML='<div class="no-manager-warning"><i class="bi bi-exclamation-triangle-fill"></i><div><div class="warning-title">No Branch Manager found!</div><div class="warning-desc">Only BM of <b>'+escapeHtml(file.branch)+'</b> branch can receive.</div></div></div>'}else{sel.disabled=false;wb.innerHTML='';sel.innerHTML='<option value="">-- Select BM --</option>';bms.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.branch)}</option>`})}if(!sendToBMModalInstance)sendToBMModalInstance=new bootstrap.Modal(document.getElementById('sendToBMModal'));sendToBMModalInstance.show()}
 function selectBMSendType(t){selectedBMSendType=t;document.querySelectorAll('#bmSendTypeGrid .send-type-card').forEach(c=>c.classList.remove('selected'));const card=document.querySelector(`#bmSendTypeGrid .send-type-card[data-type="${t}"]`);if(card)card.classList.add('selected')}
-async function confirmSendToBM(){const fid=parseInt(document.getElementById('stFileId').value);const toUid=parseInt(document.getElementById('stBranchManager').value);const remarks=document.getElementById('stRemarks').value.trim();if(hasBeenSentToBM(fid)){notify('Already sent!','danger');sendToBMModalInstance.hide();return}if(!toUid||isNaN(toUid)){notify('Select BM','warning');return}if(!selectedBMSendType){notify('Select type','warning');return}const toUser=DB.users.find(u=>u.id===toUid);const file=DB.files.find(f=>f.id===fid);if(!toUser||!file){notify('Not found','danger');return}const now=new Date().toISOString();const stl={file:'File Only',manualDO:'Manual DO',both:'File + Manual DO',other:'Other'};const le={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Sent to Branch Manager (${toUser.name})`,location:toUser.branch,handoverTo:toUser.id,handoverToName:toUser.name,handoverToDesig:toUser.designation,sendType:selectedBMSendType,sendTypeLabel:stl[selectedBMSendType],remarks:remarks||'',createdAt:now};DB.logs.push(le);const stt=stl[selectedBMSendType];await createNotification(toUser.id,'file_received',`New file: ${file.apNo} (${stt})`,`From ${currentUser.name} — ${stt}${remarks?' — '+remarks:''}`,fid);if(file.status==='Created')file.status='In Progress';await fbSet(COLLECTIONS.logs,le.id,le);await fbSet(COLLECTIONS.files,fid,file);await saveCounters();sendToBMModalInstance.hide();notify(`Sent to ${toUser.name}!`,'success');updateNotifBadge();viewFile(fid)}
+async function confirmSendToBM(){const fid=parseInt(document.getElementById('stFileId').value);const toUid=parseInt(document.getElementById('stBranchManager').value);const remarks=document.getElementById('stRemarks').value.trim();if(hasBeenSentToBM(fid)){notify('Already sent!','danger');sendToBMModalInstance.hide();return}if(!toUid||isNaN(toUid)){notify('Select BM','warning');return}if(!selectedBMSendType){notify('Select type','warning');return}const toUser=DB.users.find(u=>u.id===toUid);const file=DB.files.find(f=>f.id===fid);if(!toUser||!file){notify('Not found','danger');return}const now=new Date().toISOString();const stl={file:'File Only',manualDO:'Manual DO',both:'File + Manual DO',other:'Other'};const le={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Sent to Branch Manager (${toUser.name})`,location:toUser.branch,handoverTo:toUser.id,handoverToName:toUser.name,handoverToDesig:toUser.designation,sendType:selectedBMSendType,sendTypeLabel:stl[selectedBMSendType],remarks:remarks||'',createdAt:now};DB.logs.push(le);const stt=stl[selectedBMSendType];await createNotification(toUser.id,'file_received',`New file: ${file.apNo} (${stt})`,`From ${currentUser.name} — ${stt}${remarks?' — '+remarks:''}`,fid);await emailFileSentToBM(file,toUser);if(file.status==='Created')file.status='In Progress';await fbSet(COLLECTIONS.logs,le.id,le);await fbSet(COLLECTIONS.files,fid,file);await saveCounters();sendToBMModalInstance.hide();notify(`Sent to ${toUser.name}!`,'success');updateNotifBadge();viewFile(fid)}
 function skipSend(){const fid=parseInt(document.getElementById('stFileId').value);sendToBMModalInstance.hide();if(fid)viewFile(fid)}
-async function acceptFile(fid){const file=DB.files.find(f=>f.id===fid);if(!file)return;if(!isCurrentHolder(fid)&&!canSeeAllFiles()){notify('Not current holder!','danger');return}const now=new Date().toISOString();const nr=DB.notifications.filter(n=>n.userId===currentUser.id&&n.fileId===fid&&!n.read);nr.forEach(n=>n.read=true);const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:'Accepted File (In Hand)',location:currentUser.branch,remarks:'File received',createdAt:now};DB.logs.push(nl);if(file.status==='Created'||file.status==='In Progress')file.status='With Branch Manager';await fbSet(COLLECTIONS.logs,nl.id,nl);await fbSet(COLLECTIONS.files,fid,file);if(nr.length)await fbBatch(nr.map(n=>({collection:COLLECTIONS.notifications,docId:n._docId||n.id,data:{read:true}})));await saveCounters();notify('File accepted!','success');updateNotifBadge();viewFile(fid)}
-async function sendToHeadOffice(fid){const file=DB.files.find(f=>f.id===fid);if(!file)return;if(currentUser.designation!=='Branch Manager'&&!canSeeAllFiles()){notify('Only BM can send!','danger');return}if(!isCurrentHolder(fid)&&!canSeeAllFiles()){notify('Not current holder!','danger');return}if(hasBeenSentToHO(fid)){notify('Already sent!','danger');return}const ho=DB.users.find(u=>u.designation==='Head Office');const now=new Date().toISOString();file.headOfficeSent=true;file.status='Sent to Head Office';const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:'Sent to Head Office',location:'Head Office',handoverTo:ho?ho.id:null,handoverToName:ho?ho.name:'Head Office',handoverToDesig:'Head Office',remarks:'File dispatched to HO',createdAt:now};DB.logs.push(nl);if(ho)await createNotification(ho.id,'file_received',`New file: ${file.apNo} (from Branch)`,`From ${currentUser.name} — ${currentUser.branch}`,fid);await fbSet(COLLECTIONS.logs,nl.id,nl);await fbSet(COLLECTIONS.files,fid,file);await saveCounters();notify('Sent to HO!','success');updateNotifBadge();viewFile(fid)}
+
+// ============================================================
+// ACCEPT
+// ============================================================
+async function acceptFile(fid){const file=DB.files.find(f=>f.id===fid);if(!file)return;if(!isCurrentHolder(fid)&&!canSeeAllFiles()){notify('Not current holder!','danger');return}const now=new Date().toISOString();const nr=DB.notifications.filter(n=>n.userId===currentUser.id&&n.fileId===fid&&!n.read);nr.forEach(n=>n.read=true);const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:'Accepted File (In Hand)',location:currentUser.branch,remarks:'File received',createdAt:now};DB.logs.push(nl);if(file.status==='Created'||file.status==='In Progress')file.status='With Branch Manager';await fbSet(COLLECTIONS.logs,nl.id,nl);await fbSet(COLLECTIONS.files,fid,file);if(nr.length)await fbBatch(nr.map(n=>({collection:COLLECTIONS.notifications,docId:n._docId||n.id,data:{read:true}})));await saveCounters();const creator=DB.users.find(u=>u.id===file.createdBy);if(creator&&creator.id!==currentUser.id){await emailFileAccepted(file,creator)}notify('File accepted!','success');updateNotifBadge();viewFile(fid)}
+
+// ============================================================
+// SEND TO HO
+// ============================================================
+async function sendToHeadOffice(fid){const file=DB.files.find(f=>f.id===fid);if(!file)return;if(currentUser.designation!=='Branch Manager'&&!canSeeAllFiles()){notify('Only BM can send!','danger');return}if(!isCurrentHolder(fid)&&!canSeeAllFiles()){notify('Not current holder!','danger');return}if(hasBeenSentToHO(fid)){notify('Already sent!','danger');return}const ho=DB.users.find(u=>u.designation==='Head Office');const now=new Date().toISOString();file.headOfficeSent=true;file.status='Sent to Head Office';const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:'Sent to Head Office',location:'Head Office',handoverTo:ho?ho.id:null,handoverToName:ho?ho.name:'Head Office',handoverToDesig:'Head Office',remarks:'File dispatched to HO',createdAt:now};DB.logs.push(nl);if(ho){await createNotification(ho.id,'file_received',`New file: ${file.apNo} (from Branch)`,`From ${currentUser.name} — ${currentUser.branch}`,fid);await emailSentToHO(file,ho)}await fbSet(COLLECTIONS.logs,nl.id,nl);await fbSet(COLLECTIONS.files,fid,file);await saveCounters();notify('Sent to HO!','success');updateNotifBadge();viewFile(fid)}
+
+// ============================================================
+// HANDOVER
+// ============================================================
 function openHandover(id){const file=DB.files.find(f=>f.id===id);if(!file){notify('Not found','danger');return}if(!canUserAct(file)){notify('No permission!','danger');return}if(hasBeenSentToHO(id)){notify('Already sent!','danger');return}document.getElementById('hoFileId').value=id;document.getElementById('hoRemarks').value='';document.getElementById('hoManualDO').value='';document.getElementById('manualDOGroup').classList.add('hidden');selectedHOSendType=null;document.querySelectorAll('#hoSendTypeGrid .send-type-card').forEach(c=>c.classList.remove('selected'));const sel=document.getElementById('hoUser');sel.innerHTML='<option value="">-- Select User --</option>';const ou=DB.users.filter(u=>u.id!==currentUser.id);if(ou.length===0){sel.innerHTML='<option value="">-- No users --</option>';sel.disabled=true}else{sel.disabled=false;ou.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${escapeHtml(u.name)} — ${escapeHtml(u.designation)} (${escapeHtml(u.branch)})</option>`})}if(!handoverModalInstance)handoverModalInstance=new bootstrap.Modal(document.getElementById('handoverModal'));handoverModalInstance.show()}
 function selectHOSendType(t){selectedHOSendType=t;document.querySelectorAll('#hoSendTypeGrid .send-type-card').forEach(c=>c.classList.remove('selected'));const card=document.querySelector(`#hoSendTypeGrid .send-type-card[data-type="${t}"]`);if(card)card.classList.add('selected');if(t==='manualDO'||t==='both')document.getElementById('manualDOGroup').classList.remove('hidden');else document.getElementById('manualDOGroup').classList.add('hidden')}
-async function confirmHandover(){const fid=parseInt(document.getElementById('hoFileId').value);const toUid=parseInt(document.getElementById('hoUser').value);const mdo=document.getElementById('hoManualDO').value.trim().toUpperCase();const remarks=document.getElementById('hoRemarks').value.trim();const cf=DB.files.find(f=>f.id===fid);if(!cf){notify('Not found','danger');return}if(!canUserAct(cf)){notify('No permission!','danger');return}if(hasBeenSentToHO(fid)){notify('Already sent!','danger');return}if(!toUid||isNaN(toUid)){notify('Select user','warning');return}if(!selectedHOSendType){notify('Select type','warning');return}const toUser=DB.users.find(u=>u.id===toUid);const file=DB.files.find(f=>f.id===fid);if(!toUser||!file){notify('Not found','danger');return}const now=new Date().toISOString();const stl={file:'File Only',manualDO:'Manual DO',both:'File + Manual DO',other:'Other'};if(mdo&&(selectedHOSendType==='manualDO'||selectedHOSendType==='both'))file.manualDO=mdo;const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Handed Over to ${toUser.name}`,location:toUser.branch,handoverTo:toUser.id,handoverToName:toUser.name,handoverToDesig:toUser.designation,sendType:selectedHOSendType,sendTypeLabel:stl[selectedHOSendType],remarks:remarks||(mdo?`Manual DO: ${mdo}`:''),createdAt:now};DB.logs.push(nl);const stt=stl[selectedHOSendType];await createNotification(toUser.id,'file_received',`New file: ${file.apNo} (${stt})`,`From ${currentUser.name} — ${stt}${remarks?' — '+remarks:''}`,fid);await fbSet(COLLECTIONS.logs,nl.id,nl);await fbSet(COLLECTIONS.files,fid,file);await saveCounters();handoverModalInstance.hide();notify(`Handed over to ${toUser.name}!`,'success');updateNotifBadge();viewFile(fid)}
+async function confirmHandover(){const fid=parseInt(document.getElementById('hoFileId').value);const toUid=parseInt(document.getElementById('hoUser').value);const mdo=document.getElementById('hoManualDO').value.trim().toUpperCase();const remarks=document.getElementById('hoRemarks').value.trim();const cf=DB.files.find(f=>f.id===fid);if(!cf){notify('Not found','danger');return}if(!canUserAct(cf)){notify('No permission!','danger');return}if(hasBeenSentToHO(fid)){notify('Already sent!','danger');return}if(!toUid||isNaN(toUid)){notify('Select user','warning');return}if(!selectedHOSendType){notify('Select type','warning');return}const toUser=DB.users.find(u=>u.id===toUid);const file=DB.files.find(f=>f.id===fid);if(!toUser||!file){notify('Not found','danger');return}const now=new Date().toISOString();const stl={file:'File Only',manualDO:'Manual DO',both:'File + Manual DO',other:'Other'};if(mdo&&(selectedHOSendType==='manualDO'||selectedHOSendType==='both'))file.manualDO=mdo;const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Handed Over to ${toUser.name}`,location:toUser.branch,handoverTo:toUser.id,handoverToName:toUser.name,handoverToDesig:toUser.designation,sendType:selectedHOSendType,sendTypeLabel:stl[selectedHOSendType],remarks:remarks||(mdo?`Manual DO: ${mdo}`:''),createdAt:now};DB.logs.push(nl);const stt=stl[selectedHOSendType];await createNotification(toUser.id,'file_received',`New file: ${file.apNo} (${stt})`,`From ${currentUser.name} — ${stt}${remarks?' — '+remarks:''}`,fid);await emailFileHandover(file,toUser);await fbSet(COLLECTIONS.logs,nl.id,nl);await fbSet(COLLECTIONS.files,fid,file);await saveCounters();handoverModalInstance.hide();notify(`Handed over to ${toUser.name}!`,'success');updateNotifBadge();viewFile(fid)}
 
 // ============================================================
 // PAYMENT MODAL
@@ -992,7 +1042,7 @@ async function confirmHandover(){const fid=parseInt(document.getElementById('hoF
 function openPaymentModal(fid,pt){const file=DB.files.find(f=>f.id===fid);if(!file){notify('Not found','danger');return}if(!canUserAct(file)){notify('No permission!','danger');return}const e=getPaymentRecord(fid,pt);document.getElementById('pmFileId').value=fid;document.getElementById('pmPayType').value=pt;document.getElementById('pmApNo').textContent=file.apNo;document.getElementById('pmTypeBadge').innerHTML=payBadge(pt);document.getElementById('pmRemarks').value=e?e.remarks:'';document.getElementById('pmAmount').value=e&&e.amount?e.amount:'';selectedPMAction=e&&e.status?e.status:null;document.querySelectorAll('#pmActionGrid .pm-action-card').forEach(c=>c.classList.remove('selected'));if(selectedPMAction){const card=document.querySelector(`#pmActionGrid .pm-action-card[data-action="${selectedPMAction}"]`);if(card)card.classList.add('selected')}updateAmountVisibility();if(!paymentModalInstance)paymentModalInstance=new bootstrap.Modal(document.getElementById('paymentModal'));paymentModalInstance.show()}
 function selectPMAction(a){selectedPMAction=a;document.querySelectorAll('#pmActionGrid .pm-action-card').forEach(c=>c.classList.remove('selected'));const card=document.querySelector(`#pmActionGrid .pm-action-card[data-action="${a}"]`);if(card)card.classList.add('selected');updateAmountVisibility()}
 function updateAmountVisibility(){const g=document.getElementById('pmAmountGroup');if(selectedPMAction==='paid')g.classList.remove('hidden');else g.classList.add('hidden')}
-async function confirmPayment(){const fid=parseInt(document.getElementById('pmFileId').value);const pt=document.getElementById('pmPayType').value;const remarks=document.getElementById('pmRemarks').value.trim();const amount=parseFloat(document.getElementById('pmAmount').value)||0;if(!selectedPMAction){notify('Select status','warning');return}if(selectedPMAction==='paid'&&(!amount||amount<=0)){notify('Enter valid amount','warning');return}const file=DB.files.find(f=>f.id===fid);if(!file||!canUserAct(file)){notify('No permission!','danger');return}const e=getPaymentRecord(fid,pt);const now=new Date().toISOString();const sl=PAYMENT_STATUS_LABELS[selectedPMAction].label;let pd;if(e){e.status=selectedPMAction;e.amount=selectedPMAction==='paid'?amount:(e.amount||amount);e.remarks=remarks;e.markedBy=currentUser.id;e.markedByName=currentUser.name;e.markedAt=now;pd=e}else{pd={id:nextPayId++,fileId:fid,paymentType:pt,status:selectedPMAction,amount:amount,remarks,markedBy:currentUser.id,markedByName:currentUser.name,markedAt:now};DB.payments.push(pd)}const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`${pt} Payment — ${sl}`,location:currentUser.branch,remarks:selectedPMAction==='paid'&&amount>0?`Amount: Rs. ${amount.toLocaleString()}`:remarks||`Marked as ${sl}`,createdAt:now};DB.logs.push(nl);await fbSet(COLLECTIONS.payments,pd._docId||pd.id,pd);await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();paymentModalInstance.hide();notify(`${pt} marked as ${sl}!`,'success');updateNotifBadge();if(!document.getElementById('page-payments').classList.contains('hidden'))loadPendingPayments();else if(!document.getElementById('page-report').classList.contains('hidden'))loadPaymentReport();else viewFile(fid)}
+async function confirmPayment(){const fid=parseInt(document.getElementById('pmFileId').value);const pt=document.getElementById('pmPayType').value;const remarks=document.getElementById('pmRemarks').value.trim();const amount=parseFloat(document.getElementById('pmAmount').value)||0;if(!selectedPMAction){notify('Select status','warning');return}if(selectedPMAction==='paid'&&(!amount||amount<=0)){notify('Enter valid amount','warning');return}const file=DB.files.find(f=>f.id===fid);if(!file||!canUserAct(file)){notify('No permission!','danger');return}const e=getPaymentRecord(fid,pt);const now=new Date().toISOString();const sl=PAYMENT_STATUS_LABELS[selectedPMAction].label;let pd;if(e){e.status=selectedPMAction;e.amount=selectedPMAction==='paid'?amount:(e.amount||amount);e.remarks=remarks;e.markedBy=currentUser.id;e.markedByName=currentUser.name;e.markedAt=now;pd=e}else{pd={id:nextPayId++,fileId:fid,paymentType:pt,status:selectedPMAction,amount:amount,remarks,markedBy:currentUser.id,markedByName:currentUser.name,markedAt:now};DB.payments.push(pd)}const nl={id:nextLogId++,fileId:fid,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`${pt} Payment — ${sl}`,location:currentUser.branch,remarks:selectedPMAction==='paid'&&amount>0?`Amount: Rs. ${amount.toLocaleString()}`:remarks||`Marked as ${sl}`,createdAt:now};DB.logs.push(nl);await fbSet(COLLECTIONS.payments,pd._docId||pd.id,pd);await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();if(file.createdBy!==currentUser.id){await emailPaymentUpdate(file,pt,sl)}paymentModalInstance.hide();notify(`${pt} marked as ${sl}!`,'success');updateNotifBadge();if(!document.getElementById('page-payments').classList.contains('hidden'))loadPendingPayments();else if(!document.getElementById('page-report').classList.contains('hidden'))loadPaymentReport();else viewFile(fid)}
 
 // ============================================================
 // SEARCH
@@ -1025,7 +1075,6 @@ async function deletePayment(fid,pt){if(!isSuperAdmin()){notify('Only Super Admi
 // LOGS / USERS
 // ============================================================
 function loadLogs(){const body=document.getElementById('logsBody');const logs=[...getVisibleLogs()].sort((a,b)=>b.id-a.id);if(logs.length===0){body.innerHTML='<tr><td colspan="7"><div class="empty-state"><i class="bi bi-journal-x"></i><p>No logs yet</p></div></td></tr>';applyMobileTableLabels();return}body.innerHTML=logs.map(l=>{const f=DB.files.find(x=>x.id===l.fileId);return `<tr><td><small><b>${formatDateTime(l.createdAt)}</b><br><span class="text-muted">${timeAgo(l.createdAt)}</span></small></td><td><b>${f?escapeHtml(f.apNo):'-'}</b></td><td>${escapeHtml(l.userName)}</td><td><small>${escapeHtml(l.designation)}</small></td><td>${escapeHtml(l.action)}</td><td><span class="badge bg-secondary">${escapeHtml(l.location)}</span></td><td><small>${escapeHtml(l.remarks)||'-'}</small></td></tr>`}).join('');applyMobileTableLabels()}
-
 function loadUsers(){
   const body=document.getElementById('usersBody');
   if(currentUser){document.getElementById('myProfileName').textContent=currentUser.name||'-';document.getElementById('myProfileEmail').textContent=currentUser.email||'-';document.getElementById('myProfileDesig').textContent=currentUser.designation||'-';document.getElementById('myProfileBranch').textContent=currentUser.branch||'-'}
@@ -1071,7 +1120,7 @@ function loadAdminPanel(){
 
 async function toggleAdmin(uid){const user=DB.users.find(u=>u.id===uid);if(!user){notify('User not found','danger');return}if(user.isSuperAdmin){notify('Cannot modify Super Admin','danger');return}if(user.id===currentUser.id){notify('Cannot modify yourself','danger');return}const makeAdmin=!user.isAdmin;if(!confirm(`${makeAdmin?'Make':'Remove'} ${user.name} ${makeAdmin?'an Admin':'from Admin'}?`))return;try{user.isAdmin=makeAdmin;await fbSet(COLLECTIONS.users,user._docId||user.authUid,user);const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`${makeAdmin?'Made Admin':'Removed Admin'}: ${user.name}`,location:'Admin Panel',remarks:`Target: ${user.email}`,createdAt:new Date().toISOString()};await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();notify(`${user.name} ${makeAdmin?'is now an Admin ✅':'removed from Admin'}`,makeAdmin?'success':'warning');loadAdminPanel();loadUsers()}catch(e){console.error(e);notify('Failed','danger')}}
 
-async function removeUser(uid){const user=DB.users.find(u=>u.id===uid);if(!user){notify('User not found','danger');return}if(user.isSuperAdmin){notify('Cannot remove Super Admin','danger');return}if(user.id===currentUser.id){notify('Cannot remove yourself','danger');return}if(!confirm(`⚠️ Remove ${user.name} (${user.email})?`))return;try{const filesCount=DB.files.filter(f=>f.createdBy===uid).length;const rec={id:nextRemovedId++,userId:user.id,authUid:user.authUid,name:user.name,email:user.email.toLowerCase(),designation:user.designation,branch:user.branch,photo:user.photo||null,removedBy:currentUser.id,removedByName:currentUser.name,removedAt:new Date().toISOString(),status:'pending',attemptCount:0,lastAttemptAt:null,hadFiles:filesCount};DB.removed_users.push(rec);await fbSet(COLLECTIONS.removed_users,rec.id,rec);await fbDelete(COLLECTIONS.users,user._docId||user.authUid);const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Removed User: ${user.name}`,location:'Admin Panel',remarks:`Email: ${user.email}`,createdAt:new Date().toISOString()};await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();notify(`${user.name} removed. Review in "Removed Users" tab.`,'warning');loadAdminPanel();loadUsers()}catch(e){console.error(e);notify('Failed to remove user','danger')}}
+async function removeUser(uid){const user=DB.users.find(u=>u.id===uid);if(!user){notify('User not found','danger');return}if(user.isSuperAdmin){notify('Cannot remove Super Admin','danger');return}if(user.id===currentUser.id){notify('Cannot remove yourself','danger');return}if(!confirm(`⚠️ Remove ${user.name} (${user.email})?`))return;try{const filesCount=DB.files.filter(f=>f.createdBy===uid).length;const rec={id:nextRemovedId++,userId:user.id,authUid:user.authUid,name:user.name,email:user.email.toLowerCase(),designation:user.designation,branch:user.branch,photo:user.photo||null,removedBy:currentUser.id,removedByName:currentUser.name,removedAt:new Date().toISOString(),status:'pending',attemptCount:0,lastAttemptAt:null,hadFiles:filesCount};DB.removed_users.push(rec);await fbSet(COLLECTIONS.removed_users,rec.id,rec);await fbDelete(COLLECTIONS.users,user._docId||user.authUid);const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Removed User: ${user.name}`,location:'Admin Panel',remarks:`Email: ${user.email}`,createdAt:new Date().toISOString()};await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();await emailUserRemoved(rec);notify(`${user.name} removed. Review in "Removed Users" tab.`,'warning');loadAdminPanel();loadUsers()}catch(e){console.error(e);notify('Failed to remove user','danger')}}
 
 async function approveRemovedUser(rid){const rec=DB.removed_users.find(r=>r.id===rid);if(!rec){notify('Record not found','danger');return}if(!confirm(`Approve ${rec.name}? They will be able to login again.`))return;try{DB.removed_users=DB.removed_users.filter(r=>r.id!==rid);await fbDelete(COLLECTIONS.removed_users,rec._docId||rid);const nl={id:nextLogId++,fileId:0,userId:currentUser.id,userName:currentUser.name,designation:currentUser.designation,action:`Approved Removed User: ${rec.name}`,location:'Admin Panel',remarks:`Email: ${rec.email}`,createdAt:new Date().toISOString()};await fbSet(COLLECTIONS.logs,nl.id,nl);await saveCounters();notify(`${rec.name} approved. Can login again.`,'success');loadAdminPanel();updateAdminBadge()}catch(e){console.error(e);notify('Failed','danger')}}
 
@@ -1079,18 +1128,11 @@ async function blockRemovedUser(rid){const rec=DB.removed_users.find(r=>r.id===r
 
 async function deleteRemovedRecord(rid){const rec=DB.removed_users.find(r=>r.id===rid);if(!rec){notify('Record not found','danger');return}if(!confirm(`Delete removed-user record for ${rec.name}?`))return;try{DB.removed_users=DB.removed_users.filter(r=>r.id!==rid);await fbDelete(COLLECTIONS.removed_users,rec._docId||rid);notify('Record deleted','success');loadAdminPanel();updateAdminBadge()}catch(e){console.error(e);notify('Failed','danger')}}
 
-function viewUserActivity(uid){
-  const user=DB.users.find(u=>u.id===uid);if(!user){notify('User not found','danger');return}
-  const userFiles=DB.files.filter(f=>f.createdBy===uid);
-  const userLogs=DB.logs.filter(l=>l.userId===uid).sort((a,b)=>b.id-a.id).slice(0,20);
-  const userNotifs=DB.notifications.filter(n=>n.userId===uid&&!n.read);
-  document.getElementById('viewContent').innerHTML=`<div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2"><div class="d-flex align-items-center gap-3"><div class="icon-circle" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)"><i class="bi bi-person-lines-fill"></i></div>User Activity: ${escapeHtml(user.name)}</div><button class="btn btn-outline-secondary btn-sm" onclick="showPage('admin')"><i class="bi bi-arrow-left"></i> Back</button></div>
+function viewUserActivity(uid){const user=DB.users.find(u=>u.id===uid);if(!user){notify('User not found','danger');return}const userFiles=DB.files.filter(f=>f.createdBy===uid);const userLogs=DB.logs.filter(l=>l.userId===uid).sort((a,b)=>b.id-a.id).slice(0,20);const userNotifs=DB.notifications.filter(n=>n.userId===uid&&!n.read);document.getElementById('viewContent').innerHTML=`<div class="page-title d-flex justify-content-between align-items-center flex-wrap gap-2"><div class="d-flex align-items-center gap-3"><div class="icon-circle" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)"><i class="bi bi-person-lines-fill"></i></div>User Activity: ${escapeHtml(user.name)}</div><button class="btn btn-outline-secondary btn-sm" onclick="showPage('admin')"><i class="bi bi-arrow-left"></i> Back</button></div>
   <div class="card p-4 mb-3"><div class="d-flex align-items-center gap-4 flex-wrap">${getUserPicHtml(user,'lg')}<div><h5 class="fw-semibold mb-1">${escapeHtml(user.name)} ${user.isSuperAdmin?'<span class="badge bg-warning text-dark">Super Admin</span>':user.isAdmin?'<span class="badge bg-primary">Admin</span>':'<span class="badge bg-secondary">User</span>'}</h5><div class="text-muted small"><i class="bi bi-envelope"></i> ${escapeHtml(user.email)}</div><div class="text-muted small"><i class="bi bi-briefcase"></i> ${escapeHtml(user.designation)} • <i class="bi bi-geo-alt"></i> ${escapeHtml(user.branch)}</div></div></div></div>
   <div class="row g-3 mb-3"><div class="col-md-4 col-6"><div class="admin-stat-box"><div class="asb-label">Files</div><div class="asb-value">${userFiles.length}</div></div></div><div class="col-md-4 col-6"><div class="admin-stat-box"><div class="asb-label">Activities</div><div class="asb-value">${DB.logs.filter(l=>l.userId===uid).length}</div></div></div><div class="col-md-4 col-6"><div class="admin-stat-box"><div class="asb-label">Unread</div><div class="asb-value">${userNotifs.length}</div></div></div></div>
   <div class="card p-3 mb-3"><h6 class="fw-semibold mb-3"><i class="bi bi-files text-primary"></i> Files (${userFiles.length})</h6>${userFiles.length===0?'<div class="text-muted text-center py-3">No files</div>':`<div class="table-responsive"><table class="table table-sm"><thead><tr><th>AP NO</th><th>Customer</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>${userFiles.slice(0,10).map(f=>`<tr><td><b>${escapeHtml(f.apNo)}</b></td><td>${escapeHtml(f.customer)||'-'}</td><td>Rs. ${Number(f.amount).toLocaleString()}</td><td>${statusBadge(f.status)}</td><td><button class="btn btn-sm btn-primary" onclick="viewFile(${f.id})"><i class="bi bi-eye"></i></button></td></tr>`).join('')}</tbody></table></div>`}</div>
-  <div class="card p-3"><h6 class="fw-semibold mb-3"><i class="bi bi-journal-text text-primary"></i> Recent Activities</h6>${userLogs.length===0?'<div class="text-muted text-center py-3">No activities</div>':`<div class="timeline">${userLogs.map(l=>`<div class="timeline-item"><div class="tl-time">${formatDateTime(l.createdAt)}</div><div class="tl-title">${escapeHtml(l.action)}</div><div class="tl-desc">${escapeHtml(l.location)}${l.remarks?' • '+escapeHtml(l.remarks):''}</div></div>`).join('')}</div>`}</div>`;
-  showPage('view')
-}
+  <div class="card p-3"><h6 class="fw-semibold mb-3"><i class="bi bi-journal-text text-primary"></i> Recent Activities</h6>${userLogs.length===0?'<div class="text-muted text-center py-3">No activities</div>':`<div class="timeline">${userLogs.map(l=>`<div class="timeline-item"><div class="tl-time">${formatDateTime(l.createdAt)}</div><div class="tl-title">${escapeHtml(l.action)}</div><div class="tl-desc">${escapeHtml(l.location)}${l.remarks?' • '+escapeHtml(l.remarks):''}</div></div>`).join('')}</div>`}</div>`;showPage('view')}
 
 // ============================================================
 // CSV EXPORT
@@ -1104,10 +1146,44 @@ function downloadCSV(csv,filename){const blob=new Blob(['\uFEFF'+csv],{type:'tex
 // ============================================================
 // INIT
 // ============================================================
-window.addEventListener('load',async()=>{try{await waitForFirebase();const{onAuthStateChanged}=window.FirebaseFns;const auth=window.FirebaseAuth;onAuthStateChanged(auth,async fbUser=>{document.getElementById('loadingOverlay').classList.add('hidden');if(fbUser){firebaseUid=fbUser.uid;await loadFromStorage();const isSuper=(fbUser.email.toLowerCase()===SUPER_ADMIN_EMAIL.toLowerCase());const rr=getRemovedRecord(fbUser.email);if(rr&&!isSuper&&rr.status==='blocked'){await window.FirebaseFns.signOut(auth);document.getElementById('authScreen').classList.remove('hidden');notify('🚫 Account permanently blocked.','danger');return}if(rr&&!isSuper&&rr.status==='pending'){await window.FirebaseFns.signOut(auth);document.getElementById('authScreen').classList.remove('hidden');notify('⚠️ Account removed. Contact admin.','warning');return}let user=DB.users.find(u=>u.authUid===fbUser.uid||u.email.toLowerCase()===fbUser.email.toLowerCase());if(!user){console.warn('[HNB] Auto-creating profile...');const newId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;user={id:newId,authUid:fbUser.uid,name:fbUser.email.split('@')[0],email:fbUser.email.toLowerCase(),designation:isSuper?'Head Office':'Marketing Officer',branch:isSuper?'HEAD OFFICE':'COLOMBO',profileComplete:true,photo:null,isSuperAdmin:isSuper,isAdmin:isSuper,createdAt:new Date().toISOString()};try{await fbSet(COLLECTIONS.users,fbUser.uid,user);await saveCounters()}catch(err){console.error('[HNB] Auto-create failed:',err)}}else if(isSuper&&!user.isSuperAdmin){user.isSuperAdmin=true;user.isAdmin=true;await fbSet(COLLECTIONS.users,user._docId||firebaseUid,user)}currentUser=user;await startRealtimeSync();enterApp();return}document.getElementById('authScreen').classList.remove('hidden')})}catch(e){console.error('[HNB] Init error:',e);document.getElementById('loadingOverlay').innerHTML='<div style="text-align:center;color:#fff"><i class="bi bi-exclamation-triangle-fill" style="font-size:60px;color:#fbbf24"></i><h4 style="margin-top:16px">Firebase Connection Failed</h4><p style="font-size:14px;opacity:.8">Check console.</p><button class="btn btn-light mt-3" onclick="location.reload()">Retry</button></div>'}});
+window.addEventListener('load',async()=>{
+  try{
+    await waitForFirebase();
+    initEmailJS();
+    setupEnterKeySupport();
+    const{onAuthStateChanged}=window.FirebaseFns;
+    const auth=window.FirebaseAuth;
+    onAuthStateChanged(auth,async fbUser=>{
+      document.getElementById('loadingOverlay').classList.add('hidden');
+      if(fbUser){
+        firebaseUid=fbUser.uid;
+        await loadFromStorage();
+        const isSuper=(fbUser.email.toLowerCase()===SUPER_ADMIN_EMAIL.toLowerCase());
+        const rr=getRemovedRecord(fbUser.email);
+        if(rr&&!isSuper&&rr.status==='blocked'){await window.FirebaseFns.signOut(auth);document.getElementById('authScreen').classList.remove('hidden');notify('🚫 Account permanently blocked.','danger');return}
+        if(rr&&!isSuper&&rr.status==='pending'){await window.FirebaseFns.signOut(auth);document.getElementById('authScreen').classList.remove('hidden');notify('⚠️ Account removed. Contact admin.','warning');return}
+        let user=DB.users.find(u=>u.authUid===fbUser.uid||u.email.toLowerCase()===fbUser.email.toLowerCase());
+        if(!user){
+          const newId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;
+          user={id:newId,authUid:fbUser.uid,name:fbUser.email.split('@')[0],email:fbUser.email.toLowerCase(),designation:isSuper?'Head Office':'Marketing Officer',branch:isSuper?'HEAD OFFICE':'COLOMBO',profileComplete:true,photo:null,isSuperAdmin:isSuper,isAdmin:isSuper,createdAt:new Date().toISOString()};
+          try{await fbSet(COLLECTIONS.users,fbUser.uid,user);await saveCounters()}catch(err){console.error('[HNB] Auto-create failed:',err)}
+        }else if(isSuper&&!user.isSuperAdmin){user.isSuperAdmin=true;user.isAdmin=true;await fbSet(COLLECTIONS.users,user._docId||firebaseUid,user)}
+        currentUser=user;
+        await startRealtimeSync();
+        enterApp();
+        return
+      }
+      document.getElementById('authScreen').classList.remove('hidden')
+    })
+  }catch(e){
+    console.error('[HNB] Init error:',e);
+    document.getElementById('loadingOverlay').innerHTML='<div style="text-align:center;color:#fff"><i class="bi bi-exclamation-triangle-fill" style="font-size:60px;color:#fbbf24"></i><h4 style="margin-top:16px">Firebase Connection Failed</h4><p style="font-size:14px;opacity:.8">Check console.</p><button class="btn btn-light mt-3" onclick="location.reload()">Retry</button></div>'
+  }
+});
 
-window.hnbDebug={show:async()=>{await loadFromStorage();console.table(DB.users);console.table(DB.files);console.table(DB.removed_users)},reload:()=>loadFromStorage(),DB:()=>DB,currentUser:()=>currentUser,isSuperAdmin:()=>isSuperAdmin()};
-console.log('%c[HNB v26 - PC + Mobile Responsive]','color:#06b6d4;font-weight:bold');
+window.hnbDebug={show:async()=>{await loadFromStorage();console.table(DB.users);console.table(DB.files);console.table(DB.removed_users)},reload:()=>loadFromStorage(),DB:()=>DB,currentUser:()=>currentUser,isSuperAdmin:()=>isSuperAdmin(),testEmail:async(email,name)=>{const r=await sendEmailNotification(email||currentUser.email,name||currentUser.name,'Test Email','This is a test email from HNB Finance File Tracking System.');return r}};
+console.log('%c[HNB v27 - EmailJS + Enter Key + PC/Mobile]','color:#06c;font-weight:bold');
+console.log('%c💡 Test email: hnbDebug.testEmail()','color:#10b981;font-weight:bold');
 </script>
 </body>
 </html>
