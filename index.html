@@ -853,9 +853,15 @@ function enterApp(){
   showPage('dashboard');
 }
 function showPage(page){
-  ['dashboard','create','search','payments','report','logs','users','view','admin'].forEach(p=>{const el=document.getElementById('page-'+p);if(el)el.classList.add('hidden');const nav=document.getElementById('nav-'+p);if(nav)nav.classList.remove('active')});
+  ['dashboard','create','search','payments','report','logs','users','view','admin'].forEach(p=>{
+    const el=document.getElementById('page-'+p);
+    if(el)el.classList.add('hidden');
+    const nav=document.getElementById('nav-'+p);
+    if(nav)nav.classList.remove('active');
+  });
   document.getElementById('page-'+page).classList.remove('hidden');
-  const nav=document.getElementById('nav-'+page);if(nav)nav.classList.add('active');
+  const nav=document.getElementById('nav-'+page);
+  if(nav)nav.classList.add('active');
   if(page==='dashboard')loadDashboard();
   if(page==='logs')loadLogs();
   if(page==='users')loadUsers();
@@ -867,7 +873,7 @@ function showPage(page){
   setTimeout(applyMobileTableLabels,100);
   if(isMobile())closeMobileSidebar();
 }
-function updateAdminBadge(){if(!canManageUsers())return;const pendingCount=DB.removed_users.filter(r=>r.status==='pending').length;const b=document.getElementById('adminBadge');if(b){if(pendingCount>0){b.textContent=pendingCount;b.classList.remove('hidden')}else b.classList.add('hidden')}}}
+function updateAdminBadge(){if(!canManageUsers())return;const pendingCount=DB.removed_users.filter(r=>r.status==='pending').length;const b=document.getElementById('adminBadge');if(b){if(pendingCount>0){b.textContent=pendingCount;b.classList.remove('hidden')}else b.classList.add('hidden')}}
 
 // ============================================================
 // MOBILE NAVIGATION
