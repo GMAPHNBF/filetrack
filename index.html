@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0d6efd">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>HNB Finance - File Tracking System</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -595,8 +593,7 @@ window.dispatchEvent(new Event('firebase-ready'));
 console.log('[HNB] Firebase initialized ✅');
 </script>
 
-<script>
-const EMAILJS_CONFIG={serviceId:'service_sqxgjla',templateId:'template_xqm9ntq',publicKey:'whYuOFSUreqUHagm7'};
+<script>const EMAILJS_CONFIG={serviceId:'service_sqxgjla',templateId:'template_xqm9ntq',publicKey:'whYuOFSUreqUHagm7'};
 const SUPER_ADMIN_EMAIL='umesh.19940309@gmail.com';
 const COLLECTIONS={users:'users',files:'files',logs:'logs',payments:'payments',notifications:'notifications',meta:'meta',removed_users:'removed_users'};
 const PAYMENT_TYPES=['Interducer','Supply','RMV'];
@@ -633,7 +630,7 @@ console.log('[HNB] Real-time sync started ✅')}
 function stopRealtimeSync(){realtimeUnsubs.forEach(u=>u());realtimeUnsubs=[]}
 function recalculateIds(){nextFileId=DB.files.length?Math.max(...DB.files.map(f=>f.id))+1:1;nextLogId=DB.logs.length?Math.max(...DB.logs.map(l=>l.id))+1:1;nextPayId=DB.payments.length?Math.max(...DB.payments.map(p=>p.id))+1:1;nextUserId=DB.users.length?Math.max(...DB.users.map(u=>u.id))+1:1;nextNotifId=DB.notifications.length?Math.max(...DB.notifications.map(n=>n.id))+1:1;nextRemovedId=DB.removed_users.length?Math.max(...DB.removed_users.map(r=>r.id))+1:1}
 function notify(msg,type='success'){const colors={success:'linear-gradient(135deg,#10b981,#34d399)',danger:'linear-gradient(135deg,#ef4444,#f87171)',warning:'linear-gradient(135deg,#f59e0b,#fbbf24)',info:'linear-gradient(135deg,#0d6efd,#4d8bff)'};const icons={success:'check-circle-fill',danger:'exclamation-triangle-fill',warning:'exclamation-circle-fill',info:'info-circle-fill'};const t=document.createElement('div');t.className='toast-notify';t.style.background=colors[type];t.innerHTML=`<i class="bi bi-${icons[type]}"></i> ${msg}`;document.body.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='.3s'},2800);setTimeout(()=>t.remove(),3200)}
-function formatDateTime(iso){if(!iso)return '-';const d=new Date(iso);return d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true})}
+function formatDateTime(iso){if(!iso)return'-';const d=new Date(iso);return d.toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:true})}
 function timeAgo(iso){if(!iso)return'';const s=Math.floor((Date.now()-new Date(iso).getTime())/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago'}
 function payBadge(type){const m={Interducer:'interducer',Supply:'supply',RMV:'rmv'};return `<span class="pay-badge ${m[type]||''}">${type}</span>`}
 function payStatusBadge(s){const i=PAYMENT_STATUS_LABELS[s]||PAYMENT_STATUS_LABELS['pending'];return `<span class="pay-status ${i.class}"><i class="bi bi-${i.icon}"></i> ${i.label}</span>`}
